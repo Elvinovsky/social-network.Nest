@@ -11,4 +11,11 @@ export class UsersRepository {
   getUser(userId: string) {
     return [{ id: 1 }, { id: 2 }].find((el) => el.id === +userId);
   }
+  updateUser(id, inputModel) {
+    return {
+      id: id,
+      name: inputModel.name,
+      childrenCount: inputModel.childrenCount,
+    };
+  }
 }

@@ -10,4 +10,7 @@ export class UsersService {
   getUser(userId: string) {
     return this.usersRepository.getUser(userId);
   }
+  updateUser(id: number, inputModel) {
+    return this.usersRepository.updateUser(id, inputModel);
+  }
 }
