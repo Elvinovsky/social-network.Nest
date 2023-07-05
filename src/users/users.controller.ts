@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
   @Get()
-  getUsers() {
-    return [{ id: 1 }, { id: 2 }];
+  getUsers(@Query('term') term: string) {
+    return [
+      { id: 1, name: 'elvin' },
+      { id: 2, name: 'dima' },
+    ].filter((el) => !term || el.name.indexOf(term) > -1);
   }
   @Get(':id')
   getUser(@Param('id') userId: number) {
