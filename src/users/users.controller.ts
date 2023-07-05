@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +28,10 @@ export class UsersController {
       name: inputModel.name,
       childrenCount: inputModel.childrenCount,
     };
+  }
+  @Delete(':id')
+  deleteUsers(@Param('id') userId: number) {
+    return;
   }
 }
 
