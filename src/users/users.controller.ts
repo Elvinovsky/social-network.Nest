@@ -17,8 +17,8 @@ export class UsersController {
     return this.usersService.getUsers(query);
   }
   @Get(':id')
-  getUser(@Param('id') userId: number) {
-    return [{ id: 1 }, { id: 2 }].find((el) => el.id === +userId);
+  getUser(@Param('id') userId: string) {
+    return this.usersService.getUser(userId.toString());
   }
   @Post()
   createUsers(@Body() inputModel: CreateUserInputType) {

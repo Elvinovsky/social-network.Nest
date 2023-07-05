@@ -7,4 +7,7 @@ export class UsersService {
   getUsers(query: { term: string }) {
     return this.usersRepository.getUsers(query);
   }
+  getUser(userId: string) {
+    return this.usersRepository.getUser(userId);
+  }
 }
