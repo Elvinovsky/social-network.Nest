@@ -7,15 +7,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
   @Get()
   getUsers(@Query() query: { term: string }) {
-    return [
-      { id: 1, name: 'elvin' },
-      { id: 2, name: 'dima' },
-    ].filter((el) => !query.term || el.name.indexOf(query.term) > -1);
+    return this.usersService.getUsers(query);
   }
   @Get(':id')
   getUser(@Param('id') userId: number) {
