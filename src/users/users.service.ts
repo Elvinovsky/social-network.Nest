@@ -13,7 +13,8 @@ export class UsersService {
     return this.usersRepository.getUser(userId);
   }
   async createUser(inputModel: CreateUserInputType) {
-    return this.usersRepository.createUser(inputModel);
+    const user = await this.usersRepository.createUser(inputModel);
+    return this.usersRepository.save(user);
   }
   async updateUser(user) {
     return this.usersRepository.updateUser(user);

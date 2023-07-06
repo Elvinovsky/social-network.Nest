@@ -13,9 +13,11 @@ export class UsersRepository {
   async getUser(userId: string): Promise<UserDocument> {
     return this.userModel.findOne({ _id: userId });
   }
+  async save(user: UserDocument) {
+    await user.save();
+  }
   async createUser(inputModel: CreateUserInputType) {
     const user = new this.userModel(inputModel);
-    await user.save();
     return user;
   }
   async updateUser(user) {
