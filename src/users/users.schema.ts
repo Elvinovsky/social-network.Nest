@@ -10,6 +10,16 @@ export class User {
 
   @Prop()
   childrenCount: number;
+
+  setChildren(newChildrenCount: number) {
+    if (newChildrenCount < 0) {
+      throw new Error('bad value');
+    }
+    this.childrenCount = newChildrenCount;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.methods = {
+  setChildren: User.prototype.setChildren,
+};

@@ -10,7 +10,7 @@ export class UsersRepository {
   async getUsers(query: { term: string }) {
     return this.userModel.find();
   }
-  async getUser(userId: string) {
+  async getUser(userId: string): Promise<UserDocument> {
     return this.userModel.findOne({ _id: userId });
   }
   async createUser(inputModel: CreateUserInputType) {
@@ -18,13 +18,13 @@ export class UsersRepository {
     await user.save();
     return user;
   }
-  async updateUser(id, inputModel: CreateUserInputType) {
+  async updateUser(user) {
     return this.userModel.updateOne(
-      { _id: id },
+      { _id: user.id },
       {
         $set: {
-          name: inputModel.name,
-          childrenCount: inputModel.childrenCount,
+          name: user.name,
+          childrenCount: user.childrenCount,
         },
       },
     );

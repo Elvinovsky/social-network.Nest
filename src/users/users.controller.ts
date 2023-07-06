@@ -34,7 +34,9 @@ export class UsersController {
     @Param('id') userId: number,
     @Body() inputModel: CreateUserInputType,
   ) {
-    return this.usersService.updateUser(userId, inputModel);
+    const user = await this.usersService.getUser(userId.toString());
+    user.setChildren(inputModel.childrenCount);
+    return this.usersService.updateUser(user);
   }
 }
 
