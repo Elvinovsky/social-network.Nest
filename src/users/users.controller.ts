@@ -42,7 +42,7 @@ export class UsersController {
   }
 }
 
-type CreateUserInputType = {
+export type CreateUserInputType = {
   name: string;
   childrenCount: number;
 };

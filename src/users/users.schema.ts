@@ -9,10 +9,7 @@ export class User {
   name: string;
 
   @Prop()
-  age: number;
-
-  @Prop()
-  breed: string;
+  childrenCount: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
