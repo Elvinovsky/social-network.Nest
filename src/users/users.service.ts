@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
+import { CreateUserInputType } from './users.controller';
 
 @Injectable()
 export class UsersService {
@@ -9,6 +10,9 @@ export class UsersService {
   }
   async getUser(userId: string) {
     return this.usersRepository.getUser(userId);
+  }
+  async createUser(inputModel: CreateUserInputType) {
+    return this.usersRepository.createUser(inputModel);
   }
   async updateUser(id: number, inputModel) {
     return this.usersRepository.updateUser(id, inputModel);

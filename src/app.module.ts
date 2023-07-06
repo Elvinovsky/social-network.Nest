@@ -10,10 +10,7 @@ import { User, UserSchema } from './users/users.schema';
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://0.0.0.0:27017/home_work'),
-    MongooseModule.forFeature(
-      [{ name: User.name, schema: UserSchema }],
-      'users',
-    ),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService, UsersRepository],

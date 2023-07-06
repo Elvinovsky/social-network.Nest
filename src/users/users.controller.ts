@@ -14,27 +14,23 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get()
-  getUsers(@Query() query: { term: string }) {
+  async getUsers(@Query() query: { term: string }) {
     return this.usersService.getUsers(query);
   }
   @Get(':id')
-  getUser(@Param('id') userId: string) {
+  async getUser(@Param('id') userId: string) {
     return this.usersService.getUser(userId.toString());
   }
   @Post()
-  createUsers(@Body() inputModel: CreateUserInputType) {
-    return {
-      id: new Date().toString(),
-      name: inputModel.name,
-      childrenCount: inputModel.childrenCount,
-    };
+  async createUsers(@Body() inputModel: CreateUserInputType) {
+    return this.usersService.createUser(inputModel);
   }
   @Delete(':id')
   deleteUsers(@Param('id') userId: number) {
     return;
   }
   @Put(':id')
-  updateUser(
+  async updateUser(
     @Param('id') userId: number,
     @Body() inputModel: CreateUserInputType,
   ) {
