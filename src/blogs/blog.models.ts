@@ -33,7 +33,7 @@ export type BlogCreateDTO = {
   isMembership: boolean;
 };
 
-export type BlogViewModel = {
+export type BlogViewDTO = {
   id: string;
   name: string;
   description: string;
