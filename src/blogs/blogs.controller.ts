@@ -5,19 +5,21 @@ import {
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
 
-class PostsService {}
-
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly blogsQueryRepo: BlogsQueryRepo,
-    // protected blogsService: BlogsService,
-    private readonly postsService: PostsService,
+    private readonly blogsQueryRepo: BlogsQueryRepo, // protected blogsService: BlogsService, // private readonly postsService: PostsService,
   ) {}
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(@Query() query: QueryInputModel & SearchNameTerm) {
-    return await this.blogsQueryRepo.getAllBlogs(query);
+    return await this.blogsQueryRepo.getAllBlogs(
+      query.searchNameTerm,
+      Number(query.pageNumber),
+      Number(query.pageSize),
+      query.sortBy,
+      query.sortDirection, // todo переделать в дто
+    );
   }
   // @Get(':id')
   // @HttpCode(HttpStatus.OK)
