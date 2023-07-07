@@ -1,0 +1,28 @@
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGE_SortBy,
+  SortDirection,
+} from '../common/constant';
+
+export const getPageNumber = (pageNumber?: number): number => {
+  return pageNumber ? +pageNumber : DEFAULT_PAGE_NUMBER;
+};
+export const getPageSize = (pageSize?: number): number => {
+  return pageSize ? +pageSize : DEFAULT_PAGE_SIZE;
+};
+export const getSortBy = (sortBy?: string): string => {
+  return sortBy ? sortBy : DEFAULT_PAGE_SortBy;
+};
+export const getDirection = (sortDirection?: string) => {
+  return sortDirection === 'asc' ? SortDirection.Asc : SortDirection.Desc;
+};
+export const getSkip = (pageNumber = 1, pageSize = 10): number => {
+  return (+pageNumber - 1) * +pageSize;
+};
+export const pagesCountOfBlogs = (
+  calculateOfFiles: number,
+  pageSize?: number,
+): number => {
+  return Math.ceil(calculateOfFiles / getPageSize(pageSize));
+};
