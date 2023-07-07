@@ -44,7 +44,7 @@ export class BlogView {
   createdAt: string;
   @Prop({ required: true })
   isMembership: boolean;
-  static map(inputModel: BlogDocument) {
+  static map(inputModel: BlogDocument): BlogViewDTO {
     const blog: BlogViewDTO = new BlogView();
     blog.id = inputModel._id.toString();
     blog.name = inputModel.name;
