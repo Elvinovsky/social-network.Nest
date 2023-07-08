@@ -1,7 +1,7 @@
 import { PaginatorType } from '../pagination/pagination.models';
 import { BlogViewDTO } from './blog.models';
 import * as mongoose from 'mongoose';
-import { Blog, BlogDocument, BlogModel } from './blog.schemas';
+import { Blog, BlogDocument, BlogModel, BlogView } from './blog.schemas';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -14,9 +14,21 @@ import {
 } from '../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../common/constant';
 import { blogsMapping } from './blog.helpers';
+import { objectId } from '../common/helpers';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
+  async getBlogById(id: string): Promise<BlogViewDTO | null> {
+    try {
+      const blogDB = await this.blogModel.findById(objectId(id));
+      if (!blogDB) {
+        return null;
+      }
+      return BlogView.map(blogDB);
+    } catch (e) {
+      console.log(e, 'error findBlogById method');
+    }
+  }
   async getSortedBlogs(
     searchNameTerm?: string,
     pageNumber?: number,
