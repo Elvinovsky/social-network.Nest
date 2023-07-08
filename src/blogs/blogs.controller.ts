@@ -14,6 +14,7 @@ import {
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogViewDTO } from './blog.models';
+import { PostViewDTO } from '../posts/post.models';
 
 @Controller('blogs')
 export class BlogsController {
@@ -36,7 +37,7 @@ export class BlogsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getBlog(@Param('id') blogId: string) {
+  async getBlog(@Param('id') blogId: string): Promise<BlogViewDTO> {
     const blog = await this.blogsQueryRepo.getBlogById(blogId);
 
     if (!blog) {
@@ -45,23 +46,23 @@ export class BlogsController {
 
     return blog;
   }
-  // async getPostsByBlog(
-  //   req: RequestParamsAndInputQuery<{ blogId: string }, QueryInputModel>,
-  //   res: ResponseViewBody<PaginatorType<PostView[]>>,
-  // ) {
-  //   const getByBlogIdPosts = await this.blogsQueryRepo.searchPostByBlogId(
-  //     req.params.blogId,
-  //     Number(req.query.pageNumber),
-  //     Number(req.query.pageSize),
-  //     req.query.sortBy,
-  //     req.query.sortDirection,
-  //     req.user?.id,
-  //   );
-  //
-  //   if (!getByBlogIdPosts) {
-  //     res.sendStatus(404);
-  //     return;
-  //   }
-  //   res.send(getByBlogIdPosts);
-  // }
+  @Get('/:blogId/posts')
+  async getPostsByBlog(
+    @Param('blogId') blogId: string,
+    @Query() query: QueryInputModel,
+  ): Promise<PaginatorType<PostViewDTO[]>> {
+    const getByBlogIdPosts = await this.blogsQueryRepo.getPostByBlog(
+      blogId,
+      Number(query.pageNumber),
+      Number(query.pageSize),
+      query.sortBy,
+      query.sortDirection,
+      // user?.id,
+    );
+
+    if (!getByBlogIdPosts) {
+      throw new NotFoundException();
+    }
+    return getByBlogIdPosts;
+  }
 }
