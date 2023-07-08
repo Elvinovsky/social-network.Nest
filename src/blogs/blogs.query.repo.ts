@@ -17,7 +17,7 @@ import { blogsMapping } from './blog.helpers';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
-  async getAllBlogs(
+  async getSortedBlogs(
     searchNameTerm?: string,
     pageNumber?: number,
     pageSize?: number,
@@ -37,7 +37,8 @@ export class BlogsQueryRepo {
       })
       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
       .limit(getPageSize(pageSize))
-      .lean();
+      .lean()
+      .exec();
 
     return {
       pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),

@@ -13,12 +13,12 @@ export class BlogsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(@Query() query: QueryInputModel & SearchNameTerm) {
-    return await this.blogsQueryRepo.getAllBlogs(
+    return await this.blogsQueryRepo.getSortedBlogs(
       query.searchNameTerm,
       Number(query.pageNumber),
       Number(query.pageSize),
       query.sortBy,
-      query.sortDirection, // todo переделать в дто
+      query.sortDirection,
     );
   }
   // @Get(':id')
