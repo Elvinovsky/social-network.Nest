@@ -7,10 +7,10 @@ import { CreateUserInputType } from './users.controller';
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async getUsers(query: { term: string }) {
+  async getUsers() {
     return this.userModel.find();
   }
-  async getUser(userId: string): Promise<UserDocument> {
+  async getUser(userId: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ _id: userId });
   }
   async save(user: UserDocument) {
