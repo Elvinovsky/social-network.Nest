@@ -51,7 +51,7 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
   ): Promise<PaginatorType<PostViewDTO[]>> {
-    const getByBlogIdPosts = await this.blogsQueryRepo.getPostByBlog(
+    const getByBlogIdPosts = await this.blogsQueryRepo.getPostsByBlogID(
       blogId,
       Number(query.pageNumber),
       Number(query.pageSize),
