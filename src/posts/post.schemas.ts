@@ -37,9 +37,11 @@ export class Post {
 
 export const PostSchema = SchemaFactory.createForClass(Post);
 
-export type LikeDBInfoDocument = HydratedDocument<LikeDBInfo>;
+export type LikeDocument = HydratedDocument<Like>;
+
+export type LikeModel = Model<LikeDocument>;
 @Schema()
-export class LikeDBInfo {
+export class Like {
   @Prop({ required: true })
   status: string;
   @Prop({ required: true })
@@ -51,3 +53,5 @@ export class LikeDBInfo {
   @Prop({ required: true })
   createdAt: Date;
 }
+
+export const LikeSchema = SchemaFactory.createForClass(Like);

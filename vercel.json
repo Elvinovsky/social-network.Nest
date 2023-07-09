@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "blogs_api_nest",
+  "name": "blogs-api-nest",
   "builds": [
     {
       "src": "src/main.ts",
