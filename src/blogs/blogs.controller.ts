@@ -43,15 +43,18 @@ export class BlogsController {
     if (!blog) {
       throw new NotFoundException();
     }
+    //todo if (!blog) {
+    //   throw new Ex();
+    // }
 
     return blog;
   }
-  @Get('/:blogId/posts')
+  @Get(':blogId/posts')
   async getPostsByBlog(
     @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
   ): Promise<PaginatorType<PostViewDTO[]>> {
-    const getByBlogIdPosts = await this.blogsQueryRepo.getPostsByBlogID(
+    const getPostsByBlogId = await this.blogsQueryRepo.getPostsByBlogID(
       blogId,
       Number(query.pageNumber),
       Number(query.pageSize),
@@ -60,9 +63,9 @@ export class BlogsController {
       // user?.id,
     );
 
-    if (!getByBlogIdPosts) {
+    if (!getPostsByBlogId) {
       throw new NotFoundException();
     }
-    return getByBlogIdPosts;
+    return getPostsByBlogId;
   }
 }
