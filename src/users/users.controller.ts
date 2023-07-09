@@ -5,8 +5,8 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get()
-  async getUsers(@Query() query: { term: string }) {
-    return this.usersService.getUsers(query);
+  async getUsers() {
+    return this.usersService.getUsers();
   }
   @Get(':id')
   async getUser(@Param('id') userId: string) {
