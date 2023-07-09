@@ -1,3 +1,5 @@
+import { ConfigModule } from '@nestjs/config';
+export const configModule = ConfigModule.forRoot();
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,7 +14,8 @@ import { Blog, BlogSchema } from './blogs/blog.schemas';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://0.0.0.0:27017/home_work'),
+    configModule,
+    MongooseModule.forRoot(process.env.MONGO_URL),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
   ],
