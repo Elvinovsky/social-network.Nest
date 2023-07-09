@@ -6,10 +6,10 @@ import { UserDocument } from './users.schema';
 @Injectable()
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
-  async getUsers(query: { term: string }) {
-    return this.usersRepository.getUsers(query);
+  async getUsers() {
+    return this.usersRepository.getUsers();
   }
-  async getUser(userId: string): Promise<UserDocument> {
+  async getUser(userId: string): Promise<UserDocument | null> {
     return this.usersRepository.getUser(userId);
   }
   async createUser(inputModel: CreateUserInputType) {
