@@ -13,10 +13,10 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "esModuleInterop": true
+    "noFallthroughCasesInSwitch": false
   }
 }
