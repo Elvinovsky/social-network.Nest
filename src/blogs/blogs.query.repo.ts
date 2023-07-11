@@ -14,7 +14,7 @@ import {
 } from '../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../common/constant';
 import { blogMapping, blogsMapping } from './blog.helpers';
-import { objectId } from '../common/helpers';
+import { objectIdHelper } from '../common/helpers';
 import { PostViewDTO } from '../posts/post.models';
 import { Post, PostDocument, PostModel } from '../posts/post.schemas';
 import { PostsMapping } from '../posts/post.helpers';
@@ -28,7 +28,7 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null | void> {
     try {
-      const blogDB = await this.blogModel.findById(objectId(id));
+      const blogDB = await this.blogModel.findById(objectIdHelper(id));
       if (!blogDB) {
         return null;
       }
