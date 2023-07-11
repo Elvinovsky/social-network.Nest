@@ -18,7 +18,7 @@ export class Blog {
   addedAt: string;
   @Prop({ required: true, default: false })
   isMembership: boolean;
-  static create(inputModel: BlogInputModel): BlogCreateDTO {
+  static buildModel(inputModel: BlogInputModel): BlogCreateDTO {
     const blog: Blog = new Blog();
     blog.name = inputModel.name;
     blog.description = inputModel.description;
