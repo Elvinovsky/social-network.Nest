@@ -16,6 +16,8 @@ import { LikesInfoRepository } from './likes/likes.repository';
 import { PostsMapping } from './posts/post.helpers';
 import { LikeAndDisQuantity } from './likes/like.helpers';
 import { Like, LikeSchema, Post, PostSchema } from './posts/post.schemas';
+import { BlogsService } from './blogs/blogs.service';
+import { BlogsRepository } from './blogs/blogs.repository';
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
   throw new Error('not db connect');
@@ -34,7 +36,11 @@ if (!Mongo_Uri) {
     AppService,
     UsersService,
     UsersRepository,
+
     BlogsQueryRepo,
+    BlogsRepository,
+    BlogsService,
+
     LikesQueryRepo,
     LikesInfoRepository,
     PostsMapping,
