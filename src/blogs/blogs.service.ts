@@ -1,38 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { BlogViewDTO } from './blog.models';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModel } from './blog.schemas';
+import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
+import { Blog } from './blog.schemas';
+import { BlogsRepository } from './blogs.repository';
 
 //output  view model
-// @Injectable()
-// export class BlogsService {
-//   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
-//   async createBlog(
-//     name: string,
-//     description: string,
-//     websiteUrl: string,
-//   ): Promise<BlogViewDTO> {
-//     const createdBlog: Blog = {
-//       name: name,
-//       description: description,
-//       websiteUrl: websiteUrl,
-//       addedAt: new Date().toString(),
-//       isMembership: false,
-//     };
-//
-//     return await blogsRepository.addNewBlog(createdBlog);
-//   }
-//
-//   async updateBlogById(
-//     id: string,
-//     name: string,
-//     description: string,
-//     websiteUrl: string,
-//   ): Promise<boolean> {
-//     return blogsRepository.updateBlogById(id, name, description, websiteUrl);
-//   }
-//
-//   async BlogByIdDelete(id: string): Promise<boolean> {
-//     return blogsRepository.searchBlogByIdDelete(id);
-//   }
-// }
+@Injectable()
+export class BlogsService {
+  constructor(private readonly blogsRepository: BlogsRepository) {}
+  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
+    const newBlog: BlogCreateDTO = Blog.buildModel(inputModel);
+
+    return await this.blogsRepository.addNewBlog(newBlog);
+  }
+
+  async updateBlog(
+    id: string,
+    name: string,
+    description: string,
+    websiteUrl: string,
+  ): Promise<boolean> {
+    return this.blogsRepository.updateBlogById(
+      id,
+      name,
+      description,
+      websiteUrl,
+    );
+  }
+
+  async deleteBlog(id: string): Promise<boolean> {
+    return this.blogsRepository.deleteBlogById(id);
+  }
+}
