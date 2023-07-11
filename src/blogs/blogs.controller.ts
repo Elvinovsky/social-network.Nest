@@ -1,10 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
@@ -13,13 +15,15 @@ import {
   SearchNameTerm,
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
-import { BlogViewDTO } from './blog.models';
+import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { PostViewDTO } from '../posts/post.models';
+import { BlogsService } from './blogs.service';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly blogsQueryRepo: BlogsQueryRepo, // protected blogsService: BlogsService, // private readonly postsService: PostsService,
+    private readonly blogsQueryRepo: BlogsQueryRepo,
+    protected blogsService: BlogsService, // private readonly postsService: PostsService,
   ) {}
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -67,5 +71,12 @@ export class BlogsController {
       throw new NotFoundException();
     }
     return getPostsByBlogId;
+  }
+  @Post('blogs')
+  @HttpCode(HttpStatus.CREATED)
+  async createBlog(@Body() inputModel: BlogInputModel): Promise<BlogViewDTO> {
+    const newBlog: BlogViewDTO = await this.blogsService.createBlog(inputModel);
+
+    return newBlog;
   }
 }
