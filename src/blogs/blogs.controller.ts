@@ -3,10 +3,12 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -25,6 +27,7 @@ export class BlogsController {
     private readonly blogsQueryRepo: BlogsQueryRepo,
     protected blogsService: BlogsService, // private readonly postsService: PostsService,
   ) {}
+
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(
@@ -53,6 +56,7 @@ export class BlogsController {
 
     return blog;
   }
+
   @Get(':blogId/posts')
   async getPostsByBlog(
     @Param('blogId') blogId: string,
@@ -72,11 +76,31 @@ export class BlogsController {
     }
     return getPostsByBlogId;
   }
-  @Post('blogs')
+
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel): Promise<BlogViewDTO> {
     const newBlog: BlogViewDTO = await this.blogsService.createBlog(inputModel);
 
     return newBlog;
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(
+    @Param('id') blogId: string,
+    @Body() inputModel: BlogInputModel,
+  ) {
+    const blog: boolean | null = await this.blogsService.updateBlog(
+      blogId,
+      inputModel,
+    );
+
+    if (blog === null) {
+      throw new NotFoundException();
+    }
+    if (!blog) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
   }
 }
