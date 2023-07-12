@@ -20,6 +20,8 @@ import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { DeleteDBController } from './CLEAR.DB.TESTS/delete.db.controller';
 import { DeleteDbRepository } from './CLEAR.DB.TESTS/delete.db.repository';
+import { PostsService } from './posts/posts.service';
+import { PostsRepository } from './posts/posts.repository';
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
   throw new Error('not db connect');
@@ -49,6 +51,9 @@ if (!Mongo_Uri) {
     BlogsQueryRepo,
     BlogsRepository,
     BlogsService,
+
+    PostsService,
+    PostsRepository,
 
     LikesQueryRepo,
     LikesInfoRepository,
