@@ -34,7 +34,7 @@ export class BlogsQueryRepo {
       }
       return blogMapping(blogDB);
     } catch (e) {
-      return console.log(e, 'error findBlogById method');
+      console.log(e, 'error findBlogById method');
     }
   }
 
