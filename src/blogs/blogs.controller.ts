@@ -92,15 +92,15 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const blog: boolean | null = await this.blogsService.updateBlog(
+    const result: boolean | null = await this.blogsService.updateBlog(
       blogId,
       inputModel,
     );
 
-    if (blog === null) {
+    if (result === null) {
       throw new NotFoundException();
     }
-    if (!blog) {
+    if (!result) {
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
@@ -108,8 +108,12 @@ export class BlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
     const result = await this.blogsService.deleteBlog(blogId);
-    if (!result) {
+
+    if (result === null) {
       throw new NotFoundException();
+    }
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
