@@ -19,6 +19,7 @@ import { Like, LikeSchema, Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { DeleteDBController } from './CLEAR.DB.TESTS/delete.db.controller';
+import { DeleteDbRepository } from './CLEAR.DB.TESTS/delete.db.repository';
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
   throw new Error('not db connect');
@@ -32,10 +33,14 @@ if (!Mongo_Uri) {
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
   ],
-  controllers: [AppController, UsersController, BlogsController],
+  controllers: [
+    AppController,
+    DeleteDBController,
+    UsersController,
+    BlogsController,
+  ],
   providers: [
-    DeleteDBController,
-    DeleteDBController,
+    DeleteDbRepository,
 
     AppService,
     UsersService,
