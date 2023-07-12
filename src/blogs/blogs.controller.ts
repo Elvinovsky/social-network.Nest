@@ -19,14 +19,16 @@ import {
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogInputModel, BlogViewDTO } from './blog.models';
-import { PostViewDTO } from '../posts/post.models';
+import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
+import { PostsService } from '../posts/posts.service';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private readonly blogsQueryRepo: BlogsQueryRepo,
-    protected blogsService: BlogsService, // private readonly postsService: PostsService,
+    protected blogsService: BlogsService,
+    private readonly postsService: PostsService,
   ) {}
 
   @Get()
@@ -84,6 +86,27 @@ export class BlogsController {
     const newBlog: BlogViewDTO = await this.blogsService.createBlog(inputModel);
 
     return newBlog;
+  }
+
+  @Post(':blogId/posts')
+  @HttpCode(HttpStatus.CREATED)
+  async createPostByBlog(
+    @Param('blogId') blogId: string,
+    @Body() inputModel: BlogPostInputModel,
+  ) {
+    const foundBlog = await this.postsService.createPostByBLog(
+      blogId,
+      inputModel,
+    );
+
+    if (foundBlog === null) {
+      throw new NotFoundException();
+    }
+    if (!foundBlog) {
+      throw new HttpException('post not create', HttpStatus.EXPECTATION_FAILED);
+    }
+
+    return foundBlog;
   }
 
   @Put(':id')
