@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -101,6 +102,14 @@ export class BlogsController {
     }
     if (!blog) {
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+  }
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(@Param('id') blogId: string) {
+    const result = await this.blogsService.deleteBlog(blogId);
+    if (!result) {
+      throw new NotFoundException();
     }
   }
 }
