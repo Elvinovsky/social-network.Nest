@@ -1,4 +1,4 @@
-import { BlogCreateDTO, BlogViewDTO } from './blog.models';
+import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModel } from './blog.schemas';
@@ -24,6 +24,27 @@ export class BlogsRepository {
     const newBlog = await new this.blogModel(inputModel);
     await newBlog.save();
     return blogMapping(newBlog);
+  }
+  async updateBlogById(
+    id: string,
+    inputModel: BlogInputModel,
+  ): Promise<boolean> {
+    try {
+      const result = await this.blogModel.updateOne(
+        { _id: objectIdHelper(id) },
+        {
+          $set: {
+            name: inputModel.name,
+            description: inputModel.description,
+            websiteUrl: inputModel.websiteUrl,
+          },
+        },
+      );
+      return result.matchedCount === 1;
+    } catch (e) {
+      console.log(e, 'error updateBlogById by blogsREpository');
+      return false;
+    }
   }
 
   //поиск блога по ID для удаления.
