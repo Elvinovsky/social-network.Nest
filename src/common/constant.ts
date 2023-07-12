@@ -1,6 +1,6 @@
 export enum SortDirection {
-  Asc = 1,
-  Desc = -1,
+  Asc = 'Asc',
+  Desc = 'Desc',
 }
 
 export const DEFAULT_PAGE_SortBy = 'createdAt';
