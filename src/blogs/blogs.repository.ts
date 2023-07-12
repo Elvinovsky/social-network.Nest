@@ -48,10 +48,14 @@ export class BlogsRepository {
   }
 
   //поиск блога по ID для удаления.
-  async deleteBlogById(id: string): Promise<boolean> {
-    const deleteResult = await this.blogModel.deleteOne({
-      _id: objectIdHelper(id),
-    });
-    return deleteResult.deletedCount === 1;
+  async deleteBlogById(id: string): Promise<boolean | void> {
+    try {
+      const deleteResult = await this.blogModel.deleteOne({
+        _id: objectIdHelper(id),
+      });
+      return deleteResult.deletedCount === 1;
+    } catch (e) {
+      return console.log(e, 'error deleteBlogById');
+    }
   }
 }
