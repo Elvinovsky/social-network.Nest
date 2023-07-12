@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { PostModel } from './post.schemas';
+import { PostsRepository } from './posts.repository';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel('posts') private readonly postModel: PostModel) {}
+  constructor(private readonly postsRepository: PostsRepository) {}
 }
