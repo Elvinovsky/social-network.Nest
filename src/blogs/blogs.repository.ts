@@ -9,36 +9,24 @@ import { objectIdHelper } from '../common/helpers';
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
   //поиск блога по ID.
-  async findBlogById(id: string): Promise<BlogViewDTO | null> {
-    const blog = await this.blogModel.findById({ _id: objectIdHelper(id) });
-    if (!blog) {
-      return null;
+  async findBlogById(id: string): Promise<BlogViewDTO | null | void> {
+    try {
+      const blog = await this.blogModel.findById(objectIdHelper(id));
+      if (!blog) {
+        return null;
+      }
+      return blogMapping(blog);
+    } catch (e) {
+      return console.log(e, 'error findBlogById method by BlogsRepository');
     }
-    return blogMapping(blog);
   }
   async addNewBlog(inputModel: BlogCreateDTO): Promise<BlogViewDTO> {
     const newBlog = await new this.blogModel(inputModel);
     await newBlog.save();
     return blogMapping(newBlog);
   }
-  async updateBlogById(
-    id: string,
-    name: string,
-    description: string,
-    websiteUrl: string,
-  ): Promise<boolean> {
-    const result = await this.blogModel.updateOne(
-      { _id: objectIdHelper(id) },
-      {
-        $set: {
-          name,
-          description,
-          websiteUrl,
-        },
-      },
-    );
-    return result.matchedCount === 1;
-  } //поиск блога по ID для удаления.
+
+  //поиск блога по ID для удаления.
   async deleteBlogById(id: string): Promise<boolean> {
     const deleteResult = await this.blogModel.deleteOne({
       _id: objectIdHelper(id),
