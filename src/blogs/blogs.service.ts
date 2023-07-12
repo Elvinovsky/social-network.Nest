@@ -15,16 +15,14 @@ export class BlogsService {
 
   async updateBlog(
     id: string,
-    name: string,
-    description: string,
-    websiteUrl: string,
-  ): Promise<boolean> {
-    return this.blogsRepository.updateBlogById(
-      id,
-      name,
-      description,
-      websiteUrl,
-    );
+    inputModel: BlogInputModel,
+  ): Promise<boolean | null> {
+    const blog = await this.blogsRepository.findBlogById(id);
+    if (blog) {
+      return this.blogsRepository.updateBlogById(id, inputModel);
+    }
+
+    return null;
   }
 
   async deleteBlog(id: string): Promise<boolean> {
