@@ -1,4 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsQueryRepo } from './posts.query.repo';
 import {
@@ -22,5 +28,12 @@ export class PostsController {
       query.sortDirection,
       //user?.id
     );
+  }
+  @Get(':id')
+  async getPost(@Param('postId') postId: string) {
+    const post = await this.postsQueryRepo.getPostById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
   }
 }
