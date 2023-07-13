@@ -28,7 +28,9 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null | void> {
     try {
-      const blogDB = await this.blogModel.findById(objectIdHelper(id));
+      const blogDB: BlogDocument | null = await this.blogModel
+        .findById(objectIdHelper(id))
+        .exec();
       if (!blogDB) {
         return null;
       }
@@ -93,7 +95,8 @@ export class BlogsQueryRepo {
       })
       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
       .limit(getPageSize(pageSize))
-      .lean();
+      .lean()
+      .exec();
 
     return {
       pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
