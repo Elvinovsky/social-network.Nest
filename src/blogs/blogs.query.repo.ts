@@ -17,13 +17,13 @@ import { blogMapping, blogsMapping } from './blog.helpers';
 import { objectIdHelper } from '../common/helpers';
 import { PostViewDTO } from '../posts/post.models';
 import { Post, PostDocument, PostModel } from '../posts/post.schemas';
-import { PostsMapping } from '../posts/post.helpers';
+import { PostMapper } from '../posts/post.helpers';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(
     @InjectModel(Blog.name) private readonly blogModel: BlogModel,
     @InjectModel(Post.name) private readonly postModel: PostModel,
-    private readonly postsMapping: PostsMapping,
+    private readonly postMapper: PostMapper,
   ) {}
 
   async getBlogById(id: string): Promise<BlogViewDTO | null | void> {
@@ -100,7 +100,7 @@ export class BlogsQueryRepo {
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
-      items: await this.postsMapping.posts(Posts, userId),
+      items: await this.postMapper.posts(Posts, userId),
     };
   }
 }
