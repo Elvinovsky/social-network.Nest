@@ -13,13 +13,13 @@ import {
   pagesCountOfBlogs,
 } from '../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../common/constant';
-import { PostsMapping } from './post.helpers';
+import { PostMapper } from './post.helpers';
 
 @Injectable()
 export class PostsQueryRepo {
   constructor(
     @InjectModel(Post.name) private postModel: PostModel,
-    private postsMapping: PostsMapping,
+    private postsMapping: PostMapper,
   ) {}
 
   async getSortedPosts(
