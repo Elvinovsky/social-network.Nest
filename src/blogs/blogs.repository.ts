@@ -20,10 +20,11 @@ export class BlogsRepository {
       return console.log(e, 'error findBlogById method by BlogsRepository');
     }
   }
-  async addNewBlog(inputModel: BlogCreateDTO): Promise<BlogViewDTO> {
-    const newBlog = await new this.blogModel(inputModel);
-    await newBlog.save();
-    return blogMapping(newBlog);
+  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
+    const createBlog = Blog.createBlog(inputModel);
+    const blogDoc = await new this.blogModel(createBlog);
+    await blogDoc.save();
+    return blogMapping(blogDoc);
   }
   async updateBlogById(
     id: string,
