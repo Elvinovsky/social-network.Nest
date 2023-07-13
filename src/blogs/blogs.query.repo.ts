@@ -30,6 +30,7 @@ export class BlogsQueryRepo {
     try {
       const blogDB: BlogDocument | null = await this.blogModel
         .findById(objectIdHelper(id))
+        .lean()
         .exec();
       if (!blogDB) {
         return null;
