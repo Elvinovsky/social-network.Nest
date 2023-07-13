@@ -13,7 +13,7 @@ import { BlogsQueryRepo } from './blogs/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesQueryRepo } from './likes/likes.query.repo';
 import { LikesInfoRepository } from './likes/likes.repository';
-import { PostsMapping } from './posts/post.helpers';
+import { PostMapper } from './posts/post.helpers';
 import { LikeAndDisQuantity } from './likes/like.helpers';
 import { Like, LikeSchema, Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/blogs.service';
@@ -61,7 +61,7 @@ if (!Mongo_Uri) {
 
     LikesQueryRepo,
     LikesInfoRepository,
-    PostsMapping,
+    PostMapper,
     LikeAndDisQuantity,
   ],
 })
