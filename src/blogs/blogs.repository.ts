@@ -5,6 +5,7 @@ import { Blog, BlogModel } from './blog.schemas';
 import { blogMapping } from './blog.helpers';
 import { objectIdHelper } from '../common/helpers';
 
+// принимает 'BlogInputModel' трансформирует его для заданного хранения схемы 'BlogCreateDTO', вся логика изменения данных для входа и выхода производится в репозитории
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
@@ -21,7 +22,7 @@ export class BlogsRepository {
     }
   }
   async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const createBlog = Blog.createBlog(inputModel);
+    const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
     const blogDoc = await new this.blogModel(createBlog);
     await blogDoc.save();
     return blogMapping(blogDoc);
