@@ -45,7 +45,7 @@ export class BlogsController {
     );
   }
 
-  @Get(':id')
+  @Get(':blogId')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('blogId') blogId: string): Promise<BlogViewDTO> {
     const blog = await this.blogsQueryRepo.getBlogById(blogId);
@@ -84,7 +84,6 @@ export class BlogsController {
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel): Promise<BlogViewDTO> {
     const newBlog: BlogViewDTO = await this.blogsService.createBlog(inputModel);
-
     return newBlog;
   }
 

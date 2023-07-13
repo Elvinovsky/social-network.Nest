@@ -24,6 +24,7 @@ import { PostsService } from './posts/posts.service';
 import { PostsRepository } from './posts/posts.repository';
 import { PostsQueryRepo } from './posts/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
+
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
   throw new Error('not db connect');
