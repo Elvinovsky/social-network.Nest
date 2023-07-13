@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
-import { Blog } from './blog.schemas';
+import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { BlogsRepository } from './blogs.repository';
 
-//output  view model
+//input: BlogViewDTO, output: BlogViewDTO
+// производится проверка заданной бизнес логики, никаких трансформаций с сущностми только передача запросов между сервисами и валидация бизнес задач
 @Injectable()
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
   async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const newBlog: BlogCreateDTO = Blog.createBlog(inputModel);
-
-    return await this.blogsRepository.addNewBlog(newBlog);
+    return await this.blogsRepository.addNewBlog(inputModel);
   }
 
   async updateBlog(
