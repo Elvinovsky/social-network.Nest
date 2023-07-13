@@ -29,7 +29,7 @@ export class PostsController {
       //user?.id
     );
   }
-  @Get(':id')
+  @Get(':postId')
   async getPost(@Param('postId') postId: string) {
     const post = await this.postsQueryRepo.getPostById(postId);
     if (!post) {
