@@ -47,7 +47,7 @@ export class BlogsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getBlog(@Param('id') blogId: string): Promise<BlogViewDTO> {
+  async getBlog(@Param('blogId') blogId: string): Promise<BlogViewDTO> {
     const blog = await this.blogsQueryRepo.getBlogById(blogId);
 
     if (!blog) {
