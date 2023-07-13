@@ -8,7 +8,7 @@ import { BlogsRepository } from './blogs.repository';
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
   async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const newBlog: BlogCreateDTO = Blog.buildModel(inputModel);
+    const newBlog: BlogCreateDTO = Blog.createBlog(inputModel);
 
     return await this.blogsRepository.addNewBlog(newBlog);
   }
