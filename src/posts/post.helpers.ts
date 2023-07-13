@@ -6,10 +6,10 @@ import { LikeAndDisQuantity } from '../likes/like.helpers';
 import { LikesQueryRepo } from '../likes/likes.query.repo';
 
 @Injectable()
-export class PostsMapping {
+export class PostMapper {
   constructor(
     @InjectModel(Like.name) private likeModel: LikeModel,
-    private readonly likeAndDisQuantity: LikeAndDisQuantity,
+    private readonly likesCountService: LikeAndDisQuantity,
     private readonly likesQueryRepo: LikesQueryRepo,
   ) {}
   async posts(
@@ -23,7 +23,7 @@ export class PostsMapping {
           userId,
         );
 
-        const countsLikeAndDis = await this.likeAndDisQuantity.count(
+        const countsLikeAndDis = await this.likesCountService.count(
           el._id.toString(),
         );
 
@@ -54,7 +54,7 @@ export class PostsMapping {
       userId,
     );
 
-    const countsLikeAndDis = await this.likeAndDisQuantity.count(
+    const countsLikeAndDis = await this.likesCountService.count(
       post._id.toString(),
     );
 
