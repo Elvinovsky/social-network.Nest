@@ -14,12 +14,13 @@ import {
 } from '../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../common/constant';
 import { PostMapper } from './post.helpers';
+import { objectIdHelper } from '../common/helpers';
 
 @Injectable()
 export class PostsQueryRepo {
   constructor(
     @InjectModel(Post.name) private postModel: PostModel,
-    private postsMapping: PostMapper,
+    private postMapper: PostMapper,
   ) {}
 
   async getSortedPosts(
@@ -49,7 +50,21 @@ export class PostsQueryRepo {
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
-      items: await this.postsMapping.posts(foundPosts, userId),
+      items: await this.postMapper.posts(foundPosts, userId),
     };
+  }
+
+  async getPostById(postId: string): Promise<PostViewDTO | null | void> {
+    try {
+      const post: PostDocument | null = await this.postModel
+        .findById(objectIdHelper(postId))
+        .exec();
+      if (!post) {
+        return null;
+      }
+      return this.postMapper.post(post);
+    } catch (e) {
+      console.log(e, 'error getPostById method');
+    }
   }
 }
