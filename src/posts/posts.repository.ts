@@ -71,9 +71,9 @@ export class PostsRepository {
         { _id: objectIdHelper(postId) },
         {
           $set: {
-            name: inputModel.title,
-            description: inputModel.shortDescription,
-            websiteUrl: inputModel.content,
+            title: inputModel.title,
+            shortDescription: inputModel.shortDescription,
+            content: inputModel.content,
           },
         },
       );
