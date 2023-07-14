@@ -14,9 +14,10 @@ export class PostsService {
   async createPostByBLog(
     blogId: string,
     inputModel: BlogPostInputModel,
-  ): Promise<PostViewDTO | null | void> {
-    const foundBlog: void | BlogViewDTO | null =
-      await this.blogsQueryRepo.getBlogById(blogId);
+  ): Promise<PostViewDTO | null> {
+    const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
+      blogId,
+    );
     if (!foundBlog) {
       return null;
     }
@@ -28,11 +29,10 @@ export class PostsService {
     );
   }
 
-  async createPost(
-    inputModel: PostInputModel,
-  ): Promise<PostViewDTO | null | void> {
-    const foundBlog: void | BlogViewDTO | null =
-      await this.blogsQueryRepo.getBlogById(inputModel.blogId);
+  async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
+    const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
+      inputModel.blogId,
+    );
     if (!foundBlog) {
       return null;
     }
@@ -43,9 +43,10 @@ export class PostsService {
   async updatePost(
     postId: string,
     inputModel: PostInputModel,
-  ): Promise<boolean | null | void> {
-    const foundBlog: void | BlogViewDTO | null =
-      await this.blogsQueryRepo.getBlogById(inputModel.blogId);
+  ): Promise<boolean | null> {
+    const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
+      inputModel.blogId,
+    );
 
     if (foundBlog) {
       return this.postsRepository.updatePostById(postId, inputModel);
@@ -54,7 +55,7 @@ export class PostsService {
     return foundBlog;
   }
 
-  async deletePost(postId: string): Promise<Document | null | void> {
+  async deletePost(postId: string): Promise<Document | null> {
     return this.postsRepository.deletePost(postId);
   }
 }
