@@ -41,7 +41,7 @@ export class UsersController {
     @Body() inputModel: UserInputModel,
   ) {
     const user = await this.usersService.getUser(userId.toString());
-    if (user) user.canBeConfirmed(user.emailConfirmation.expirationDate);
+    if (user) user.canBeConfirmed(<Date>user.emailConfirmation.expirationDate);
     return this.usersService.updateUser(user);
   }
 }
