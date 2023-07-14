@@ -7,20 +7,20 @@ import { BlogsRepository } from './blogs.repository';
 @Injectable()
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
-  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
+  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO | void> {
     return await this.blogsRepository.addNewBlog(inputModel);
   }
 
   async updateBlog(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean | null> {
+  ): Promise<boolean | null | void> {
     const blog = await this.blogsRepository.findBlogById(id);
     if (blog) {
       return this.blogsRepository.updateBlogById(id, inputModel);
     }
 
-    return null;
+    return blog;
   }
 
   async deleteBlog(id: string): Promise<Document | null | void> {
