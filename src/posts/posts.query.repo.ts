@@ -50,7 +50,7 @@ export class PostsQueryRepo {
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
-      items: await this.postMapper.posts(foundPosts, userId),
+      items: await this.postMapper.mapPosts(foundPosts, userId),
     };
   }
 
@@ -63,7 +63,7 @@ export class PostsQueryRepo {
       if (!post) {
         return null;
       }
-      return this.postMapper.post(post);
+      return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error getPostById method');
     }

@@ -15,7 +15,7 @@ export class PostsRepository {
     try {
       const post: PostDocument = new this.postModel(inputDTO);
       await post.save();
-      return this.postMapper.post(post);
+      return this.postMapper.mapPost(post);
     } catch (e) {
       const foundNewPost: PostDocument | null = await this.postModel.findOne({
         addedAt: inputDTO.addedAt,

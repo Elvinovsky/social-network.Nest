@@ -12,7 +12,7 @@ export class PostMapper {
     private readonly likesCountService: LikeAndDisQuantity,
     private readonly likesQueryRepo: LikesQueryRepo,
   ) {}
-  async posts(
+  async mapPosts(
     array: Array<PostDocument>,
     userId?: string,
   ): Promise<PostViewDTO[]> {
@@ -48,7 +48,7 @@ export class PostMapper {
       }),
     );
   }
-  async post(post: PostDocument, userId?: string): Promise<PostViewDTO> {
+  async mapPost(post: PostDocument, userId?: string): Promise<PostViewDTO> {
     const status = await this.likesQueryRepo.getLikeStatusCurrentUser(
       post._id.toString(),
       userId,

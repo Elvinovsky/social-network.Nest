@@ -104,7 +104,7 @@ export class BlogsQueryRepo {
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
-      items: await this.postMapper.posts(Posts, userId),
+      items: await this.postMapper.mapPosts(Posts, userId),
     };
   }
 }
