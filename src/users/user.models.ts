@@ -26,7 +26,7 @@ export type UserMethodType = {
 };
 export class EmailConfirmationModel {
   confirmationCode: string;
-  expirationDate: Date;
+  expirationDate: Date | string;
   isConfirmed: boolean;
 }
 
