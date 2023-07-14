@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   NotFoundException,
   Param,
@@ -39,15 +38,14 @@ export class PostsController {
   }
   @Get(':postId')
   async getPost(@Param('postId') postId: string) {
-    const result: PostViewDTO | null | void =
-      await this.postsQueryRepo.getPostById(postId);
+    const result: PostViewDTO | null = await this.postsQueryRepo.getPostById(
+      postId,
+    );
 
     if (result === null) {
       throw new NotFoundException();
     }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
-    }
+
     return result;
   }
   @Post()
@@ -56,9 +54,6 @@ export class PostsController {
 
     if (result === null) {
       throw new NotFoundException();
-    }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
 
     return result;
@@ -69,30 +64,25 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    const result: boolean | null | void = await this.postsService.updatePost(
+    const result: boolean | null = await this.postsService.updatePost(
       postId,
       inputModel,
     );
 
     if (result === null) {
-      throw new NotFoundException();
+      throw new NotFoundException('blog not found');
     }
-    if (result === false) {
-      throw new NotFoundException();
+    if (!result) {
+      throw new NotFoundException('post not found');
     }
   }
   @Delete(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('postId') postId: string) {
-    const result: Document | null | void = await this.postsService.deletePost(
-      postId,
-    );
+    const result: Document | null = await this.postsService.deletePost(postId);
 
     if (result === null) {
-      throw new NotFoundException();
-    }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new NotFoundException('post not found');
     }
   }
 }
