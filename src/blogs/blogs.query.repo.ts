@@ -84,8 +84,8 @@ export class BlogsQueryRepo {
     if (!blogIdForPosts) {
       return null;
     }
-    const calculateOfFiles = await this.postModel.countDocuments({ blogId });
 
+    const calculateOfFiles = await this.postModel.countDocuments({ blogId });
     const Posts: PostDocument[] = await this.postModel
       .find({
         blogId,

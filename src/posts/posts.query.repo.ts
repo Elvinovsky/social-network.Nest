@@ -45,6 +45,7 @@ export class PostsQueryRepo {
       })
       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
       .limit(getPageSize(pageSize));
+
     return {
       pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
       page: getPageNumber(pageNumber),
