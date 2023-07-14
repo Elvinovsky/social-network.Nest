@@ -22,11 +22,15 @@ export class PostsRepository {
     blogName: string,
   ): Promise<PostViewDTO | null | void> {
     try {
-      const createPost: PostCreateDTO = Post.createPost(
-        inputDTO,
-        blogName,
-        blogId,
-      );
+      const createPost: PostCreateDTO = {
+        blogId: blogId,
+        title: inputDTO.title,
+        shortDescription: inputDTO.shortDescription,
+        content: inputDTO.content,
+        blogName: blogName,
+        addedAt: new Date().toISOString(),
+      };
+
       const post: PostDocument = new this.postModel(createPost);
       await post.save();
 
