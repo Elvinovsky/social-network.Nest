@@ -13,7 +13,7 @@ export class PostsService {
 
   async createPostByBLog(
     blogId: string,
-    inputDTO: BlogPostInputModel,
+    inputModel: BlogPostInputModel,
   ): Promise<PostViewDTO | null | void> {
     const foundBlog: void | BlogViewDTO | null =
       await this.blogsQueryRepo.getBlogById(blogId);
@@ -22,20 +22,35 @@ export class PostsService {
     }
 
     return this.postsRepository.createPostBlog(
-      inputDTO,
+      inputModel,
       blogId,
       foundBlog.name,
     );
   }
+
   async createPost(
-    inputDTO: PostInputModel,
+    inputModel: PostInputModel,
   ): Promise<PostViewDTO | null | void> {
     const foundBlog: void | BlogViewDTO | null =
-      await this.blogsQueryRepo.getBlogById(inputDTO.blogId);
+      await this.blogsQueryRepo.getBlogById(inputModel.blogId);
     if (!foundBlog) {
       return null;
     }
 
-    return this.postsRepository.createPost(inputDTO, foundBlog.name);
+    return this.postsRepository.createPost(inputModel, foundBlog.name);
+  }
+
+  async updatePost(
+    postId: string,
+    inputModel: PostInputModel,
+  ): Promise<boolean | null | void> {
+    const foundBlog: void | BlogViewDTO | null =
+      await this.blogsQueryRepo.getBlogById(inputModel.blogId);
+
+    if (foundBlog) {
+      return this.postsRepository.updatePostById(postId, inputModel);
+    }
+
+    return foundBlog;
   }
 }
