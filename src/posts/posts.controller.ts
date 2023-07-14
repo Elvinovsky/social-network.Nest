@@ -77,8 +77,8 @@ export class PostsController {
     if (result === null) {
       throw new NotFoundException();
     }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    if (result === false) {
+      throw new NotFoundException();
     }
   }
   @Delete(':postId')
