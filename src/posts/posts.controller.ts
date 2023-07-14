@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -71,6 +72,20 @@ export class PostsController {
     const result: boolean | null | void = await this.postsService.updatePost(
       postId,
       inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+  }
+  @Delete(':postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(@Param('postId') postId: string) {
+    const result: Document | null | void = await this.postsService.deletePost(
+      postId,
     );
 
     if (result === null) {
