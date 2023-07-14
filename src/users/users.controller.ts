@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserInputModel } from './user.models';
 import {
@@ -7,6 +18,7 @@ import {
   SearchLoginTerm,
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
+import { UserDocument } from './users.schema';
 
 @Controller('users')
 export class UsersController {
@@ -35,13 +47,20 @@ export class UsersController {
   async createUsers(@Body() inputModel: UserInputModel) {
     return this.usersService.createUser(inputModel);
   }
-  @Put(':id')
+  @Put(':userId')
   async updateUser(
-    @Param('id') userId: number,
+    @Param('userId') userId: string,
     @Body() inputModel: UserInputModel,
   ) {
-    const user = await this.usersService.getUser(userId.toString());
-    if (user) user.canBeConfirmed(<Date>user.emailConfirmation.expirationDate);
-    return this.usersService.updateUser(user);
+    const user: UserDocument | null = await this.usersService.getUser(
+      userId.toString(),
+    );
+    //if (user) user.canBeConfirmed(<Date>user.emailConfirmation.expirationDate);
+    return this.usersService.updateUser(user!.id, inputModel);
+  }
+  @Delete(':userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param(':userId') userId: string) {
+    return this.usersService.deleteUser(userId);
   }
 }

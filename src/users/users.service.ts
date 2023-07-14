@@ -15,8 +15,11 @@ export class UsersService {
     return await this.usersRepository.createUser(inputModel, hash);
   }
 
-  async updateUser(user) {
-    return this.usersRepository.updateUser(user);
+  async updateUser(userId: string, inputModel: UserInputModel) {
+    return this.usersRepository.updateUser(userId, inputModel);
+  }
+  async deleteUser(userId: string) {
+    return this.usersRepository.deleteUser(userId);
   }
   async _generateHash(password: string): Promise<string> {
     return await bcrypt.hash(password, 7);

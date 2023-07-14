@@ -4,6 +4,7 @@ import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import { userMapping } from './user.helpers';
+import { objectIdHelper } from '../common/helpers';
 
 @Injectable()
 export class UsersRepository {
@@ -23,7 +24,7 @@ export class UsersRepository {
       login: inputModel.login,
       passwordHash: hash,
       email: inputModel.email,
-      createdAt: new Date().toISOString(),
+      addedAt: new Date().toISOString(),
       emailConfirmation: {
         confirmationCode: 'not required',
         expirationDate: 'not required',
@@ -35,15 +36,19 @@ export class UsersRepository {
     await user.save();
     return userMapping(user);
   }
-  async updateUser(user) {
+  async updateUser(user, inputModel: UserInputModel) {
     return this.userModel.updateOne(
       { _id: user.id },
       {
         $set: {
-          name: user.name,
-          childrenCount: user.childrenCount,
+          login: inputModel.login,
+          childrenCount: inputModel.email,
         },
       },
     );
+  }
+
+  async deleteUser(userId: string) {
+    return this.userModel.findByIdAndDelete(objectIdHelper(userId));
   }
 }
