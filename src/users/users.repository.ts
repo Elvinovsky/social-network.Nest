@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
-import { CreateUserInputType } from './users.controller';
+import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
+import { userMapping } from './user.helpers';
 
 @Injectable()
 export class UsersRepository {
@@ -13,12 +14,26 @@ export class UsersRepository {
   async getUser(userId: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ _id: userId });
   }
-  async save(user: UserDocument) {
+
+  async createUser(
+    inputModel: UserInputModel,
+    hash: string,
+  ): Promise<UserViewDTO> {
+    const newUser: UserCreateDTO = {
+      login: inputModel.login,
+      passwordHash: hash,
+      email: inputModel.email,
+      createdAt: new Date().toISOString(),
+      emailConfirmation: {
+        confirmationCode: 'not required',
+        expirationDate: 'not required',
+        isConfirmed: true,
+      },
+    };
+
+    const user: UserDocument = new this.userModel(newUser);
     await user.save();
-  }
-  async createUser(inputModel: CreateUserInputType) {
-    const user = new this.userModel(inputModel);
-    return user;
+    return userMapping(user);
   }
   async updateUser(user) {
     return this.userModel.updateOne(
