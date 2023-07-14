@@ -7,7 +7,7 @@ export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
       id: el._id.toString(),
       login: el.login,
       email: el.email,
-      createdAt: el.createdAt,
+      createdAt: el.addedAt,
     };
   });
 };
@@ -16,7 +16,7 @@ export const userMapping = (user: UserDocument): UserViewDTO => {
     id: user._id.toString(),
     login: user.login,
     email: user.email,
-    createdAt: user.createdAt,
+    createdAt: user.addedAt,
   };
 };
 
