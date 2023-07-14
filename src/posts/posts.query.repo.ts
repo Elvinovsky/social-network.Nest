@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModel } from './post.schemas';
@@ -55,7 +55,7 @@ export class PostsQueryRepo {
     };
   }
 
-  async getPostById(postId: string): Promise<PostViewDTO | null | void> {
+  async getPostById(postId: string): Promise<PostViewDTO | null> {
     try {
       const post: PostDocument | null = await this.postModel
         .findById(objectIdHelper(postId))
@@ -67,6 +67,7 @@ export class PostsQueryRepo {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error getPostById method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
