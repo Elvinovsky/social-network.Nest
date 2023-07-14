@@ -47,6 +47,26 @@ export class BlogPostInputModel {
   @Length(3, 1000)
   content: string;
 }
+export class PostUpdateInputModel {
+  /**
+   * title input  model {maxLength: 30 }
+   */
+  @IsNotEmpty()
+  @Length(3, 30)
+  title: string;
+  /**
+   * shortDescription input model {maxLength: 100}
+   */
+  @IsNotEmpty()
+  @Length(3, 100)
+  shortDescription: string;
+  /**
+   * content input model {maxLength: 1000}
+   */
+  @IsNotEmpty()
+  @Length(3, 1000)
+  content: string;
+}
 
 export type PostCreateDTO = {
   title: string;
