@@ -18,19 +18,23 @@ export class BlogsRepository {
       }
       return blogMapping(blog);
     } catch (e) {
-      return console.log(e, 'error findBlogById method by BlogsRepository');
+      console.log(e, 'error findBlogById method by BlogsRepository');
     }
   }
-  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
-    const blogDoc = await new this.blogModel(createBlog);
-    await blogDoc.save();
-    return blogMapping(blogDoc);
+  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO | void> {
+    try {
+      const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
+      const blogDoc = await new this.blogModel(createBlog);
+      await blogDoc.save();
+      return blogMapping(blogDoc);
+    } catch (e) {
+      console.log(e);
+    }
   }
   async updateBlogById(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean> {
+  ): Promise<boolean | void> {
     try {
       const result = await this.blogModel.updateOne(
         { _id: objectIdHelper(id) },
@@ -44,8 +48,7 @@ export class BlogsRepository {
       );
       return result.matchedCount === 1;
     } catch (e) {
-      console.log(e, 'error updateBlogById by blogsREpository');
-      return false;
+      console.log(e, 'error updateBlogById by blogsRepository');
     }
   }
 
