@@ -108,13 +108,13 @@ export class BlogsController {
     return foundBlog;
   }
 
-  @Put(':id')
+  @Put(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Param('id') blogId: string,
+    @Param('blogId') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const result: boolean | null = await this.blogsService.updateBlog(
+    const result: boolean | null | void = await this.blogsService.updateBlog(
       blogId,
       inputModel,
     );
