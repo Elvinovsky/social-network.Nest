@@ -8,6 +8,7 @@ import {
   PostViewDTO,
 } from './post.models';
 import { PostMapper } from './post.helpers';
+import { objectIdHelper } from '../common/helpers';
 
 @Injectable()
 export class PostsRepository {
@@ -58,6 +59,27 @@ export class PostsRepository {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error createPost method');
+    }
+  }
+
+  async updatePostById(
+    postId: string,
+    inputModel: PostInputModel,
+  ): Promise<boolean | void> {
+    try {
+      const result = await this.postModel.updateOne(
+        { _id: objectIdHelper(postId) },
+        {
+          $set: {
+            name: inputModel.title,
+            description: inputModel.shortDescription,
+            websiteUrl: inputModel.content,
+          },
+        },
+      );
+      return result.matchedCount === 1;
+    } catch (e) {
+      console.log(e, 'error updatePost by blogsRepository');
     }
   }
 }
