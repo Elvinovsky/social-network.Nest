@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   NotFoundException,
   Param,
@@ -53,10 +52,6 @@ export class BlogsController {
     if (!blog) {
       throw new NotFoundException();
     }
-    //todo if (!blog) {
-    //   throw new Ex();
-    // }
-
     return blog;
   }
 
@@ -65,7 +60,7 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
   ): Promise<PaginatorType<PostViewDTO[]>> {
-    const getPostsByBlogId = await this.blogsQueryRepo.getPostsByBlogID(
+    const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
       blogId,
       Number(query.pageNumber),
       Number(query.pageSize),
@@ -83,15 +78,10 @@ export class BlogsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel) {
-    const result: BlogViewDTO | void = await this.blogsService.createBlog(
-      inputModel,
-    );
+    const result: BlogViewDTO = await this.blogsService.createBlog(inputModel);
 
     if (result === null) {
       throw new NotFoundException();
-    }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
     return result;
   }
@@ -110,10 +100,6 @@ export class BlogsController {
     if (foundBlog === null) {
       throw new NotFoundException();
     }
-    if (!foundBlog) {
-      throw new HttpException('post not create', HttpStatus.EXPECTATION_FAILED);
-    }
-
     return foundBlog;
   }
 
@@ -131,9 +117,6 @@ export class BlogsController {
     if (result === null) {
       throw new NotFoundException();
     }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
-    }
   }
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -142,9 +125,6 @@ export class BlogsController {
 
     if (result === null) {
       throw new NotFoundException();
-    }
-    if (!result) {
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
