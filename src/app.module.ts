@@ -24,6 +24,7 @@ import { PostsService } from './posts/posts.service';
 import { PostsRepository } from './posts/posts.repository';
 import { PostsQueryRepo } from './posts/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
+import { UsersQueryRepository } from './users/users.query.repo';
 
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
@@ -51,6 +52,7 @@ if (!Mongo_Uri) {
     AppService,
     UsersService,
     UsersRepository,
+    UsersQueryRepository,
 
     BlogsQueryRepo,
     BlogsRepository,
