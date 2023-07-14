@@ -82,9 +82,18 @@ export class BlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const newBlog: BlogViewDTO = await this.blogsService.createBlog(inputModel);
-    return newBlog;
+  async createBlog(@Body() inputModel: BlogInputModel) {
+    const result: BlogViewDTO | void = await this.blogsService.createBlog(
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+    return result;
   }
 
   @Post(':blogId/posts')
