@@ -8,7 +8,7 @@ import { BlogViewDTO } from '../blogs/blog.models';
 export class PostsService {
   constructor(
     private readonly postsRepository: PostsRepository,
-    private blogsQueryRepo: BlogsQueryRepo,
+    private readonly blogsQueryRepo: BlogsQueryRepo,
   ) {}
 
   async createPostByBLog(
@@ -52,5 +52,9 @@ export class PostsService {
     }
 
     return foundBlog;
+  }
+
+  async deletePost(postId: string): Promise<Document | null | void> {
+    return this.postsRepository.deletePost(postId);
   }
 }
