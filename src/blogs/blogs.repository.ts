@@ -59,7 +59,7 @@ export class BlogsRepository {
         _id: objectIdHelper(id),
       });
     } catch (e) {
-      return console.log(e, 'error deleteBlogById');
+      console.log(e, 'error deleteBlogById');
     }
   }
 }
