@@ -79,7 +79,15 @@ export class PostsRepository {
       );
       return result.matchedCount === 1;
     } catch (e) {
-      console.log(e, 'error updatePost by blogsRepository');
+      console.log(e, 'error updatePostById by postsRepository');
+    }
+  }
+
+  async deletePost(postId: string): Promise<Document | null | void> {
+    try {
+      return this.postModel.findByIdAndDelete(objectIdHelper(postId));
+    } catch (e) {
+      console.log(e, 'error deletePost by postsRepository');
     }
   }
 }
