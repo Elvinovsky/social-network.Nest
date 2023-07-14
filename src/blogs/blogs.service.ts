@@ -7,14 +7,14 @@ import { BlogsRepository } from './blogs.repository';
 @Injectable()
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
-  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO | void> {
+  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
     return await this.blogsRepository.addNewBlog(inputModel);
   }
 
   async updateBlog(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean | null | void> {
+  ): Promise<boolean | null> {
     const blog = await this.blogsRepository.findBlogById(id);
     if (blog) {
       return this.blogsRepository.updateBlogById(id, inputModel);
@@ -23,7 +23,7 @@ export class BlogsService {
     return blog;
   }
 
-  async deleteBlog(id: string): Promise<Document | null | void> {
+  async deleteBlog(id: string): Promise<Document | null> {
     return this.blogsRepository.deleteBlogById(id);
   }
 }
