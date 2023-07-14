@@ -2,9 +2,13 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -13,7 +17,7 @@ import {
   QueryInputModel,
   SearchTitleTerm,
 } from '../pagination/pagination.models';
-import { PostInputModel } from './post.models';
+import { PostInputModel, PostViewDTO } from './post.models';
 
 @Controller('posts')
 export class PostsController {
@@ -34,19 +38,46 @@ export class PostsController {
   }
   @Get(':postId')
   async getPost(@Param('postId') postId: string) {
-    const post = await this.postsQueryRepo.getPostById(postId);
-    if (!post) {
+    const result: PostViewDTO | null | void =
+      await this.postsQueryRepo.getPostById(postId);
+
+    if (result === null) {
       throw new NotFoundException();
     }
-    return post;
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+    return result;
   }
   @Post()
   async createPost(@Body() inputModel: PostInputModel) {
-    const newPost = await this.postsService.createPost(inputModel);
-    if (!newPost) {
+    const result = await this.postsService.createPost(inputModel);
+
+    if (result === null) {
       throw new NotFoundException();
     }
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
 
-    return newPost;
+    return result;
+  }
+  @Put(':postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('postId') postId: string,
+    @Body() inputModel: PostInputModel,
+  ) {
+    const result: boolean | null | void = await this.postsService.updatePost(
+      postId,
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+    if (!result) {
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
   }
 }
