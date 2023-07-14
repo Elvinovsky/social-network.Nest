@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModel } from './post.schemas';
 import {
@@ -21,7 +21,7 @@ export class PostsRepository {
     inputDTO: BlogPostInputModel,
     blogId: string,
     blogName: string,
-  ): Promise<PostViewDTO | null | void> {
+  ): Promise<PostViewDTO | null> {
     try {
       const createPost: PostCreateDTO = {
         blogId: blogId,
@@ -38,12 +38,13 @@ export class PostsRepository {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error createPost method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
   async createPost(
     inputDTO: PostInputModel,
     blogName: string,
-  ): Promise<PostViewDTO | null | void> {
+  ): Promise<PostViewDTO | null> {
     try {
       const createPost: PostCreateDTO = {
         blogId: inputDTO.blogId,
@@ -59,13 +60,14 @@ export class PostsRepository {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error createPost method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 
   async updatePostById(
     postId: string,
     inputModel: PostInputModel,
-  ): Promise<boolean | void> {
+  ): Promise<boolean> {
     try {
       const result = await this.postModel.updateOne(
         { _id: objectIdHelper(postId) },
@@ -80,14 +82,16 @@ export class PostsRepository {
       return result.matchedCount === 1;
     } catch (e) {
       console.log(e, 'error updatePostById by postsRepository');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 
-  async deletePost(postId: string): Promise<Document | null | void> {
+  async deletePost(postId: string): Promise<Document | null> {
     try {
       return this.postModel.findByIdAndDelete(objectIdHelper(postId));
     } catch (e) {
       console.log(e, 'error deletePost by postsRepository');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
