@@ -28,14 +28,14 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null | void> {
     try {
-      const blogDB: BlogDocument | null = await this.blogModel
+      const blogDoc: BlogDocument | null = await this.blogModel
         .findById(objectIdHelper(id))
         .lean()
         .exec();
-      if (!blogDB) {
+      if (!blogDoc) {
         return null;
       }
-      return blogMapping(blogDB);
+      return blogMapping(blogDoc);
     } catch (e) {
       console.log(e, 'error findBlogById method');
     }

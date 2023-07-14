@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { PostCreateDTO, PostInputModel } from './post.models';
+import {
+  BlogPostInputModel,
+  PostCreateDTO,
+  PostInputModel,
+} from './post.models';
 
 export type PostDocument = HydratedDocument<Post>;
 
@@ -19,18 +23,27 @@ export class Post {
   blogName: string;
   @Prop({ required: true })
   addedAt: string;
-  static create(
-    inputModel: PostInputModel,
-    blogId: string,
+  static createPost(
+    inputModel: PostInputModel | BlogPostInputModel,
     blogName: string,
+    blogId?: string,
   ): PostCreateDTO {
     const post: Post = new Post();
+
+    if (blogId) {
+      post.blogId = blogId;
+    }
+
+    if (!(inputModel instanceof BlogPostInputModel)) {
+      post.blogId = inputModel.blogId;
+    }
+
     post.title = inputModel.title;
     post.shortDescription = inputModel.shortDescription;
-    post.content = post.content;
-    post.blogId = inputModel.blogId || blogId;
+    post.content = inputModel.content;
     post.blogName = blogName;
     post.addedAt = new Date().toISOString();
+
     return post;
   }
 }

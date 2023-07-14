@@ -1,8 +1,10 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
+  Post,
   Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -11,6 +13,7 @@ import {
   QueryInputModel,
   SearchTitleTerm,
 } from '../pagination/pagination.models';
+import { PostInputModel } from './post.models';
 
 @Controller('posts')
 export class PostsController {
@@ -36,5 +39,14 @@ export class PostsController {
       throw new NotFoundException();
     }
     return post;
+  }
+  @Post()
+  async createPost(@Body() inputModel: PostInputModel) {
+    const newPost = await this.postsService.createPost(inputModel);
+    if (!newPost) {
+      throw new NotFoundException();
+    }
+
+    return newPost;
   }
 }

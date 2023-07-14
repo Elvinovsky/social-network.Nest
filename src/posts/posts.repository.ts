@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModel } from './post.schemas';
-import { PostCreateDTO } from './post.models';
+import {
+  BlogPostInputModel,
+  PostCreateDTO,
+  PostInputModel,
+  PostViewDTO,
+} from './post.models';
 import { PostMapper } from './post.helpers';
 
 @Injectable()
@@ -11,23 +16,37 @@ export class PostsRepository {
     private readonly postMapper: PostMapper,
   ) {}
 
-  async createPost(inputDTO: PostCreateDTO) {
+  async createPostBlog(
+    inputDTO: BlogPostInputModel,
+    blogId: string,
+    blogName: string,
+  ): Promise<PostViewDTO | null | void> {
     try {
-      const post: PostDocument = new this.postModel(inputDTO);
+      const createPost: PostCreateDTO = Post.createPost(
+        inputDTO,
+        blogName,
+        blogId,
+      );
+      const post: PostDocument = new this.postModel(createPost);
       await post.save();
+
       return this.postMapper.mapPost(post);
     } catch (e) {
-      const foundNewPost: PostDocument | null = await this.postModel.findOne({
-        addedAt: inputDTO.addedAt,
-      });
+      console.log(e, 'error createPost method');
+    }
+  }
+  async createPost(
+    inputDTO: PostInputModel,
+    blogName: string,
+  ): Promise<PostViewDTO | null | void> {
+    try {
+      const createPost: PostCreateDTO = Post.createPost(inputDTO, blogName);
+      const post: PostDocument = new this.postModel(createPost);
+      await post.save();
 
-      if (!foundNewPost) {
-        console.log(e, 'post not created');
-        return false;
-      }
-
-      console.log(e, 'post created');
-      return true;
+      return this.postMapper.mapPost(post);
+    } catch (e) {
+      console.log(e, 'error createPost method');
     }
   }
 }
