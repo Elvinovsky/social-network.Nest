@@ -1,5 +1,5 @@
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModel } from './blog.schemas';
 import { blogMapping } from './blog.helpers';
@@ -10,7 +10,7 @@ import { objectIdHelper } from '../common/helpers';
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
   //поиск блога по ID.
-  async findBlogById(id: string): Promise<BlogViewDTO | null | void> {
+  async findBlogById(id: string): Promise<BlogViewDTO | null> {
     try {
       const blog = await this.blogModel.findById(objectIdHelper(id));
       if (!blog) {
@@ -19,9 +19,10 @@ export class BlogsRepository {
       return blogMapping(blog);
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
-  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO | void> {
+  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
     try {
       const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
       const blogDoc = await new this.blogModel(createBlog);
@@ -29,12 +30,13 @@ export class BlogsRepository {
       return blogMapping(blogDoc);
     } catch (e) {
       console.log(e);
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
   async updateBlogById(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean | void> {
+  ): Promise<boolean> {
     try {
       const result = await this.blogModel.updateOne(
         { _id: objectIdHelper(id) },
@@ -49,17 +51,19 @@ export class BlogsRepository {
       return result.matchedCount === 1;
     } catch (e) {
       console.log(e, 'error updateBlogById by blogsRepository');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 
   //поиск блога по ID для удаления.
-  async deleteBlogById(id: string): Promise<Document | null | void> {
+  async deleteBlogById(id: string): Promise<Document | null> {
     try {
       return await this.blogModel.findByIdAndDelete({
         _id: objectIdHelper(id),
       });
     } catch (e) {
       console.log(e, 'error deleteBlogById');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
