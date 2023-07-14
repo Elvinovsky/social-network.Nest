@@ -58,6 +58,7 @@ export class PostsQueryRepo {
     try {
       const post: PostDocument | null = await this.postModel
         .findById(objectIdHelper(postId))
+        .lean()
         .exec();
       if (!post) {
         return null;
