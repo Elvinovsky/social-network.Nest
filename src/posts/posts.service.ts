@@ -23,8 +23,8 @@ export class PostsService {
 
     return this.postsRepository.createPostBlog(
       inputDTO,
-      foundBlog.name,
       blogId,
+      foundBlog.name,
     );
   }
   async createPost(
