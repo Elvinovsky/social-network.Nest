@@ -17,7 +17,7 @@ export class UserCreateDTO {
   login: string;
   passwordHash: string;
   email: string;
-  createdAt: string;
+  addedAt: string;
   emailConfirmation: EmailConfirmationModel;
 }
 

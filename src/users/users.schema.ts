@@ -16,7 +16,7 @@ export class User {
   email: string;
 
   @Prop()
-  createdAt: string;
+  addedAt: string;
 
   @Prop()
   emailConfirmation: EmailConfirmationModel;
