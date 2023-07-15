@@ -61,7 +61,7 @@ export class UsersController {
   }
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param(':userId') userId: string) {
+  async deleteUser(@Param('userId') userId: string) {
     const result: Document | null = await this.usersService.deleteUser(userId);
 
     if (result === null) {
