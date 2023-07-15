@@ -27,7 +27,6 @@ export class PostInputModel {
 }
 
 export class BlogPostInputModel {
-  // todo не использовать
   /**
    * title input  model {maxLength: 30 }
    */

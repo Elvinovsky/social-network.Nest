@@ -18,7 +18,7 @@ export class UsersService {
   async updateUser(userId: string, inputModel: UserInputModel) {
     return this.usersRepository.updateUser(userId, inputModel);
   }
-  async deleteUser(userId: string) {
+  async deleteUser(userId: string): Promise<Document | null> {
     return this.usersRepository.deleteUser(userId);
   }
   async _generateHash(password: string): Promise<string> {

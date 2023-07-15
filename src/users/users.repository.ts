@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
@@ -48,7 +48,12 @@ export class UsersRepository {
     );
   }
 
-  async deleteUser(userId: string) {
-    return this.userModel.findByIdAndDelete(objectIdHelper(userId));
+  async deleteUser(userId: string): Promise<Document | null> {
+    try {
+      return this.userModel.findByIdAndDelete(objectIdHelper(userId));
+    } catch (e) {
+      console.log(e, 'error deleteUser method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
   }
 }
