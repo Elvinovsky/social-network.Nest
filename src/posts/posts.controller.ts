@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -53,7 +54,9 @@ export class PostsController {
     const result = await this.postsService.createPost(inputModel);
 
     if (result === null) {
-      throw new NotFoundException();
+      throw new BadRequestException([
+        { field: 'blogId', message: 'blogId invalid' },
+      ]);
     }
 
     return result;
@@ -70,7 +73,9 @@ export class PostsController {
     );
 
     if (result === null) {
-      throw new NotFoundException('blog not found');
+      throw new BadRequestException([
+        { field: 'blogId', message: 'blogId invalid' },
+      ]);
     }
     if (!result) {
       throw new NotFoundException('post not found');
