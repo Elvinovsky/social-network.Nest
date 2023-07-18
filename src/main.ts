@@ -11,13 +11,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       stopAtFirstError: true,
       exceptionFactory: (errors: ValidationError[]) => {
         throw new BadRequestException(
           errors.map((e: ValidationError) => {
             return {
               field: e.property,
-              message: 'invalid',
+              message: e.property + ' invalid',
             };
           }),
         );
@@ -27,4 +28,10 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(3000);
 }
-bootstrap();
+
+try {
+  bootstrap();
+  console.log('it is ok');
+} catch (e) {
+  console.log('no connection');
+}
