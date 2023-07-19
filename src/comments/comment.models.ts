@@ -1,4 +1,9 @@
+import { IsNotEmpty, IsString, Length } from 'class-validator';
+
 export class CommentInputModel {
+  @IsNotEmpty()
+  @IsString()
+  @Length(20, 300)
   content: string;
   /**
    *maxLength: 300
