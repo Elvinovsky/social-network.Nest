@@ -15,7 +15,7 @@ import { LikesQueryRepo } from './likes/likes.query.repo';
 import { LikesInfoRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
 import { LikeAndDisQuantity } from './likes/like.helpers';
-import { Like, LikeSchema, Post, PostSchema } from './posts/post.schemas';
+import { Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { DeleteDBController } from './CLEAR.DB.TESTS/delete.db.controller';
@@ -25,6 +25,7 @@ import { PostsRepository } from './posts/posts.repository';
 import { PostsQueryRepo } from './posts/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
 import { UsersQueryRepository } from './users/users.query.repo';
+import { Like, LikeSchema } from './likes/like.schemas';
 
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
