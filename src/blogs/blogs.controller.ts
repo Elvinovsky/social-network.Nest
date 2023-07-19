@@ -17,7 +17,7 @@ import {
   SearchNameTerm,
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
-import { BlogInputModel, BlogViewDTO } from './blog.models';
+import { BlogInputModel, BlogViewDTO, ParamObjectId } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
@@ -55,13 +55,14 @@ export class BlogsController {
     return blog;
   }
 
-  @Get(':blogId/posts')
+  @Get(':id/posts')
   async getPostsByBlog(
-    @Param('blogId') blogId: string,
+    @Param() params: ParamObjectId,
     @Query() query: QueryInputModel,
   ): Promise<PaginatorType<PostViewDTO[]>> {
+    console.log('ID', params.id); //todo
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
-      blogId,
+      params.id,
       Number(query.pageNumber),
       Number(query.pageSize),
       query.sortBy,
@@ -92,10 +93,8 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() inputModel: BlogPostInputModel,
   ) {
-    const foundBlog = await this.postsService.createPostByBLog(
-      blogId,
-      inputModel,
-    );
+    const foundBlog: PostViewDTO | null =
+      await this.postsService.createPostByBLog(blogId, inputModel);
 
     if (foundBlog === null) {
       throw new NotFoundException();
@@ -109,7 +108,7 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const result: boolean | null | void = await this.blogsService.updateBlog(
+    const result: boolean | null = await this.blogsService.updateBlog(
       blogId,
       inputModel,
     );
