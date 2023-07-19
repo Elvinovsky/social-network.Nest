@@ -14,7 +14,7 @@ import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesQueryRepo } from './likes/likes.query.repo';
 import { LikesInfoRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
-import { LikeAndDisQuantity } from './likes/like.helpers';
+import { LikeAndDisCounter } from './likes/like.helpers';
 import { Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
@@ -26,7 +26,11 @@ import { PostsQueryRepo } from './posts/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
 import { UsersQueryRepository } from './users/users.query.repo';
 import { Like, LikeSchema } from './likes/like.schemas';
-import { CommentSchema } from './comments/comment.schemas';
+import { Comment, CommentSchema } from './comments/comment.schemas';
+import { CommentsService } from './comments/comments.service';
+import { CommentsRepository } from './comments/comments.repository';
+import { CommentsController } from './comments/comments.controller';
+import { CommentMapper } from './comments/helpers/comment.mapping';
 
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
@@ -48,6 +52,7 @@ if (!Mongo_Uri) {
     UsersController,
     BlogsController,
     PostsController,
+    CommentsController,
   ],
   providers: [
     DeleteDbRepository,
@@ -64,11 +69,15 @@ if (!Mongo_Uri) {
     PostsService,
     PostsRepository,
     PostsQueryRepo,
+    PostMapper,
+
+    CommentsService,
+    CommentsRepository,
+    CommentMapper,
 
     LikesQueryRepo,
     LikesInfoRepository,
-    PostMapper,
-    LikeAndDisQuantity,
+    LikeAndDisCounter,
   ],
 })
 export class AppModule {}
