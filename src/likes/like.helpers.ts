@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
-
+// todo убрать в репо
 @Injectable()
 export class LikeAndDisCounter {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}

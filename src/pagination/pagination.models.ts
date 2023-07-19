@@ -5,6 +5,7 @@ export type PaginatorType<T> = {
   totalCount: number;
   items: T;
 };
+//todo class validator
 export type QueryInputModel = {
   pageNumber: string;
   pageSize: string;

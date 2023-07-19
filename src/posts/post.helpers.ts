@@ -2,7 +2,7 @@ import { PostViewDTO } from './post.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikeAndDisCounter } from '../likes/like.helpers';
-import { LikesQueryRepo } from '../likes/likes.query.repo';
+import { LikesServiceRepo } from '../likes/likes-service.repo';
 import { LikeCreateDTO, LikeViewDTO } from '../likes/like.models';
 import { Like, LikeModel } from '../likes/like.schemas';
 import { PostDocument } from './post.schemas';
@@ -12,7 +12,7 @@ export class PostMapper {
   constructor(
     @InjectModel(Like.name) private likeModel: LikeModel,
     private readonly likesCountService: LikeAndDisCounter,
-    private readonly likesQueryRepo: LikesQueryRepo,
+    private readonly likesQueryRepo: LikesServiceRepo,
   ) {}
   async mapPosts(
     array: Array<PostDocument>,

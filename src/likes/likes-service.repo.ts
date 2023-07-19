@@ -6,7 +6,7 @@ import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
 @Injectable()
-export class LikesQueryRepo {
+export class LikesServiceRepo {
   constructor(
     @InjectModel(Like.name) private likeModel: LikeModel,
     private likesInfoRepository: LikesInfoRepository,

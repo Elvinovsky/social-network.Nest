@@ -11,7 +11,7 @@ import { User, UserSchema } from './users/users.schema';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsQueryRepo } from './blogs/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
-import { LikesQueryRepo } from './likes/likes.query.repo';
+import { LikesServiceRepo } from './likes/likes-service.repo';
 import { LikesInfoRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
 import { LikeAndDisCounter } from './likes/like.helpers';
@@ -75,7 +75,7 @@ if (!Mongo_Uri) {
     CommentsRepository,
     CommentMapper,
 
-    LikesQueryRepo,
+    LikesServiceRepo,
     LikesInfoRepository,
     LikeAndDisCounter,
   ],

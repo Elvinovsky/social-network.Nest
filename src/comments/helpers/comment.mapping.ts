@@ -1,13 +1,13 @@
 import { CommentDocument } from '../comment.schemas';
 import { CommentViewDTO } from '../comment.models';
-import { LikesQueryRepo } from '../../likes/likes.query.repo';
+import { LikesServiceRepo } from '../../likes/likes-service.repo';
 import { LikeAndDisCounter } from '../../likes/like.helpers';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentMapper {
   constructor(
-    private readonly likesQueryRepo: LikesQueryRepo,
+    private readonly likesQueryRepo: LikesServiceRepo,
     private readonly likeAndDisCounter: LikeAndDisCounter,
   ) {}
   async map(
