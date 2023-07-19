@@ -1,9 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModel } from '../blogs/blog.schemas';
 import { Injectable } from '@nestjs/common';
-import { Like, LikeModel, Post, PostModel } from '../posts/post.schemas';
+import { Post, PostModel } from '../posts/post.schemas';
 import { User } from '../users/users.schema';
 import { Model } from 'mongoose';
+import { Like, LikeModel } from '../likes/like.schemas';
 
 @Injectable()
 export class DeleteDbRepository {
