@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Status } from './like.helpers';
 import { InjectModel } from '@nestjs/mongoose';
-import { Like, LikeModel } from '../posts/post.schemas';
-import { LikeDBInfo, LikeInfoView } from '../posts/post.models';
 import { LikesInfoRepository } from './likes.repository';
+import { LikeDBInfo, LikeInfoView } from './like.models';
+import { Like, LikeModel } from './like.schemas';
+import { Status } from '../common/constant';
 
 @Injectable()
 export class LikesQueryRepo {
@@ -26,12 +26,12 @@ export class LikesQueryRepo {
     userId?: string,
   ): Promise<string> {
     if (!userId) {
-      return 'None';
+      return Status.None;
     }
 
     const likeInfo: LikeDBInfo | null =
       await this.likesInfoRepository.getLikeInfo(userId, commentOrPostId);
-    return likeInfo ? likeInfo.status : 'None';
+    return likeInfo ? likeInfo.status : Status.None;
   }
   async getLastLikes(id: string): Promise<LikeInfoView[]> {
     const likesArr = await this.getLikesByPostId(id);
