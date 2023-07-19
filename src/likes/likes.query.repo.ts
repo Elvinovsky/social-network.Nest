@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikesInfoRepository } from './likes.repository';
-import { LikeDBInfo, LikeInfoView } from './like.models';
+import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
@@ -11,7 +11,7 @@ export class LikesQueryRepo {
     @InjectModel(Like.name) private likeModel: LikeModel,
     private likesInfoRepository: LikesInfoRepository,
   ) {}
-  async getLikesByPostId(postId: string): Promise<LikeDBInfo[]> {
+  async getLikesByPostId(postId: string): Promise<LikeCreateDTO[]> {
     return this.likeModel.find({
       postOrCommentId: postId,
       status: Status.Like,
@@ -29,11 +29,11 @@ export class LikesQueryRepo {
       return Status.None;
     }
 
-    const likeInfo: LikeDBInfo | null =
+    const likeInfo: LikeCreateDTO | null =
       await this.likesInfoRepository.getLikeInfo(userId, commentOrPostId);
     return likeInfo ? likeInfo.status : Status.None;
   }
-  async getLastLikes(id: string): Promise<LikeInfoView[]> {
+  async getLastLikes(id: string): Promise<LikeViewDTO[]> {
     const likesArr = await this.getLikesByPostId(id);
 
     return Promise.all(

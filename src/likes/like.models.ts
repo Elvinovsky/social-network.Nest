@@ -1,17 +1,17 @@
-export type ExtendedLikesInfoView = {
+export type ExtendedLikesViewDTO = {
   likesCount: number;
   dislikesCount: number;
   myStatus: string;
-  newestLikes: LikeInfoView[] | null;
+  newestLikes: LikeViewDTO[] | null;
 };
 
-export type LikeInfoView = {
+export type LikeViewDTO = {
   addedAt: string;
   userId: string;
   login: string;
 };
 
-export type LikeDBInfo = {
+export type LikeCreateDTO = {
   status: string;
   userId: string;
   userLogin: string;

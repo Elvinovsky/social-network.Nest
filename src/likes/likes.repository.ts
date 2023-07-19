@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { LikeDBInfo } from './like.models';
+import { LikeCreateDTO } from './like.models';
 import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
@@ -10,7 +10,7 @@ export class LikesInfoRepository {
   async testDeleteDb() {
     await this.likeModel.deleteMany({});
   }
-  async getLikes(id: string): Promise<LikeDBInfo[]> {
+  async getLikes(id: string): Promise<LikeCreateDTO[]> {
     return this.likeModel.find({
       postOrCommentId: id,
       status: Status.Like,

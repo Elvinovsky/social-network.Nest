@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length } from 'class-validator';
-import { ExtendedLikesInfoView } from '../likes/like.models';
+import { ExtendedLikesViewDTO } from '../likes/like.models';
 
 export class PostInputModel {
   /**
@@ -65,5 +65,5 @@ export type PostViewDTO = {
   blogId: string;
   blogName: string;
   createdAt: string;
-  extendedLikesInfo: ExtendedLikesInfoView;
+  extendedLikesInfo: ExtendedLikesViewDTO;
 };

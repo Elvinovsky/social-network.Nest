@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikeAndDisQuantity } from '../likes/like.helpers';
 import { LikesQueryRepo } from '../likes/likes.query.repo';
-import { LikeDBInfo, LikeInfoView } from '../likes/like.models';
+import { LikeCreateDTO, LikeViewDTO } from '../likes/like.models';
 import { Like, LikeModel } from '../likes/like.schemas';
 import { PostDocument } from './post.schemas';
 
@@ -29,8 +29,9 @@ export class PostMapper {
           el._id.toString(),
         );
 
-        const lastLikes: LikeInfoView[] =
-          await this.likesQueryRepo.getLastLikes(el._id.toString());
+        const lastLikes: LikeViewDTO[] = await this.likesQueryRepo.getLastLikes(
+          el._id.toString(),
+        );
 
         return {
           id: el._id.toString(),
@@ -60,11 +61,11 @@ export class PostMapper {
       post._id.toString(),
     );
 
-    const likes: LikeDBInfo[] = await this.likesQueryRepo.getLikes(
+    const likes: LikeCreateDTO[] = await this.likesQueryRepo.getLikes(
       post._id.toString(),
     );
 
-    const lastLikes: LikeInfoView[] = await Promise.all(
+    const lastLikes: LikeViewDTO[] = await Promise.all(
       likes
         .sort(function (a, b) {
           return a.createdAt < b.createdAt
