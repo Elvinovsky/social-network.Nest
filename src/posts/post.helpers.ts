@@ -1,9 +1,11 @@
-import { Like, LikeModel, PostDocument } from './post.schemas';
-import { LikeDBInfo, LikeInfoView, PostViewDTO } from './post.models';
+import { PostViewDTO } from './post.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikeAndDisQuantity } from '../likes/like.helpers';
 import { LikesQueryRepo } from '../likes/likes.query.repo';
+import { LikeDBInfo, LikeInfoView } from '../likes/like.models';
+import { Like, LikeModel } from '../likes/like.schemas';
+import { PostDocument } from './post.schemas';
 
 @Injectable()
 export class PostMapper {
