@@ -4,7 +4,7 @@ import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
 @Injectable()
-export class LikeAndDisQuantity {
+export class LikeAndDisCounter {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
   async count(id: string): Promise<{ likes: number; disLikes: number }> {
     const likes = await this.likeModel.countDocuments({
