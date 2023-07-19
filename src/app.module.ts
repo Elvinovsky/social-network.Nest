@@ -26,6 +26,7 @@ import { PostsQueryRepo } from './posts/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
 import { UsersQueryRepository } from './users/users.query.repo';
 import { Like, LikeSchema } from './likes/like.schemas';
+import { CommentSchema } from './comments/comment.schemas';
 
 const Mongo_Uri = process.env.MONGO_URL;
 if (!Mongo_Uri) {
@@ -39,6 +40,7 @@ if (!Mongo_Uri) {
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
   ],
   controllers: [
     AppController,
