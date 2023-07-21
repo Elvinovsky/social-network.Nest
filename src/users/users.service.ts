@@ -18,8 +18,8 @@ export class UsersService {
   async updateUser(userId: string, inputModel: UserInputModel) {
     return this.usersRepository.updateUser(userId, inputModel);
   }
-  async deleteUser(userId: string): Promise<Document | null> {
-    return this.usersRepository.deleteUser(userId);
+  async deleteUser(id: string): Promise<Document | null> {
+    return this.usersRepository.deleteUser(id);
   }
   async _generateHash(password: string): Promise<string> {
     return await bcrypt.hash(password, 7);
