@@ -15,7 +15,9 @@ export class BlogsService {
     id: string,
     inputModel: BlogInputModel,
   ): Promise<boolean | null> {
-    const blog = await this.blogsRepository.findBlogById(id);
+    const blog: BlogViewDTO | null = await this.blogsRepository.findBlogById(
+      id,
+    );
     if (blog) {
       return this.blogsRepository.updateBlogById(id, inputModel);
     }
