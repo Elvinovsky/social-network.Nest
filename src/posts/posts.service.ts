@@ -12,21 +12,17 @@ export class PostsService {
   ) {}
 
   async createPostByBLog(
-    blogId: string,
+    id: string,
     inputModel: BlogPostInputModel,
   ): Promise<PostViewDTO | null> {
     const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
-      blogId,
+      id,
     );
     if (!foundBlog) {
       return null;
     }
 
-    return this.postsRepository.createPostBlog(
-      inputModel,
-      blogId,
-      foundBlog.name,
-    );
+    return this.postsRepository.createPostBlog(inputModel, id, foundBlog.name);
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
@@ -41,7 +37,7 @@ export class PostsService {
   }
 
   async updatePost(
-    postId: string,
+    id: string,
     inputModel: PostInputModel,
   ): Promise<boolean | null> {
     const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
@@ -49,13 +45,13 @@ export class PostsService {
     );
 
     if (foundBlog) {
-      return this.postsRepository.updatePostById(postId, inputModel);
+      return this.postsRepository.updatePostById(id, inputModel);
     }
 
     return foundBlog;
   }
 
-  async deletePost(postId: string): Promise<Document | null> {
-    return this.postsRepository.deletePost(postId);
+  async deletePost(id: string): Promise<Document | null> {
+    return this.postsRepository.deletePost(id);
   }
 }
