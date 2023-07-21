@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsUrl, Length } from 'class-validator';
+import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 
 export class BlogInputModel {
   /**
@@ -44,7 +44,3 @@ export type BlogViewDTO = {
    */
   isMembership: boolean;
 };
-export class ParamObjectId {
-  @IsMongoId()
-  id: string;
-}
