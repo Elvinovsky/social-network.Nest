@@ -28,9 +28,9 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null> {
     try {
-      const blogDoc: BlogDocument | null = await this.blogModel //todo lean .exec?
+      const blogDoc: BlogDocument | null = await this.blogModel
         .findById(objectIdHelper(id))
-        .lean();
+        .exec();
       if (!blogDoc) {
         return null;
       }
