@@ -1,6 +1,5 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsMongoId, IsNotEmpty, Length } from 'class-validator';
 import { ExtendedLikesViewDTO } from '../likes/like.models';
-
 export class PostInputModel {
   /**
    * title input  model {maxLength: 30 }
@@ -23,7 +22,8 @@ export class PostInputModel {
   /**
    * ID existing Blog {linked to a post}
    */
-  @IsNotEmpty()
+  @IsNotEmpty() //todo
+  @IsMongoId()
   blogId: string;
 }
 
