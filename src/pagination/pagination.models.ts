@@ -1,3 +1,5 @@
+import { IsNotEmpty } from 'class-validator';
+
 export type PaginatorType<T> = {
   pagesCount: number;
   page: number;
@@ -5,13 +7,18 @@ export type PaginatorType<T> = {
   totalCount: number;
   items: T;
 };
-//todo class validator
-export type QueryInputModel = {
+
+export class QueryInputModel {
+  // todo трансфорп намбер
+  @IsNotEmpty()
   pageNumber: string;
+  @IsNotEmpty()
   pageSize: string;
+  @IsNotEmpty()
   sortBy: string;
+  @IsNotEmpty()
   sortDirection: string;
-};
+}
 export type SearchNameTerm = { searchNameTerm?: string };
 export type SearchTitleTerm = { searchTitleTerm?: string };
 export type SearchEmailTerm = { searchEmailTerm?: string };
