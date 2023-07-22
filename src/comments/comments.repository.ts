@@ -12,12 +12,14 @@ export class CommentsRepository {
   ) {}
   async getCommentById(commentId: string, userId: any) {
     try {
+      if (!objectIdHelper(commentId)) return null;
+
       const result: CommentDocument | null = await this.commentModel.findById(
         objectIdHelper(commentId),
       );
-      if (result) return this.commentMapper.map(result, userId);
+      if (!result) return null;
 
-      return null;
+      return this.commentMapper.map(result, userId);
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);
