@@ -21,7 +21,6 @@ import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
-import { ParamObjectId } from '../common/models';
 
 @Controller('blogs')
 export class BlogsController {
@@ -47,8 +46,10 @@ export class BlogsController {
 
   @Get(':blogId')
   @HttpCode(HttpStatus.OK)
-  async getBlog(@Param() params: ParamObjectId): Promise<BlogViewDTO> {
-    const blog = await this.blogsQueryRepo.getBlogById(params.id);
+  async getBlog(@Param('blogId') blogId: string): Promise<BlogViewDTO> {
+    const blog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
+      blogId,
+    );
 
     if (!blog) {
       throw new NotFoundException();
@@ -56,13 +57,13 @@ export class BlogsController {
     return blog;
   }
 
-  @Get(':id/posts')
+  @Get(':blogId/posts')
   async getPostsByBlog(
-    @Param() params: ParamObjectId,
+    @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
-      params.id,
+      blogId,
       Number(query.pageNumber),
       Number(query.pageSize),
       query.sortBy,
@@ -90,11 +91,11 @@ export class BlogsController {
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
-    @Param() params: ParamObjectId,
+    @Param('blogId') blogId: string,
     @Body() inputModel: BlogPostInputModel,
   ) {
     const foundBlog: PostViewDTO | null =
-      await this.postsService.createPostByBLog(params.id, inputModel);
+      await this.postsService.createPostByBLog(blogId, inputModel);
 
     if (foundBlog === null) {
       throw new NotFoundException();
@@ -105,11 +106,11 @@ export class BlogsController {
   @Put(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Param() params: ParamObjectId,
+    @Param('blogId') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
     const result: boolean | null = await this.blogsService.updateBlog(
-      params.id,
+      blogId,
       inputModel,
     );
 
@@ -117,10 +118,10 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
-  @Delete(':id')
+  @Delete(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param() params: ParamObjectId) {
-    const result = await this.blogsService.deleteBlog(params.id);
+  async deleteBlog(@Param('blogId') blogId: string) {
+    const result = await this.blogsService.deleteBlog(blogId);
 
     if (result === null) {
       throw new NotFoundException();
