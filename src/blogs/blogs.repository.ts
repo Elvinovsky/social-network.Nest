@@ -1,7 +1,7 @@
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModel } from './blog.schemas';
+import { Blog, BlogDocument, BlogModel } from './blog.schemas';
 import { blogMapping } from './blog.helpers';
 import { objectIdHelper } from '../common/helpers';
 
@@ -12,17 +12,12 @@ export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
 
   // Находит блог по заданному ID
-  // Возвращает BlogViewDTO или null, если блог не найден
-  async findBlogById(id: string): Promise<BlogViewDTO | null> {
+  // Возвращает BlogDocument или null, если блог не найден
+  async findBlogById(id: string): Promise<BlogDocument | null> {
     try {
       if (objectIdHelper(id)) return null;
 
-      const blog = await this.blogModel.findById(objectIdHelper(id));
-      if (!blog) {
-        return null;
-      }
-
-      return blogMapping(blog);
+      return await this.blogModel.findById(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
