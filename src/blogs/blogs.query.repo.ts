@@ -28,14 +28,16 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null> {
     try {
-      const blogDoc: BlogDocument | null = await this.blogModel
+      if (!objectIdHelper(id)) return null;
+
+      const foundBlog: BlogDocument | null = await this.blogModel
         .findById(objectIdHelper(id))
         .exec();
-      if (!blogDoc) {
+      if (!foundBlog) {
         return null;
       }
 
-      return blogMapping(blogDoc);
+      return blogMapping(foundBlog);
     } catch (e) {
       console.log(e, 'error findBlogById method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
@@ -91,7 +93,11 @@ export class BlogsQueryRepo {
     userId?: string,
   ): Promise<PaginatorType<PostViewDTO[]> | null> {
     try {
-      const blogIdForPosts = await this.postModel.findOne({ blogId: blogId });
+      if (!objectIdHelper(blogId)) return null;
+
+      const blogIdForPosts = await this.blogModel.findById(
+        objectIdHelper(blogId),
+      );
       if (!blogIdForPosts) {
         return null;
       }
@@ -99,7 +105,7 @@ export class BlogsQueryRepo {
       const calculateOfFiles = await this.postModel.countDocuments({ blogId });
       const Posts: PostDocument[] = await this.postModel
         .find({
-          blogId,
+          blogId: blogId,
         })
         .sort({
           [getSortBy(sortBy)]: getDirection(sortDirection),
@@ -107,7 +113,6 @@ export class BlogsQueryRepo {
         })
         .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
         .limit(getPageSize(pageSize))
-        .lean()
         .exec();
 
       return {
