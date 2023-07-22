@@ -22,7 +22,7 @@ export class PostInputModel {
   /**
    * ID existing Blog {linked to a post}
    */
-  @IsNotEmpty() //todo
+  @IsNotEmpty()
   @IsMongoId()
   blogId: string;
 }
