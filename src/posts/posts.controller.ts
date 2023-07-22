@@ -19,7 +19,6 @@ import {
   SearchTitleTerm,
 } from '../pagination/pagination.models';
 import { PostInputModel, PostViewDTO } from './post.models';
-import { ParamObjectId } from '../common/models';
 
 @Controller('posts')
 export class PostsController {
@@ -65,11 +64,11 @@ export class PostsController {
   @Put(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Param() params: ParamObjectId,
+    @Param('postId') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
     const result: boolean | null = await this.postsService.updatePost(
-      params.id,
+      postId,
       inputModel,
     );
 
@@ -84,10 +83,8 @@ export class PostsController {
   }
   @Delete(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param() params: ParamObjectId) {
-    const result: Document | null = await this.postsService.deletePost(
-      params.id,
-    );
+  async deletePost(@Param('postId') postId: string) {
+    const result: Document | null = await this.postsService.deletePost(postId);
 
     if (result === null) {
       throw new NotFoundException('post not found');
