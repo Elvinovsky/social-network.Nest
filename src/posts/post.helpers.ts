@@ -32,7 +32,6 @@ export class PostMapper {
         const lastLikes: LikeViewDTO[] = await this.likesQueryRepo.getLastLikes(
           el._id.toString(),
         );
-
         return {
           id: el._id.toString(),
           title: el.title,
