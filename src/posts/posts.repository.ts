@@ -69,6 +69,8 @@ export class PostsRepository {
     inputModel: PostInputModel,
   ): Promise<boolean> {
     try {
+      if (!objectIdHelper(postId)) return false;
+
       const result = await this.postModel.updateOne(
         { _id: objectIdHelper(postId) },
         {
@@ -88,6 +90,8 @@ export class PostsRepository {
 
   async deletePost(postId: string): Promise<Document | null> {
     try {
+      if (!objectIdHelper(postId)) return null;
+
       return this.postModel.findByIdAndDelete(objectIdHelper(postId));
     } catch (e) {
       console.log(e, 'error deletePost by postsRepository');
