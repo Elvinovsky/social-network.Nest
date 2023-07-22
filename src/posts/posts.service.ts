@@ -13,7 +13,7 @@ export class PostsService {
 
   async createPostByBLog(
     id: string,
-    inputModel: BlogPostInputModel,
+    inputModel: BlogPostInputModel, // todo repository
   ): Promise<PostViewDTO | null> {
     const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
       id,
@@ -38,7 +38,7 @@ export class PostsService {
 
   async updatePost(
     id: string,
-    inputModel: PostInputModel,
+    inputModel: PostInputModel, // todo repository!!
   ): Promise<boolean | null> {
     const foundBlog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
       inputModel.blogId,
