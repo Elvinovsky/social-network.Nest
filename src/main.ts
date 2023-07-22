@@ -6,8 +6,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ErrorExceptionFilter,
   HttpExceptionFilter,
+  ErrorExceptionFilter,
 } from './http-exception.filter';
 
 async function bootstrap() {
@@ -27,7 +27,7 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter(), new ErrorExceptionFilter());
+  app.useGlobalFilters(new ErrorExceptionFilter(), new HttpExceptionFilter());
   await app.listen(3000);
 }
 
