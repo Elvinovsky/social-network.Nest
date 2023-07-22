@@ -33,3 +33,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
   }
 }
+
+@Catch(Error)
+export class ErrorExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+
+    response
+      .status(500)
+      .send({ error: exception.toString(), stack: exception.stack });
+
+    response.status(500).send('some error occurred');
+  }
+}

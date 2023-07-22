@@ -5,7 +5,10 @@ import {
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from './http-exception.filter';
+import {
+  ErrorExceptionFilter,
+  HttpExceptionFilter,
+} from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -24,7 +27,7 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(), new ErrorExceptionFilter());
   await app.listen(3000);
 }
 
