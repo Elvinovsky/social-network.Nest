@@ -13,7 +13,9 @@ export class UsersRepository {
     return this.userModel.find();
   }
   async getUser(userId: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ _id: userId });
+    if (!objectIdHelper(userId)) return null;
+
+    return this.userModel.findById(objectIdHelper(userId));
   }
 
   async createUser(
@@ -34,6 +36,7 @@ export class UsersRepository {
 
     const user: UserDocument = new this.userModel(newUser);
     await user.save();
+
     return userMapping(user);
   }
   async updateUser(user, inputModel: UserInputModel) {
