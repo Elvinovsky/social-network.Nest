@@ -20,7 +20,6 @@ import {
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
-import { ParamObjectId } from '../common/models';
 
 @Controller('users')
 export class UsersController {
@@ -42,8 +41,8 @@ export class UsersController {
     );
   }
   @Get(':id')
-  async getUser(@Param() params: ParamObjectId) {
-    return this.usersService.getUser(params.id);
+  async getUser(@Param('userId') userId: string) {
+    return this.usersService.getUser(userId);
   }
   @Post()
   async createUsers(@Body() inputModel: UserInputModel) {
@@ -51,21 +50,17 @@ export class UsersController {
   }
   @Put(':userId')
   async updateUser(
-    @Param() params: ParamObjectId,
+    @Param('userId') userId: string,
     @Body() inputModel: UserInputModel,
   ) {
-    const user: UserDocument | null = await this.usersService.getUser(
-      params.id,
-    );
+    const user: UserDocument | null = await this.usersService.getUser(userId);
     //if (user) user.canBeConfirmed(<Date>user.emailConfirmation.expirationDate);
     return this.usersService.updateUser(user!.id, inputModel);
   }
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param() params: ParamObjectId) {
-    const result: Document | null = await this.usersService.deleteUser(
-      params.id,
-    );
+  async deleteUser(@Param('userId') userId: string) {
+    const result: Document | null = await this.usersService.deleteUser(userId);
 
     if (result === null) {
       throw new NotFoundException('user not found');
