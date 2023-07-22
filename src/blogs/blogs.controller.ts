@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   PaginatorType,
@@ -21,6 +22,7 @@ import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -79,6 +81,7 @@ export class BlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
   async createBlog(@Body() inputModel: BlogInputModel) {
     const result: BlogViewDTO = await this.blogsService.createBlog(inputModel);
 
