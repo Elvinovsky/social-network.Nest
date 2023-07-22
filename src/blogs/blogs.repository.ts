@@ -15,10 +15,13 @@ export class BlogsRepository {
   // Возвращает BlogViewDTO или null, если блог не найден
   async findBlogById(id: string): Promise<BlogViewDTO | null> {
     try {
+      if (objectIdHelper(id)) return null;
+
       const blog = await this.blogModel.findById(objectIdHelper(id));
       if (!blog) {
         return null;
       }
+
       return blogMapping(blog);
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
@@ -33,6 +36,7 @@ export class BlogsRepository {
       const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
       const createdBlog = await new this.blogModel(createBlog);
       await createdBlog.save();
+
       return blogMapping(createdBlog);
     } catch (e) {
       console.log(e);
@@ -47,6 +51,8 @@ export class BlogsRepository {
     inputModel: BlogInputModel,
   ): Promise<boolean> {
     try {
+      if (objectIdHelper(id)) return false;
+
       const result = await this.blogModel.updateOne(
         { _id: objectIdHelper(id) },
         {
@@ -59,7 +65,7 @@ export class BlogsRepository {
       );
       return result.matchedCount === 1;
     } catch (e) {
-      console.log(e, 'error updateBlogById by blogsRepository');
+      console.log('error updateBlogById', e);
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
@@ -68,6 +74,8 @@ export class BlogsRepository {
   // Возвращает удаленный документ или null, если блог не найден
   async deleteBlogById(id: string): Promise<Document | null> {
     try {
+      if (objectIdHelper(id)) return null;
+
       return await this.blogModel.findByIdAndDelete({
         _id: objectIdHelper(id),
       });
