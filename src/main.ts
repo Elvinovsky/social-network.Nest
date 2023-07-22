@@ -2,9 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
   BadRequestException,
-  Body,
-  NotFoundException,
-  Param,
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
@@ -16,10 +13,6 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       exceptionFactory: (errors: ValidationError[]) => {
-        if (Param() && !Body()) {
-          //todo переделать эту шляпу
-          throw new NotFoundException();
-        }
         throw new BadRequestException(
           errors.map((e: ValidationError) => {
             return {
