@@ -11,10 +11,9 @@ import { User, UserSchema } from './users/users.schema';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsQueryRepo } from './blogs/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
-import { LikesServiceRepo } from './likes/likes-service.repo';
-import { LikesInfoRepository } from './likes/likes.repository';
+import { LikesService } from './likes/likes.service';
+import { LikesRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
-import { LikeAndDisCounter } from './likes/like.helpers';
 import { Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
@@ -75,9 +74,8 @@ if (!Mongo_Uri) {
     CommentsRepository,
     CommentMapper,
 
-    LikesServiceRepo,
-    LikesInfoRepository,
-    LikeAndDisCounter,
+    LikesService,
+    LikesRepository,
   ],
 })
 export class AppModule {}
