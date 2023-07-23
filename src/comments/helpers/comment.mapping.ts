@@ -1,25 +1,21 @@
 import { CommentDocument } from '../comment.schemas';
 import { CommentViewDTO } from '../comment.models';
-import { LikesServiceRepo } from '../../likes/likes-service.repo';
-import { LikeAndDisCounter } from '../../likes/like.helpers';
+import { LikesService } from '../../likes/likes.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentMapper {
-  constructor(
-    private readonly likesQueryRepo: LikesServiceRepo,
-    private readonly likeAndDisCounter: LikeAndDisCounter,
-  ) {}
+  constructor(private readonly likesService: LikesService) {}
   async map(
     comment: CommentDocument,
     userId?: string,
   ): Promise<CommentViewDTO> {
-    const status = await this.likesQueryRepo.getLikeStatusCurrentUser(
+    const status = await this.likesService.getLikeStatusCurrentUser(
       comment._id.toString(),
       userId,
     );
 
-    const countsLikeAndDis = await this.likeAndDisCounter.count(
+    const countsLikeAndDis = await this.likesService.countLikesDisLikes(
       comment._id.toString(),
     );
 
