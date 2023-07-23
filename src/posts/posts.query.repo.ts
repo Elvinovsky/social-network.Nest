@@ -12,7 +12,7 @@ import {
   getSortBy,
   pagesCountOfBlogs,
 } from '../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../common/constant';
+import { DEFAULT_PAGE_SortBy } from '../common/constants';
 import { PostMapper } from './post.helpers';
 import { objectIdHelper } from '../common/helpers';
 

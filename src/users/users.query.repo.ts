@@ -13,7 +13,7 @@ import {
   getSortBy,
   pagesCountOfBlogs,
 } from '../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../common/constant';
+import { DEFAULT_PAGE_SortBy } from '../common/constants';
 
 @Injectable()
 export class UsersQueryRepository {

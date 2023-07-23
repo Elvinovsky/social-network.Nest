@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
-import { Status } from '../common/constant';
+import { Status } from '../common/constants';
 
 @Injectable()
 export class LikesService {

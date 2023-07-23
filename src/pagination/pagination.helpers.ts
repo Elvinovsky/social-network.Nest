@@ -3,7 +3,7 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_SortBy,
   SortDirection,
-} from '../common/constant';
+} from '../common/constants';
 
 export const getPageNumber = (pageNumber?: number): number => {
   return pageNumber ? +pageNumber : DEFAULT_PAGE_NUMBER;
