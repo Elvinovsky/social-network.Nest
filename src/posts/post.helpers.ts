@@ -1,35 +1,28 @@
 import { PostViewDTO } from './post.models';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { LikeAndDisCounter } from '../likes/like.helpers';
-import { LikesServiceRepo } from '../likes/likes-service.repo';
-import { LikeCreateDTO, LikeViewDTO } from '../likes/like.models';
-import { Like, LikeModel } from '../likes/like.schemas';
+import { LikesService } from '../likes/likes.service';
+import { LikeViewDTO } from '../likes/like.models';
 import { PostDocument } from './post.schemas';
 
 @Injectable()
 export class PostMapper {
-  constructor(
-    @InjectModel(Like.name) private likeModel: LikeModel,
-    private readonly likesCountService: LikeAndDisCounter,
-    private readonly likesQueryRepo: LikesServiceRepo,
-  ) {}
+  constructor(private readonly likesService: LikesService) {}
   async mapPosts(
     array: Array<PostDocument>,
     userId?: string,
   ): Promise<PostViewDTO[]> {
     return Promise.all(
       array.map(async (el) => {
-        const status = await this.likesQueryRepo.getLikeStatusCurrentUser(
+        const status = await this.likesService.getLikeStatusCurrentUser(
           el._id.toString(),
           userId,
         );
 
-        const countsLikeAndDis = await this.likesCountService.count(
+        const countsLikeAndDis = await this.likesService.countLikesDisLikes(
           el._id.toString(),
         );
 
-        const lastLikes: LikeViewDTO[] = await this.likesQueryRepo.getLastLikes(
+        const lastLikes: LikeViewDTO[] = await this.likesService.getLastLikes(
           el._id.toString(),
         );
         return {
@@ -51,37 +44,17 @@ export class PostMapper {
     );
   }
   async mapPost(post: PostDocument, userId?: string): Promise<PostViewDTO> {
-    const status = await this.likesQueryRepo.getLikeStatusCurrentUser(
+    const status = await this.likesService.getLikeStatusCurrentUser(
       post._id.toString(),
       userId,
     );
 
-    const countsLikeAndDis = await this.likesCountService.count(
+    const countsLikeAndDis = await this.likesService.countLikesDisLikes(
       post._id.toString(),
     );
 
-    const likes: LikeCreateDTO[] = await this.likesQueryRepo.getLikes(
+    const lastLikes: LikeViewDTO[] = await this.likesService.getLastLikes(
       post._id.toString(),
-    );
-
-    const lastLikes: LikeViewDTO[] = await Promise.all(
-      likes
-        .sort(function (a, b) {
-          return a.createdAt < b.createdAt
-            ? -1
-            : a.createdAt > b.createdAt
-            ? 1
-            : 0;
-        })
-        .reverse()
-        .map(async (lastLikes) => {
-          return {
-            addedAt: lastLikes.createdAt.toISOString(),
-            userId: lastLikes.userId,
-            login: lastLikes.userLogin,
-          };
-        })
-        .slice(0, 3),
     );
 
     return {
