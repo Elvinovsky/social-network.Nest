@@ -5,10 +5,21 @@ import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
 @Injectable()
-export class LikesInfoRepository {
+export class LikesRepository {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
-  async testDeleteDb() {
-    await this.likeModel.deleteMany({});
+  async countLikes(id: string) {
+    const likes = await this.likeModel.countDocuments({
+      postOrCommentId: id,
+      status: Status.Like,
+    });
+    return likes;
+  }
+  async countDisLikes(id: string) {
+    const disLikes = await this.likeModel.countDocuments({
+      postOrCommentId: id,
+      status: Status.Dislike,
+    });
+    return disLikes;
   }
   async getLikes(id: string): Promise<LikeCreateDTO[]> {
     return this.likeModel.find({
