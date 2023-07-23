@@ -12,15 +12,21 @@ export class PostsService {
   ) {}
 
   async createPostByBLog(
-    id: string,
+    blogId: string,
     inputModel: BlogPostInputModel,
   ): Promise<PostViewDTO | null> {
-    const foundBlog: BlogDocument | null = await this.blogService.findById(id);
+    const foundBlog: BlogDocument | null = await this.blogService.findById(
+      blogId,
+    );
     if (!foundBlog) {
       return null;
     }
 
-    return this.postsRepository.createPostBlog(inputModel, id, foundBlog.name);
+    return this.postsRepository.createPostBlog(
+      inputModel,
+      blogId,
+      foundBlog.name,
+    );
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
