@@ -1,24 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { LikesInfoRepository } from './likes.repository';
+import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
-import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constant';
 
 @Injectable()
-export class LikesServiceRepo {
-  constructor(
-    @InjectModel(Like.name) private likeModel: LikeModel,
-    private likesInfoRepository: LikesInfoRepository,
-  ) {}
-  async getLikesByPostId(postId: string): Promise<LikeCreateDTO[]> {
-    return this.likeModel.find({
-      postOrCommentId: postId,
-      status: Status.Like,
-    });
+export class LikesService {
+  constructor(private likesRepository: LikesRepository) {}
+  async countLikesDisLikes(id: string) {
+    const likes = await this.likesRepository.countLikes(id);
+    const disLikes = await this.likesRepository.countDisLikes(id);
+
+    return { likes, disLikes };
   }
   getLikes(id: string) {
-    return this.likesInfoRepository.getLikes(id);
+    return this.likesRepository.getLikes(id);
   }
 
   async getLikeStatusCurrentUser(
@@ -30,11 +25,12 @@ export class LikesServiceRepo {
     }
 
     const likeInfo: LikeCreateDTO | null =
-      await this.likesInfoRepository.getLikeInfo(userId, commentOrPostId);
+      await this.likesRepository.getLikeInfo(userId, commentOrPostId);
+
     return likeInfo ? likeInfo.status : Status.None;
   }
   async getLastLikes(id: string): Promise<LikeViewDTO[]> {
-    const likesArr = await this.getLikesByPostId(id);
+    const likesArr: LikeCreateDTO[] = await this.likesRepository.getLikes(id);
 
     return Promise.all(
       likesArr
