@@ -49,7 +49,7 @@ export class UsersController {
   @Post()
   @UseGuards(AuthGuard)
   async createUsers(@Body() inputModel: UserInputModel) {
-    return this.usersService.createUser(inputModel);
+    return this.usersService.createUserForSA(inputModel);
   }
   @Put(':userId')
   async updateUser(
