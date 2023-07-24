@@ -31,14 +31,15 @@ import { CommentsRepository } from './comments/comments.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentMapper } from './comments/helpers/comment.mapping';
 
-const Mongo_Uri = process.env.MONGO_URL;
-if (!Mongo_Uri) {
+//const mongoUrl = process.env.MONGO_URL;
+const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
+if (!mongoUrl) {
   throw new Error('not db connect');
 }
 @Module({
   imports: [
     configModule,
-    MongooseModule.forRoot(Mongo_Uri),
+    MongooseModule.forRoot(mongoUrl),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),

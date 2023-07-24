@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserInputModel } from './user.models';
@@ -20,6 +21,7 @@ import {
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -45,6 +47,7 @@ export class UsersController {
     return this.usersService.getUser(userId);
   }
   @Post()
+  @UseGuards(AuthGuard)
   async createUsers(@Body() inputModel: UserInputModel) {
     return this.usersService.createUser(inputModel);
   }
