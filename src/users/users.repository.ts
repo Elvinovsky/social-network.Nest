@@ -18,23 +18,8 @@ export class UsersRepository {
     return this.userModel.findById(objectIdHelper(userId));
   }
 
-  async createUser(
-    inputModel: UserInputModel,
-    hash: string,
-  ): Promise<UserViewDTO> {
-    const newUser: UserCreateDTO = {
-      login: inputModel.login,
-      passwordHash: hash,
-      email: inputModel.email,
-      addedAt: new Date().toISOString(),
-      emailConfirmation: {
-        confirmationCode: 'not required',
-        expirationDate: 'not required',
-        isConfirmed: true,
-      },
-    };
-
-    const user: UserDocument = new this.userModel(newUser);
+  async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
+    const user: UserDocument = new this.userModel(inputModel);
     await user.save();
 
     return userMapping(user);
