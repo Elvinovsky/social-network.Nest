@@ -1,24 +1,36 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  InternalServerErrorException,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { RegistrationInputModel } from './auth.models';
 import { AuthService } from './auth.service';
 
 @Controller('/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('/registration')
   async registration(@Body() inputModel: RegistrationInputModel) {
-    const user = await this.authService.userRegistration(inputModel);
-    return user;
+    const isRegistered = this.authService.userRegistration(inputModel);
+    if (!isRegistered) {
+      throw new InternalServerErrorException();
+    }
   }
-  //   async registrationConfirm ( req: RequestInputBody<RegistrationConfirmationCodeModel>, res: Response ) {
-  //     const isConfirmed = await this.authService.confirmCode(req.body.code)
-  //     if (isConfirmed) {
-  //       res.sendStatus(204)
-  //       return
-  //     }
-  //     res.sendStatus(400)
-  //   }
-  //
+  @Put('/registration-confirmation')
+  async registrationConfirm(@Body('code', new ParseUUIDPipe()) code: string) {
+    const isConfirmed = await this.authService.confirmationCode(code);
+    if (!isConfirmed) throw new BadRequestException();
+    return true;
+  }
+
   //   async emailResending ( req: RequestInputBody<RegistrationEmailResending>, res: Response ) {
   //     const isSentCode = await this.authService.confirmEmail(req.body.email)
   //     if (isSentCode) {
