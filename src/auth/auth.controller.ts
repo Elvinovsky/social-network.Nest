@@ -5,16 +5,22 @@ import {
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
-  ParseUUIDPipe,
   Post,
-  Put,
 } from '@nestjs/common';
-import { RegistrationInputModel } from './auth.models';
+import {
+  RegistrationConfirmationCodeModel,
+  RegistrationEmailResending,
+  RegistrationInputModel,
+} from './auth.models';
 import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('/registration')
@@ -24,23 +30,29 @@ export class AuthController {
       throw new InternalServerErrorException();
     }
   }
-  @Put('/registration-confirmation')
-  async registrationConfirm(@Body('code', new ParseUUIDPipe()) code: string) {
-    const isConfirmed = await this.authService.confirmationCode(code);
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('/registration-confirmation')
+  async registrationConfirm(
+    @Body() codeModel: RegistrationConfirmationCodeModel,
+  ) {
+    const isConfirmed = await this.authService.confirmationCode(codeModel.code);
     if (!isConfirmed) throw new BadRequestException();
     return true;
   }
 
-  //   async emailResending ( req: RequestInputBody<RegistrationEmailResending>, res: Response ) {
-  //     const isSentCode = await this.authService.confirmEmail(req.body.email)
-  //     if (isSentCode) {
-  //       res.sendStatus(204)
-  //       return
-  //     }
-  //     res.sendStatus(400)
-  //     return
-  //   }
-  //
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post()
+  async emailResending(@Body() emailModel: RegistrationEmailResending) {
+    const foundUser = await this.usersService.findUserByEmail(emailModel.email);
+    if (!foundUser) throw new BadRequestException();
+
+    const isSentCode = await this.authService.updateConfirmationCodeByEmail(
+      emailModel.email,
+    );
+    if (!isSentCode) throw new BadRequestException();
+    return true;
+  }
   //   async login() {
   //     const user = await this.authService.checkCredentials(req.body.loginOrEmail,
   //       req.body.password)
