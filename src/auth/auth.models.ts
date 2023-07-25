@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, Length, Matches } from 'class-validator';
 
 export class RegistrationInputModel {
   @IsNotEmpty()
@@ -13,3 +13,33 @@ export class RegistrationInputModel {
   @Matches(/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
 }
+
+export class RegistrationConfirmationCodeModel {
+  @IsNotEmpty()
+  @IsUUID()
+  code: string;
+  /**
+   * Code that be sent via Email inside link
+   */
+}
+
+export class RegistrationEmailResending {
+  @IsNotEmpty()
+  @Matches(/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/)
+  email: string;
+  /**
+   *    pattern: ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$
+   *     Email of already registered but not confirmed user
+   */
+}
+export type PasswordRecoveryInputModel = {
+  email: string;
+};
+export type NewPasswordRecoveryInputModel = {
+  newPassword: string;
+  /**
+   * maxLength: 20
+   * minLength: 6
+   */
+  recoveryCode: string;
+};
