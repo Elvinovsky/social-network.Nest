@@ -46,7 +46,7 @@ export class BlogsRepository {
     inputModel: BlogInputModel,
   ): Promise<boolean> {
     try {
-      if (objectIdHelper(id)) return false;
+      if (!objectIdHelper(id)) return false;
 
       const result = await this.blogModel.updateOne(
         { _id: objectIdHelper(id) },
