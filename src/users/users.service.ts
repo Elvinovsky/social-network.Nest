@@ -3,7 +3,6 @@ import { UsersRepository } from './users.repository';
 import { UserDocument } from './users.schema';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
-import { add } from 'date-fns';
 @Injectable()
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
@@ -51,10 +50,21 @@ export class UsersService {
   async updateUser(userId: string, inputModel: UserInputModel) {
     return this.usersRepository.updateUser(userId, inputModel);
   }
-  async deleteUser(id: string): Promise<Document | null> {
-    return this.usersRepository.deleteUser(id);
+  async deleteUserById(id: string): Promise<Document | null> {
+    return this.usersRepository.deleteUserById(id);
+  }
+  async deleteUserByEmail(email: string): Promise<boolean> {
+    return this.usersRepository.deleteUserByEmail(email);
   }
   async _generateHash(password: string): Promise<string> {
     return await bcrypt.hash(password, 7);
+  }
+
+  async findUserByEmail(email: string) {
+    const user = await this.usersRepository.findUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+    return user;
   }
 }
