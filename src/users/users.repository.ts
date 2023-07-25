@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
@@ -36,12 +41,32 @@ export class UsersRepository {
     );
   }
 
-  async deleteUser(userId: string): Promise<Document | null> {
+  async deleteUserById(userId: string): Promise<Document | null> {
     try {
       return this.userModel.findByIdAndDelete(objectIdHelper(userId));
     } catch (e) {
       console.log(e, 'error deleteUser method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+  }
+  async deleteUserByEmail(email: string) {
+    try {
+      const deleteResult = await this.userModel
+        .deleteOne({ email: email })
+        .exec();
+      return deleteResult.deletedCount === 1;
+    } catch (e) {
+      console.log(e, 'error deleteUser method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+  }
+
+  async findUserByEmail(email: string) {
+    try {
+      return this.userModel.findOne({ email }).lean();
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
   }
 }
