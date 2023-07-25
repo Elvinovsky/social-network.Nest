@@ -4,7 +4,6 @@ import { UserDocument } from './users.schema';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
 import { add } from 'date-fns';
-import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
@@ -29,18 +28,20 @@ export class UsersService {
     return await this.usersRepository.createUser(newUser);
   }
 
-  async createUserRegistration(inputModel: UserInputModel, hash: string) {
+  async createUserRegistration(
+    inputModel: UserInputModel,
+    hash: string,
+    code: string,
+    expirationDate: Date,
+  ) {
     const newUser: UserCreateDTO = {
       login: inputModel.login,
       passwordHash: hash,
       email: inputModel.email,
       addedAt: new Date().toISOString(),
       emailConfirmation: {
-        confirmationCode: uuidv4(),
-        expirationDate: add(new Date(), {
-          hours: 1,
-          minutes: 10,
-        }),
+        confirmationCode: code,
+        expirationDate: expirationDate,
         isConfirmed: false,
       },
     };
