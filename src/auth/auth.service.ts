@@ -38,7 +38,7 @@ export class AuthService {
       return true;
     }
 
-    await this.usersService.deleteUser(newUser.id);
+    await this.usersService.deleteUserById(newUser.id);
     return false;
   }
   async confirmationCode(code: string) {
@@ -58,27 +58,25 @@ export class AuthService {
   //   const isRestored = await usersRepository.updatePasswordHash(hash, code);
   //   return isRestored;
   // }
-  // async confirmEmail(email: string): Promise<boolean> {
-  //   const newCode = uuidv4();
-  //   const codeReplacement = await usersRepository.updateConfirmationCodeByEmail(
-  //     email,
-  //     newCode,
-  //   );
-  //
-  //   if (!codeReplacement) {
-  //     return false;
-  //   }
-  //
-  //   try {
-  //     await this.emailsManager.sendEmailConformationMessage(email, newCode);
-  //   } catch (error) {
-  //     const user = await usersRepository.findByLoginOrEmail(email);
-  //     await usersRepository.userByIdDelete(user!._id.toString()); // емайл не подтвержден! user валидириуется в верхних слоях экспресс валидатора
-  //     console.error(error);
-  //     return false;
-  //   }
-  //   return true;
-  // }
+  async updateConfirmationCodeByEmail(email: string): Promise<boolean> {
+    const newCode = uuidv4();
+    const isConfirmed = await this.usersService.findUserByEmail(email);
+    if (isConfirmed!.emailConfirmation.isConfirmed) {
+      return false;
+    }
+
+    await this.authRepository.updateConfirmationCodeByEmail(email, newCode);
+
+    const emailResending = await this.emailService.sendEmailConformationMessage(
+      email,
+      newCode,
+    );
+    if (!emailResending) {
+      await this.usersService.deleteUserByEmail(email);
+      return false;
+    }
+    return true;
+  }
   // async sendPasswordRecovery(email: string): Promise<boolean> {
   //   const newCode = uuidv4();
   //   const codeReplacement = await usersRepository.updateConfirmationCodeByEmail(
