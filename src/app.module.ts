@@ -30,9 +30,13 @@ import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentMapper } from './comments/helpers/comment.mapping';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { EmailService } from './email/email.service';
+import { AuthRepository } from './auth/auth.repository';
 
-//const mongoUrl = process.env.MONGO_URL;
-const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
+const mongoUrl = process.env.MONGO_URL;
+//const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
 if (!mongoUrl) {
   throw new Error('not db connect');
 }
@@ -49,6 +53,7 @@ if (!mongoUrl) {
   controllers: [
     AppController,
     DeleteDBController,
+    AuthController,
     UsersController,
     BlogsController,
     PostsController,
@@ -58,6 +63,11 @@ if (!mongoUrl) {
     DeleteDbRepository,
 
     AppService,
+
+    AuthService,
+    AuthRepository,
+    EmailService,
+
     UsersService,
     UsersRepository,
     UsersQueryRepository,
