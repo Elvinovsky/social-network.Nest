@@ -69,11 +69,9 @@ export class BlogsRepository {
   // Возвращает удаленный документ или null, если блог не найден
   async deleteBlogById(id: string): Promise<Document | null> {
     try {
-      if (objectIdHelper(id)) return null;
+      if (!objectIdHelper(id)) return null;
 
-      return await this.blogModel.findByIdAndDelete({
-        _id: objectIdHelper(id),
-      });
+      return await this.blogModel.findByIdAndDelete(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error deleteBlogById');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
