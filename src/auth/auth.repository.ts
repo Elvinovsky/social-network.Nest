@@ -22,4 +22,21 @@ export class AuthRepository {
       throw new InternalServerErrorException();
     }
   }
+
+  async updateConfirmationCodeByEmail(email: string, newCode: string) {
+    try {
+      const isUpdate = await this.userModel
+        .updateOne(
+          {
+            email: email,
+          },
+          { $set: { emailConfirmation: { confirmationCode: newCode } } },
+        )
+        .exec();
+      return isUpdate.matchedCount === 1;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
 }
