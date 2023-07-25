@@ -15,7 +15,7 @@ export class BlogsRepository {
   // Возвращает BlogDocument или null, если блог не найден
   async findBlogById(id: string): Promise<BlogDocument | null> {
     try {
-      if (objectIdHelper(id)) return null;
+      if (!objectIdHelper(id)) return null;
 
       return await this.blogModel.findById(objectIdHelper(id));
     } catch (e) {
