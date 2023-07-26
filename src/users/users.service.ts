@@ -33,6 +33,7 @@ export class UsersService {
     code: string,
     expirationDate: Date,
   ) {
+    //собираем ДТО юзера для отправки в репозиторий.
     const newUser: UserCreateDTO = {
       login: inputModel.login,
       passwordHash: hash,
@@ -44,6 +45,7 @@ export class UsersService {
         isConfirmed: false,
       },
     };
+    //отправляем ДТО в репозиторий
     return this.usersRepository.createUser(newUser);
   }
 
@@ -61,10 +63,10 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string) {
-    const user = await this.usersRepository.findUserByEmail(email);
-    if (!user) {
-      return null;
-    }
-    return user;
+    return this.usersRepository.findUserByEmail(email);
+  }
+
+  async findUserByConfirmCode(code: string) {
+    return this.usersRepository.findUserByCode(code);
   }
 }
