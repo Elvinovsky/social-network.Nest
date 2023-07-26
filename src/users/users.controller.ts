@@ -21,7 +21,7 @@ import {
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
-import { AuthGuard } from '../guards/auth.guard';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -46,9 +46,9 @@ export class UsersController {
   async getUser(@Param('userId') userId: string) {
     return this.usersService.getUser(userId);
   }
+  @UseGuards(BasicAuthGuard)
   @Post()
-  @UseGuards(AuthGuard)
-  async createUsers(@Body() inputModel: UserInputModel) {
+  async createUser(@Body() inputModel: UserInputModel) {
     return this.usersService.createUserForSA(inputModel);
   }
   @Put(':userId')
