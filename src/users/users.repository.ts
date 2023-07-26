@@ -14,9 +14,6 @@ import { objectIdHelper } from '../common/helpers';
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async getUsers() {
-    return this.userModel.find();
-  }
   async getUser(userId: string): Promise<UserDocument | null> {
     if (!objectIdHelper(userId)) return null;
 
@@ -64,6 +61,17 @@ export class UsersRepository {
   async findUserByEmail(email: string) {
     try {
       return this.userModel.findOne({ email }).lean();
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async findUserByCode(code: string) {
+    try {
+      return this.userModel
+        .findOne({ emailConfirmation: { confirmationCode: code } })
+        .exec();
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
