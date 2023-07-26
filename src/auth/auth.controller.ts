@@ -31,7 +31,12 @@ export class AuthController {
       await this.usersService.findUserByEmail(inputModel.email);
     // если находим возвращаем в ответе ошибку.
     if (foundUser) {
-      throw new BadRequestException();
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email invalid',
+        },
+      ]);
     }
 
     //регистрируем юзера отправляем код по эл/почте
