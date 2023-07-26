@@ -14,6 +14,7 @@ import {
 } from './auth.models';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { UserCreateDTO } from '../users/user.models';
 
 @Controller('/auth')
 export class AuthController {
@@ -25,6 +26,15 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('/registration')
   async registration(@Body() inputModel: RegistrationInputModel) {
+    //ищем юзера в БД по эл/почте
+    const foundUser: UserCreateDTO | null =
+      await this.usersService.findUserByEmail(inputModel.email);
+    // если находим возвращаем в ответе ошибку.
+    if (foundUser) {
+      throw new BadRequestException();
+    }
+
+    //регистрируем юзера отправляем код по эл/почте
     const isRegistered = this.authService.userRegistration(inputModel);
     if (!isRegistered) {
       throw new InternalServerErrorException();
@@ -36,23 +46,41 @@ export class AuthController {
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
-    const isConfirmed = await this.authService.confirmationCode(codeModel.code);
-    if (!isConfirmed) throw new BadRequestException();
-    return true;
+    //ищем юзера в БД по коду подтверждения
+    const foundUser = await this.usersService.findUserByConfirmCode(
+      codeModel.code,
+    );
+
+    //если юзер не найден или код подтвержен  возвращаем 400 ошибку.
+    if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
+      throw new BadRequestException();
+    }
+
+    //подтвержаем эл/почту юзера.
+    await this.authService.confirmationCode(codeModel.code);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post()
+  @Post('/registration-email-resending')
   async emailResending(@Body() emailModel: RegistrationEmailResending) {
-    const foundUser = await this.usersService.findUserByEmail(emailModel.email);
-    if (!foundUser) throw new BadRequestException();
+    // ищем юзера в БД по эл/почте.
+    const foundUser: UserCreateDTO | null =
+      await this.usersService.findUserByEmail(emailModel.email);
 
-    const isSentCode = await this.authService.updateConfirmationCodeByEmail(
+    // если юзер не найден или его почта уже подтвержена выдаем ошибку 400 ошибку
+    if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
+      throw new BadRequestException();
+    }
+
+    //обновляем код и отправляем по электронной почте
+    const isSendCode = await this.authService.sendUpdateConfirmCodeByEmail(
       emailModel.email,
     );
-    if (!isSentCode) throw new BadRequestException();
-    return true;
+
+    //если код не отправился выдаем 500 ошибку
+    if (!isSendCode) throw new InternalServerErrorException();
   }
+
   //   async login() {
   //     const user = await this.authService.checkCredentials(req.body.loginOrEmail,
   //       req.body.password)
