@@ -16,6 +16,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
   async userRegistration(inputModel: RegistrationInputModel): Promise<boolean> {
+    //создаем хэш пароля, код подтверждения, задаем дату протухания коду
     const hash: string = await this._generateHash(inputModel.password);
     const code: string = uuidv4();
     const expirationDate: Date = add(new Date(), {
@@ -23,6 +24,7 @@ export class AuthService {
       minutes: 10,
     });
 
+    //отправляем сгенерированные данные для создания новго юзера в сервис.
     const newUser: UserViewDTO = await this.usersService.createUserRegistration(
       inputModel,
       hash,
@@ -58,19 +60,18 @@ export class AuthService {
   //   const isRestored = await usersRepository.updatePasswordHash(hash, code);
   //   return isRestored;
   // }
-  async updateConfirmationCodeByEmail(email: string): Promise<boolean> {
+  async sendUpdateConfirmCodeByEmail(email: string): Promise<boolean> {
+    //обновляем код подтверждения юзера в БД.
     const newCode = uuidv4();
-    const isConfirmed = await this.usersService.findUserByEmail(email);
-    if (isConfirmed!.emailConfirmation.isConfirmed) {
-      return false;
-    }
-
     await this.authRepository.updateConfirmationCodeByEmail(email, newCode);
 
+    //отправляем код подтвержнеия на элеткронную почту.
     const emailResending = await this.emailService.sendEmailConformationMessage(
       email,
       newCode,
     );
+
+    // если код не отправился удаляем юзера из БД, возвращаем false.
     if (!emailResending) {
       await this.usersService.deleteUserByEmail(email);
       return false;
