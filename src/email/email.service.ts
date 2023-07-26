@@ -27,7 +27,7 @@ export class EmailService {
       subject: 'email confirmation', // Subject line
       html: `<h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
-            <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
+            <a href='https://somesite.net?code=${code}'>complete registration</a>
         </p>`, // plain text body
     };
     // send mail
@@ -41,7 +41,7 @@ export class EmailService {
       return false;
     }
   }
-
+  //todo разобраться с отправкой??
   async sendEmailPasswordRecovery(
     email: string,
     newCode: string,
@@ -77,7 +77,9 @@ export class EmailService {
 
     // send mail
     try {
-      await transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions, (r, e) => {
+        console.log(e);
+      });
       // обработка успешного результата
       return true;
     } catch (err) {
