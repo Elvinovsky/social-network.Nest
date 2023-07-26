@@ -34,6 +34,8 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { EmailService } from './email/email.service';
 import { AuthRepository } from './auth/auth.repository';
+import { BasicStrategy } from './auth/strategies/basic.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 const mongoUrl = process.env.MONGO_URL;
 //const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
@@ -49,6 +51,7 @@ if (!mongoUrl) {
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+    PassportModule,
   ],
   controllers: [
     AppController,
@@ -61,6 +64,7 @@ if (!mongoUrl) {
   ],
   providers: [
     DeleteDbRepository,
+    BasicStrategy,
 
     AppService,
 
