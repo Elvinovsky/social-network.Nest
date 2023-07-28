@@ -69,4 +69,8 @@ export class UsersService {
   async findUserByConfirmCode(code: string) {
     return this.usersRepository.findUserByCode(code);
   }
+
+  async findByLoginOrEmail(loginOrEmail: string) {
+    return this.usersRepository.findUserLoginOrEmail(loginOrEmail);
+  }
 }
