@@ -6,6 +6,8 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import {
   RegistrationConfirmationCodeModel,
@@ -15,6 +17,7 @@ import {
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('/auth')
 export class AuthController {
@@ -85,33 +88,28 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new InternalServerErrorException();
   }
-
-  //   async login() {
-  //     const user = await this.authService.checkCredentials(req.body.loginOrEmail,
-  //       req.body.password)
-  //     if (!user) return res.sendStatus(401)
-  //
-  //     const deviceId = uuidv4()
-  //     const accessToken = await this.jwtService.createJWTAccessToken(user._id)
-  //     const refreshToken = await this.jwtService.createJWTRefreshToken(user._id,
-  //       deviceId)
-  //
-  //     const ipAddress = requestIp.getClientIp(req)
-  //     const deviceName = req.headers["user-agent"]
-  //     const issuedAt = await this.jwtService.getIATByRefreshToken(refreshToken)
-  //     await this.devicesService.createDeviceSession(user._id,
-  //       deviceId,
-  //       issuedAt!,
-  //       ipAddress,
-  //       deviceName,)
-  //
-  //     return res
-  //       .status(200)
-  //       .cookie('refreshToken',
-  //         refreshToken,
-  //         refreshCookieOptions)
-  //       .send(accessToken)
-  //   }
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('/login')
+  async login(@Request() req) {
+    const accessToken = await this.authService.login(req.userId);
+    //
+    // const ipAddress = requestIp.getClientIp(req);
+    // const deviceName = req.headers['user-agent'];
+    // const issuedAt = await this.jwtService.getIATByRefreshToken(refreshToken);
+    // await this.devicesService.createDeviceSession(
+    //   req.user._id,
+    //   deviceId,
+    //   issuedAt!,
+    //   ipAddress,
+    //   deviceName,
+    // );
+    //
+    // return res
+    //   .status(200)
+    //   .cookie('refreshToken', refreshToken, refreshCookieOptions)
+    //   .send(accessToken);
+  }
   //
   //   async createRefToken ( req: Request, res: Response ) {
   //     const accessToken = await this.jwtService.createJWTAccessToken(req.userId)
