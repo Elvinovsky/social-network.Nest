@@ -77,4 +77,24 @@ export class UsersRepository {
       throw new InternalServerErrorException();
     }
   }
+
+  async findUserLoginOrEmail(loginOrEmail: string) {
+    try {
+      // ищем юзера в БД...
+      const user = await this.userModel
+        .findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+        .exec();
+
+      // если не находим возвращаем null.
+      if (!user) {
+        return null;
+      }
+
+      // маппим найденного юзера, возвращаем UserViewDTO
+      return user;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
 }
