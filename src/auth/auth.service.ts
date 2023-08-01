@@ -106,7 +106,8 @@ export class AuthService {
     loginOrEmail: string,
     password: string,
   ): Promise<UserViewDTO | null> {
-    //ищем юзера в БД по логинуу или эл/почте
+    debugger;
+    //ищем юзера в БД по логину или эл/почте
     const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
 
     //если ненаходим или почта не подтверждена возвращаем null.
@@ -141,10 +142,6 @@ export class AuthService {
       deviceId: deviceId,
     });
 
-    const createJWTRefreshToken = this.jwtService.sign({
-      userId: userId,
-      deviceId: deviceId,
-    });
-    return { createJWTAccessToken, createJWTRefreshToken };
+    return { createJWTAccessToken };
   }
 }
