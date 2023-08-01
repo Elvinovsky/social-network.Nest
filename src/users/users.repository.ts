@@ -70,7 +70,7 @@ export class UsersRepository {
   async findUserByCode(code: string) {
     try {
       return this.userModel
-        .findOne({ emailConfirmation: { confirmationCode: code } })
+        .findOne({ 'emailConfirmation.confirmationCode': code })
         .exec();
     } catch (e) {
       console.log(e);
