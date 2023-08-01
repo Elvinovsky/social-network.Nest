@@ -11,9 +11,9 @@ export class AuthRepository {
       const isUpdate = await this.userModel
         .updateOne(
           {
-            emailConfirmation: { confirmationCode: code },
+            'emailConfirmation.confirmationCode': code,
           },
-          { $set: { emailConfirmation: { isConfirmed: true } } },
+          { $set: { 'emailConfirmation.isConfirmed': true } },
         )
         .exec();
       return isUpdate.matchedCount === 1;
