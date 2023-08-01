@@ -6,8 +6,6 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
-  UseGuards,
-  Request,
 } from '@nestjs/common';
 import {
   RegistrationConfirmationCodeModel,
@@ -17,7 +15,6 @@ import {
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('/auth')
 export class AuthController {
@@ -32,6 +29,7 @@ export class AuthController {
     //ищем юзера в БД по эл/почте
     const foundUser: UserCreateDTO | null =
       await this.usersService.findUserByEmail(inputModel.email);
+
     // если находим возвращаем в ответе ошибку.
     if (foundUser) {
       throw new BadRequestException([
@@ -43,7 +41,7 @@ export class AuthController {
     }
 
     //регистрируем юзера отправляем код по эл/почте
-    const isRegistered = this.authService.userRegistration(inputModel);
+    const isRegistered = await this.authService.userRegistration(inputModel);
     if (!isRegistered) {
       throw new InternalServerErrorException();
     }
@@ -61,7 +59,12 @@ export class AuthController {
 
     //если юзер не найден или код подтвержен  возвращаем 400 ошибку.
     if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException();
+      throw new BadRequestException([
+        {
+          field: 'code',
+          message: 'user not found',
+        },
+      ]);
     }
 
     //подтвержаем эл/почту юзера.
@@ -88,27 +91,12 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new InternalServerErrorException();
   }
-  @UseGuards(LocalAuthGuard)
+
   @HttpCode(HttpStatus.OK)
   @Post('/login')
-  async login(@Request() req) {
-    const accessToken = await this.authService.login(req.userId);
-    //
-    // const ipAddress = requestIp.getClientIp(req);
-    // const deviceName = req.headers['user-agent'];
-    // const issuedAt = await this.jwtService.getIATByRefreshToken(refreshToken);
-    // await this.devicesService.createDeviceSession(
-    //   req.user._id,
-    //   deviceId,
-    //   issuedAt!,
-    //   ipAddress,
-    //   deviceName,
-    // );
-    //
-    // return res
-    //   .status(200)
-    //   .cookie('refreshToken', refreshToken, refreshCookieOptions)
-    //   .send(accessToken);
+  async login() {
+    const tokens = await this.authService.login('234567');
+    return tokens;
   }
   //
   //   async createRefToken ( req: Request, res: Response ) {
