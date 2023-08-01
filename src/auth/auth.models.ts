@@ -32,6 +32,12 @@ export class RegistrationEmailResending {
    *     Email of already registered but not confirmed user
    */
 }
+export class LoginInputModel {
+  @IsNotEmpty()
+  loginOrEmail: string;
+  @IsNotEmpty()
+  password: string;
+}
 export type PasswordRecoveryInputModel = {
   email: string;
 };
