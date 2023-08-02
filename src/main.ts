@@ -12,22 +12,22 @@ import {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     transform: true,
-  //     exceptionFactory: (errors: ValidationError[]) => {
-  //       throw new BadRequestException(
-  //         errors.map((e: ValidationError) => {
-  //           return {
-  //             field: e.property,
-  //             message: e.property + ' invalid',
-  //           };
-  //         }),
-  //       );
-  //     },
-  //   }),
-  // );
-  //app.useGlobalFilters(new ErrorExceptionFilter(), new HttpExceptionFilter());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: (errors: ValidationError[]) => {
+        throw new BadRequestException(
+          errors.map((e: ValidationError) => {
+            return {
+              field: e.property,
+              message: e.property + ' invalid',
+            };
+          }),
+        );
+      },
+    }),
+  );
+  app.useGlobalFilters(new ErrorExceptionFilter(), new HttpExceptionFilter());
   await app.listen(3000);
 }
 
