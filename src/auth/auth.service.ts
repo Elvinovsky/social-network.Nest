@@ -6,13 +6,12 @@ import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from './auth.models';
 import { UserViewDTO } from '../users/user.models';
 import { EmailService } from '../email/email.service';
-import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
+import { jwtConstants } from './auth.constants';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly authRepository: AuthRepository,
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
@@ -45,8 +44,8 @@ export class AuthService {
     await this.usersService.deleteUserById(newUser.id);
     return false;
   }
-  async confirmationCode(code: string) {
-    return this.authRepository.confirmEmail(code);
+  async confirmationEmail(code: string) {
+    return this.usersService.confirmationEmail(code);
   }
   // async passwordRecovery(
   //   password: string,
@@ -65,7 +64,7 @@ export class AuthService {
   async sendUpdateConfirmCodeByEmail(email: string): Promise<boolean> {
     //обновляем код подтверждения юзера в БД.
     const newCode = uuidv4();
-    await this.authRepository.updateConfirmationCodeByEmail(email, newCode);
+    await this.usersService.updateConfirmationCodeByEmail(email, newCode);
 
     //отправляем код подтвержнеия на элеткронную почту.
     const emailResending = await this.emailService.sendEmailConformationMessage(
@@ -106,7 +105,6 @@ export class AuthService {
     loginOrEmail: string,
     password: string,
   ): Promise<UserViewDTO | null> {
-    debugger;
     //ищем юзера в БД по логину или эл/почте
     const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
 
@@ -135,13 +133,20 @@ export class AuthService {
     return await bcrypt.compare(password, hash);
   }
   async login(userId: string) {
-    const deviceId = uuidv4();
+    try {
+      const deviceId = uuidv4();
+      const createJWTAccessToken = this.jwtService.sign(
+        {
+          userId: userId,
+          deviceId: deviceId,
+        },
+        { privateKey: jwtConstants.secretAccess },
+      );
 
-    const createJWTAccessToken = this.jwtService.sign({
-      userId: userId,
-      deviceId: deviceId,
-    });
-
-    return { createJWTAccessToken };
+      return { createJWTAccessToken };
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 }
