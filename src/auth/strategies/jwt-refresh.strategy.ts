@@ -13,6 +13,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
       secretOrKey: jwtConstants.secretRefresh,
     });
   }
+  extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers['authorization']?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
   async validate(payload: any) {
     return {
       id: payload.sub,
