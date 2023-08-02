@@ -8,7 +8,7 @@ import { cookieExtractor } from '../helpers/cookie-extractor';
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   constructor() {
     super({
-      JwtFromRequest: cookieExtractor,
+      jwtFromRequest: cookieExtractor,
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secretRefresh,
     });
