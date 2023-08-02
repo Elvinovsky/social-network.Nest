@@ -5,7 +5,7 @@ import { jwtConstants } from '../auth.constants';
 export class JwtBearerStrategy extends PassportStrategy(Strategy, 'bearer') {
   constructor() {
     super({
-      JwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secretRefresh,
     });
