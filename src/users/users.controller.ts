@@ -42,15 +42,20 @@ export class UsersController {
       query.sortDirection,
     );
   }
-  @Get(':id')
+  @Get(':userId')
   async getUser(@Param('userId') userId: string) {
-    return this.usersService.getUser(userId);
+    const result = await this.usersService.getUser(userId);
+    if (!result) {
+      throw new NotFoundException();
+    }
+    return result;
   }
   @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() inputModel: UserInputModel) {
     return this.usersService.createUserForSA(inputModel);
   }
+
   @Put(':userId')
   async updateUser(
     @Param('userId') userId: string,
