@@ -5,7 +5,7 @@ import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
-  constructor(protected usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
   async getUser(userId: string): Promise<UserDocument | null> {
     return this.usersRepository.getUser(userId);
   }
@@ -72,5 +72,11 @@ export class UsersService {
 
   async findByLoginOrEmail(loginOrEmail: string) {
     return this.usersRepository.findUserLoginOrEmail(loginOrEmail);
+  }
+  async confirmationEmail(code: string) {
+    return this.usersRepository.confirmEmail(code);
+  }
+  async updateConfirmationCodeByEmail(email: string, newCode: string) {
+    return this.usersRepository.updateConfirmationCodeByEmail(email, newCode);
   }
 }
