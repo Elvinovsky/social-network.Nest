@@ -3,7 +3,6 @@ import { BasicStrategy } from './strategies/basic.strategy';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './auth.constants';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { EmailService } from '../email/email.service';
@@ -23,11 +22,7 @@ import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
     // }),
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secretAccess,
-      signOptions: { expiresIn: '60s' },
-    }),
+    JwtModule,
   ],
   providers: [
     AuthService,
