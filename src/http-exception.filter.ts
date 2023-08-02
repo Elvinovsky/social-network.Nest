@@ -42,11 +42,11 @@ export class ErrorExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
 
-    if (process.env.SECRET_KEY) {
+    if (!process.env.SECRET_KEY) {
+      //todo realize
       response
-        .status(status)
+        .status(500)
         .send({ error: exception.toString(), stack: exception.stack });
     } else {
       response.status(500).send('some error occurred');
