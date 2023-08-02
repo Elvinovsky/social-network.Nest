@@ -135,15 +135,28 @@ export class AuthService {
   async login(userId: string) {
     try {
       const deviceId = uuidv4();
+
       const createJWTAccessToken = this.jwtService.sign(
+        {
+          userId: userId,
+        },
+        {
+          expiresIn: jwtConstants.accessTokenExpirationTime,
+          secret: jwtConstants.secretAccess,
+        },
+      );
+
+      const createJWTRefreshToken = this.jwtService.sign(
         {
           userId: userId,
           deviceId: deviceId,
         },
-        { privateKey: jwtConstants.secretAccess },
+        {
+          expiresIn: jwtConstants.refreshTokenExpirationTime,
+          secret: jwtConstants.secretRefresh,
+        },
       );
-
-      return { createJWTAccessToken };
+      return { createJWTAccessToken, createJWTRefreshToken };
     } catch (e) {
       console.log(e);
       return null;
