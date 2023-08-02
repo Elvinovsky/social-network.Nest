@@ -6,7 +6,6 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,6 +17,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { CurrentUserId } from './decorators/current-user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -96,8 +96,9 @@ export class AuthController {
   }
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    const tokens = await this.authService.login(req.userId);
+  async login(@CurrentUserId() currentUserId: string) {
+    const tokens = await this.authService.login(currentUserId);
+    // todo расширить реквест для айди index.d.ts
     return tokens;
   }
   //
