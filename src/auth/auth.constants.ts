@@ -6,4 +6,6 @@ export const basicConstants = {
 export const jwtConstants = {
   secretAccess: process.env.ACCESS_JWT_SECRET_KEY,
   secretRefresh: process.env.REFRESH_JWT_SECRET_KEY,
+  accessTokenExpirationTime: '60s',
+  refreshTokenExpirationTime: '60s',
 };
