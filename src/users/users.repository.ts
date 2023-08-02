@@ -90,8 +90,41 @@ export class UsersRepository {
         return null;
       }
 
-      // маппим найденного юзера, возвращаем UserViewDTO
+      //возвращаем найденного юзера.
       return user;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+  async confirmEmail(code: string): Promise<boolean> {
+    try {
+      const isUpdate = await this.userModel
+        .updateOne(
+          {
+            'emailConfirmation.confirmationCode': code,
+          },
+          { $set: { 'emailConfirmation.isConfirmed': true } },
+        )
+        .exec();
+      return isUpdate.matchedCount === 1;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateConfirmationCodeByEmail(email: string, newCode: string) {
+    try {
+      const isUpdate = await this.userModel
+        .updateOne(
+          {
+            email: email,
+          },
+          { $set: { emailConfirmation: { confirmationCode: newCode } } },
+        )
+        .exec();
+      return isUpdate.matchedCount === 1;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
