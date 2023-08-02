@@ -6,6 +6,8 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   RegistrationConfirmationCodeModel,
@@ -15,8 +17,9 @@ import {
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
-@Controller('/auth')
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -24,7 +27,7 @@ export class AuthController {
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('/registration')
+  @Post('registration')
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const foundUser: UserCreateDTO | null =
@@ -48,7 +51,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('/registration-confirmation')
+  @Post('registration-confirmation')
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -68,11 +71,11 @@ export class AuthController {
     }
 
     //подтвержаем эл/почту юзера.
-    await this.authService.confirmationCode(codeModel.code);
+    await this.authService.confirmationEmail(codeModel.code);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('/registration-email-resending')
+  @Post('registration-email-resending')
   async emailResending(@Body() emailModel: RegistrationEmailResending) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
@@ -91,11 +94,10 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new InternalServerErrorException();
   }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('/login')
-  async login() {
-    const tokens = await this.authService.login('234567');
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  async login(@Request() req) {
+    const tokens = await this.authService.login(req.userId);
     return tokens;
   }
   //
