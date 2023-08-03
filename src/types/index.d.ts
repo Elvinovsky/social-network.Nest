@@ -1,5 +1,5 @@
 declare global {
-  namespace Express {
+  export namespace Express {
     export interface Request {
       userId: string;
       issuedAt: number;
@@ -7,3 +7,4 @@ declare global {
     }
   }
 }
+export * from './dist';
