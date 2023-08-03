@@ -98,7 +98,6 @@ export class AuthController {
   @Post('login')
   async login(@CurrentUserId() currentUserId: string) {
     const tokens = await this.authService.login(currentUserId);
-    // todo расширить реквест для айди index.d.ts
     return tokens;
   }
   //
