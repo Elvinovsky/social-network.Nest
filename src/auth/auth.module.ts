@@ -13,6 +13,9 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtBearerGuard } from './guards/jwt-auth.guard';
 import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
+import { DevicesModule } from '../devices/devices.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
 
 @Module({
   imports: [
@@ -21,10 +24,16 @@ import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
     //   limit: 5,
     // }),
     UsersModule,
+    DevicesModule,
     PassportModule,
     JwtModule,
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
   ],
   providers: [
+    ThrottlerBehindProxyGuard,
     AuthService,
     BasicStrategy,
     BasicAuthGuard,
