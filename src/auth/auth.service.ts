@@ -114,12 +114,12 @@ export class AuthService {
     }
 
     // сравниваем поступивщий пароль и пароль  из БД
-    const isHashesEquals = await this._isPasswordCorrect(
+    const isHashesEquals: boolean = await this._isPasswordCorrect(
       password,
       user.passwordHash,
     );
 
-    // если сверка прошла успешнв возвращаем UserDocument в ином случае null.
+    // если сверка прошла успешна возвращаем UserViewDto в ином случае null.
     if (isHashesEquals) {
       return userMapping(user);
     } else {
@@ -139,29 +139,99 @@ export class AuthService {
       }
       const deviceId = uuidv4();
 
-      const createJWTAccessToken = this.jwtService.sign(
-        {
-          userId: userId,
-        },
-        {
-          expiresIn: jwtConstants.accessTokenExpirationTime,
-          secret: jwtConstants.secretAccess,
-        },
+      const createJWTAccessToken = this.createJWTAccessToken(userId);
+
+      const createJWTRefreshToken = this.createJWTRefreshToken(
+        userId,
+        deviceId,
       );
 
-      const createJWTRefreshToken = this.jwtService.sign(
-        {
-          userId: userId,
-          deviceId: deviceId,
-        },
-        {
-          expiresIn: jwtConstants.refreshTokenExpirationTime,
-          secret: jwtConstants.secretRefresh,
-        },
-      );
       return { createJWTAccessToken, createJWTRefreshToken };
     } catch (e) {
       console.log(e);
+      return null;
+    }
+  }
+  async createJWTAccessToken(userId: string) {
+    const accessToken = this.jwtService.sign(
+      {
+        userId: userId,
+      },
+      {
+        expiresIn: jwtConstants.accessTokenExpirationTime,
+        secret: jwtConstants.secretAccess,
+      },
+    );
+    return {
+      accessToken: accessToken,
+    };
+  }
+
+  async createJWTRefreshToken(
+    userId: string,
+    deviceId: string,
+  ): Promise<string> {
+    return this.jwtService.sign(
+      {
+        userId: userId,
+        deviceId: deviceId,
+      },
+      {
+        expiresIn: jwtConstants.refreshTokenExpirationTime,
+        secret: jwtConstants.secretRefresh,
+      },
+    );
+  }
+
+  async getUserIdByAccessToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: jwtConstants.secretAccess,
+      }) as {
+        userId: string;
+      };
+      return payload.userId;
+    } catch (error) {
+      console.log('error verify', error);
+      return null;
+    }
+  }
+
+  async getUserIdByRefreshToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: jwtConstants.secretRefresh,
+      }) as {
+        userId: string;
+      };
+      return payload.userId;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getDeviceIdRefreshToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: jwtConstants.secretRefresh,
+      }) as {
+        deviceId: string;
+      };
+      return payload.deviceId;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getIATByRefreshToken(
+    token: string,
+  ): Promise<number | undefined | null> {
+    try {
+      const payload = this.jwtService.verify(token, { complete: true }) as {
+        iat: number;
+      };
+      return payload.iat;
+    } catch (error) {
       return null;
     }
   }
