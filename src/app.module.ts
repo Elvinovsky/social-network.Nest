@@ -29,6 +29,7 @@ import { CommentMapper } from './comments/helpers/comment.mapping';
 import { EmailService } from './email/email.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { Device, DeviceSchema } from './devices/device.schemas';
 
 const mongoUrl = process.env.MONGO_URL;
 //const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
@@ -47,6 +48,7 @@ if (!mongoUrl) {
       { name: Post.name, schema: PostSchema },
       { name: Like.name, schema: LikeSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Device.name, schema: DeviceSchema },
     ]),
   ],
   controllers: [
