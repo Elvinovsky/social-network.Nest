@@ -70,7 +70,10 @@ export class UsersService {
       inputModel.login,
       inputModel.email,
     );
-    return !!user;
+    if (!user) {
+      return false;
+    }
+    return true;
   }
   async findUserByEmail(email: string) {
     return this.usersRepository.findUserByEmail(email);
