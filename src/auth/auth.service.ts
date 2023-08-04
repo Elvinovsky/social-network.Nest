@@ -219,6 +219,7 @@ export class AuthService {
       };
       return payload.deviceId;
     } catch (error) {
+      console.log('error verify', error);
       return null;
     }
   }
@@ -234,6 +235,7 @@ export class AuthService {
       };
       return payload.iat;
     } catch (error) {
+      console.log('error verify', error);
       return null;
     }
   }
