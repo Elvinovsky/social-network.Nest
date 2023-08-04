@@ -134,6 +134,9 @@ export class AuthService {
   }
   async login(userId: string) {
     try {
+      if (!userId) {
+        return null;
+      }
       const deviceId = uuidv4();
 
       const createJWTAccessToken = this.jwtService.sign(
