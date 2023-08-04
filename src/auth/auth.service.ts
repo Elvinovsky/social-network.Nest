@@ -185,9 +185,9 @@ export class AuthService {
 
   async getUserIdByAccessToken(token: string) {
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload = (await this.jwtService.verify(token, {
         secret: jwtConstants.secretAccess,
-      }) as {
+      })) as {
         userId: string;
       };
       return payload.userId;
@@ -199,9 +199,9 @@ export class AuthService {
 
   async getUserIdByRefreshToken(token: string) {
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload = (await this.jwtService.verify(token, {
         secret: jwtConstants.secretRefresh,
-      }) as {
+      })) as {
         userId: string;
       };
       return payload.userId;
@@ -212,9 +212,9 @@ export class AuthService {
 
   async getDeviceIdRefreshToken(token: string) {
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload = (await this.jwtService.verify(token, {
         secret: jwtConstants.secretRefresh,
-      }) as {
+      })) as {
         deviceId: string;
       };
       return payload.deviceId;
@@ -227,7 +227,9 @@ export class AuthService {
     token: string,
   ): Promise<number | undefined | null> {
     try {
-      const payload = this.jwtService.verify(token, { complete: true }) as {
+      const payload = (await this.jwtService.verify(token, {
+        complete: true,
+      })) as {
         iat: number;
       };
       return payload.iat;
