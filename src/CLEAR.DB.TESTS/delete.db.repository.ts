@@ -6,6 +6,7 @@ import { User } from '../users/users.schema';
 import { Model } from 'mongoose';
 import { Like, LikeModel } from '../likes/like.schemas';
 import { Comment, CommentModel } from '../comments/comment.schemas';
+import { Device, DeviceModel } from '../devices/device.schemas';
 
 @Injectable()
 export class DeleteDbRepository {
@@ -15,6 +16,7 @@ export class DeleteDbRepository {
     @InjectModel(Post.name) private postModel: PostModel,
     @InjectModel(Comment.name) private commentModel: CommentModel,
     @InjectModel(Like.name) private likeModel: LikeModel,
+    @InjectModel(Device.name) private deviceModel: DeviceModel,
   ) {}
   async deleteDB() {
     await this.blogModel.deleteMany();
@@ -22,5 +24,6 @@ export class DeleteDbRepository {
     await this.userModel.deleteMany();
     await this.postModel.deleteMany();
     await this.commentModel.deleteMany();
+    await this.deviceModel.deleteMany();
   }
 }
