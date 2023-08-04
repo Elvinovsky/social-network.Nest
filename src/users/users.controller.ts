@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserInputModel } from './user.models';
@@ -22,6 +23,7 @@ import {
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
 import { AuthService } from '../auth/auth.service';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -83,6 +85,7 @@ export class UsersController {
     }
     return this.usersService.updateUser(userId, inputModel);
   }
+  @UseGuards(BasicAuthGuard)
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('userId') userId: string) {
