@@ -4,7 +4,7 @@ import { add } from 'date-fns';
 import { UsersService } from '../users/users.service';
 import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from './auth.models';
-import { UserViewDTO } from '../users/user.models';
+import { UserInputModel, UserViewDTO } from '../users/user.models';
 import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
@@ -18,6 +18,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly devicesService: DevicesService,
   ) {}
+  async userRegistrationSA(inputModel: UserInputModel) {
+    //создаем хэш пароля.
+    const hash: string = await this._generateHash(inputModel.password);
+    const newUser: UserViewDTO = await this.usersService.createUserForSA(
+      inputModel,
+      hash,
+    );
+    return newUser;
+  }
   async userRegistration(inputModel: RegistrationInputModel): Promise<boolean> {
     //создаем хэш пароля, код подтверждения, задаем дату протухания коду
     const hash: string = await this._generateHash(inputModel.password);
