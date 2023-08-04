@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,12 +23,14 @@ import {
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepo: UsersQueryRepository,
+    private readonly authService: AuthService,
   ) {}
   @Get()
   async getUsers(
@@ -53,7 +56,22 @@ export class UsersController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() inputModel: UserInputModel) {
-    return this.usersService.createUserForSA(inputModel);
+    //ищем юзера в БД по эл/почте
+    const isUserExists: boolean = await this.usersService._isUserExists(
+      inputModel,
+    );
+
+    // если находим возвращаем в ответе ошибку.
+    if (!isUserExists) {
+      throw new BadRequestException([
+        {
+          field: 'email or login',
+          message: 'email or login invalid',
+        },
+      ]);
+    }
+
+    return this.authService.userRegistrationSA(inputModel);
   }
 
   @Put(':userId')
@@ -62,8 +80,10 @@ export class UsersController {
     @Body() inputModel: UserInputModel,
   ) {
     const user: UserDocument | null = await this.usersService.getUser(userId);
-    //if (user) user.canBeConfirmed(<Date>user.emailConfirmation.expirationDate);
-    return this.usersService.updateUser(user!.id, inputModel);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return this.usersService.updateUser(user.id, inputModel);
   }
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
