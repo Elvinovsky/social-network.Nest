@@ -36,15 +36,16 @@ export class AuthController {
   @Post('registration')
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
-    const foundUser: UserCreateDTO | null =
-      await this.usersService.findUserByEmail(inputModel.email);
+    const isUserExists: boolean = await this.usersService._isUserExists(
+      inputModel,
+    );
 
     // если находим возвращаем в ответе ошибку.
-    if (foundUser) {
+    if (!isUserExists) {
       throw new BadRequestException([
         {
-          field: 'email',
-          message: 'email invalid',
+          field: 'email or login',
+          message: 'email or login invalid',
         },
       ]);
     }
