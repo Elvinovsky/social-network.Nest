@@ -41,7 +41,7 @@ export class AuthController {
     );
 
     // если находим возвращаем в ответе ошибку.
-    if (!isUserExists) {
+    if (isUserExists) {
       throw new BadRequestException([
         {
           field: 'email or login',
