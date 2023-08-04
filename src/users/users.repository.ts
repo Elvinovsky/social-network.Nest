@@ -60,7 +60,7 @@ export class UsersRepository {
 
   async findUserByEmail(email: string) {
     try {
-      return this.userModel.findOne({ email }).lean();
+      return this.userModel.findOne({ email: email }).lean();
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -125,6 +125,25 @@ export class UsersRepository {
         )
         .exec();
       return isUpdate.matchedCount === 1;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+  async findUserByLoginAndEmail(login: string, email: string) {
+    try {
+      // ищем юзера в БД...
+      const user = await this.userModel
+        .findOne({ $or: [{ login: login }, { email: email }] })
+        .exec();
+
+      // если не находим возвращаем null.
+      if (!user) {
+        return null;
+      }
+
+      //возвращаем найденного юзера.
+      return user;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
