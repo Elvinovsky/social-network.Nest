@@ -54,6 +54,7 @@ export class UsersController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() inputModel: UserInputModel) {
     //ищем юзера в БД
