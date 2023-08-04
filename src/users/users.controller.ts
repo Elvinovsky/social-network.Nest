@@ -83,7 +83,7 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException();
     }
-    return this.usersService.updateUser(user.id, inputModel);
+    return this.usersService.updateUser(userId, inputModel);
   }
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
