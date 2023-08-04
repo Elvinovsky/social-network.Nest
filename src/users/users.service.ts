@@ -3,6 +3,7 @@ import { UsersRepository } from './users.repository';
 import { UserDocument } from './users.schema';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
+import { RegistrationInputModel } from '../auth/auth.models';
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
@@ -10,8 +11,10 @@ export class UsersService {
     return this.usersRepository.getUser(userId);
   }
 
-  async createUserForSA(inputModel: UserInputModel): Promise<UserViewDTO> {
-    const hash = await this._generateHash(inputModel.password); //todo logic registr => auth?
+  async createUserForSA(
+    inputModel: UserInputModel,
+    hash: string,
+  ): Promise<UserViewDTO> {
     const newUser: UserCreateDTO = {
       login: inputModel.login,
       passwordHash: hash,
@@ -62,10 +65,16 @@ export class UsersService {
     return await bcrypt.hash(password, 7);
   }
 
+  async _isUserExists(inputModel: RegistrationInputModel): Promise<boolean> {
+    const user = await this.usersRepository.findUserByLoginAndEmail(
+      inputModel.login,
+      inputModel.email,
+    );
+    return !!user;
+  }
   async findUserByEmail(email: string) {
     return this.usersRepository.findUserByEmail(email);
   }
-
   async findUserByConfirmCode(code: string) {
     return this.usersRepository.findUserByCode(code);
   }
