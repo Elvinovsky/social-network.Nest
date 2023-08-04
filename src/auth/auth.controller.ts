@@ -6,6 +6,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
+  PreconditionFailedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -98,7 +99,9 @@ export class AuthController {
   @Post('login')
   async login(@CurrentUserId() currentUserId: string) {
     const tokens = await this.authService.login(currentUserId);
-    return tokens;
+    if (tokens === null) {
+      throw new PreconditionFailedException();
+    }
   }
   //
   //   async createRefToken ( req: Request, res: Response ) {
