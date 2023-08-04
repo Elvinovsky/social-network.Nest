@@ -8,6 +8,10 @@ import {
   Post,
   PreconditionFailedException,
   UseGuards,
+  Headers,
+  Ip, // todo Ip or req.ip?
+  Request,
+  Response,
 } from '@nestjs/common';
 import {
   RegistrationConfirmationCodeModel,
@@ -19,6 +23,8 @@ import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
+import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
+import { refreshCookieOptions } from '../common/helpers';
 
 @Controller('auth')
 export class AuthController {
@@ -95,13 +101,34 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new InternalServerErrorException();
   }
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(LocalAuthGuard, ThrottlerBehindProxyGuard)
   @Post('login')
-  async login(@CurrentUserId() currentUserId: string) {
-    const tokens = await this.authService.login(currentUserId);
+  async login(
+    @CurrentUserId() currentUserId: string,
+    @Headers() headers,
+    @Request() req,
+    @Response() res,
+  ) {
+    const ipAddress = req.ip;
+    const deviceName = headers['user-agent'];
+    const tokens = await this.authService.login(
+      currentUserId,
+      deviceName,
+      ipAddress,
+    );
+
     if (tokens === null) {
       throw new PreconditionFailedException();
     }
+
+    res
+      .status(200)
+      .cookie(
+        'refreshToken',
+        tokens.createJWTRefreshToken,
+        refreshCookieOptions,
+      )
+      .send(tokens.createJWTAccessToken);
   }
   //
   //   async createRefToken ( req: Request, res: Response ) {
