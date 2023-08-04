@@ -9,12 +9,14 @@ import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
 import { jwtConstants } from './auth.constants';
+import { DevicesService } from '../devices/devices.service';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
+    private readonly devicesService: DevicesService,
   ) {}
   async userRegistration(inputModel: RegistrationInputModel): Promise<boolean> {
     //создаем хэш пароля, код подтверждения, задаем дату протухания коду
@@ -132,18 +134,30 @@ export class AuthService {
   async _isPasswordCorrect(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
-  async login(userId: string) {
+  async login(userId: string, deviceName: string, ip: string) {
     try {
       if (!userId) {
         return null;
       }
+
       const deviceId = uuidv4();
-
-      const createJWTAccessToken = this.createJWTAccessToken(userId);
-
-      const createJWTRefreshToken = this.createJWTRefreshToken(
+      const createJWTAccessToken = await this.createJWTAccessToken(userId);
+      const createJWTRefreshToken = await this.createJWTRefreshToken(
         userId,
         deviceId,
+      );
+
+      const issuedAt = await this.getIATByRefreshToken(createJWTRefreshToken);
+      if (!issuedAt) {
+        return null;
+      }
+
+      await this.devicesService.createDeviceSession(
+        userId,
+        deviceId,
+        issuedAt,
+        ip,
+        deviceName,
       );
 
       return { createJWTAccessToken, createJWTRefreshToken };
@@ -228,12 +242,10 @@ export class AuthService {
     token: string,
   ): Promise<number | undefined | null> {
     try {
-      const payload = (await this.jwtService.verify(token, {
+      const decoded = this.jwtService.decode(token, {
         complete: true,
-      })) as {
-        iat: number;
-      };
-      return payload.iat;
+      }) as { payload: { iat: number } };
+      return decoded.payload.iat;
     } catch (error) {
       console.log('error verify', error);
       return null;
