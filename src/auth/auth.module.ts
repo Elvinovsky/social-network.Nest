@@ -1,6 +1,6 @@
 import { PassportModule } from '@nestjs/passport';
 import { BasicStrategy } from './strategies/basic.strategy';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
@@ -23,7 +23,7 @@ import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
     //   ttl: 60,
     //   limit: 5,
     // }),
-    UsersModule,
+    forwardRef(() => UsersModule),
     DevicesModule,
     PassportModule,
     JwtModule,
