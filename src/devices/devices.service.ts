@@ -2,7 +2,6 @@ import add from 'date-fns/add';
 import { Injectable } from '@nestjs/common';
 import { DevicesRepository } from './devices.repository';
 import { SessionCreateDTO } from './device.models';
-import mongoose from 'mongoose';
 @Injectable()
 export class DevicesService {
   constructor(protected devicesRepository: DevicesRepository) {}
@@ -11,7 +10,7 @@ export class DevicesService {
   }
 
   async createDeviceSession(
-    userId: mongoose.Types.ObjectId,
+    userId: string,
     deviceId: string,
     issuedAt: number,
     ip: string | null,
@@ -20,7 +19,7 @@ export class DevicesService {
     const createDeviceSession: SessionCreateDTO = {
       deviceId: deviceId,
       issuedAt: issuedAt,
-      userId: userId.toString(),
+      userId: userId,
       ip: ip || null,
       title: deviceName || null,
       lastActiveDate: new Date().toISOString(),
