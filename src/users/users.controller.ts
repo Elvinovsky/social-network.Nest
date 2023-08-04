@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserInputModel } from './user.models';
@@ -22,7 +21,6 @@ import {
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
-import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { AuthService } from '../auth/auth.service';
 
 @Controller('users')
@@ -53,10 +51,10 @@ export class UsersController {
     }
     return result;
   }
-  @UseGuards(BasicAuthGuard)
+
   @Post()
   async createUser(@Body() inputModel: UserInputModel) {
-    //ищем юзера в БД по эл/почте
+    //ищем юзера в БД
     const isUserExists: boolean = await this.usersService._isUserExists(
       inputModel,
     );
