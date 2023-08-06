@@ -60,7 +60,15 @@ export class UsersRepository {
 
   async findUserByEmail(email: string) {
     try {
-      return this.userModel.findOne({ email: email }).lean();
+      return this.userModel.findOne({ email: email }).exec();
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+  async findUserByLogin(login: string) {
+    try {
+      return this.userModel.findOne({ login: login }).exec();
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
