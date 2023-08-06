@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   PaginatorType,
@@ -21,6 +22,7 @@ import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -77,6 +79,7 @@ export class BlogsController {
     return getPostsByBlogId;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel) {
@@ -88,6 +91,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
@@ -103,6 +107,7 @@ export class BlogsController {
     return foundBlog;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
@@ -118,6 +123,8 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Delete(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('blogId') blogId: string) {
