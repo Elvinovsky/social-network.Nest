@@ -24,6 +24,7 @@ import { UsersQueryRepository } from './users.query.repo';
 import { UserDocument } from './users.schema';
 import { AuthService } from '../auth/auth.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { ResultsAuthForErrors } from '../auth/auth.constants';
 
 @Controller('users')
 export class UsersController {
@@ -57,17 +58,26 @@ export class UsersController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() inputModel: UserInputModel) {
-    //ищем юзера в БД
-    const isUserExists: boolean = await this.usersService._isUserExists(
-      inputModel,
-    );
+    //ищем юзера в БД по эл/почте
+    const isUserExists: true | ResultsAuthForErrors =
+      await this.usersService._isUserExists(inputModel);
 
     // если находим возвращаем в ответе ошибку.
-    if (isUserExists) {
+    if (isUserExists === ResultsAuthForErrors.email) {
       throw new BadRequestException([
         {
-          field: 'email or login',
-          message: 'email or login invalid',
+          field: 'email',
+          message: 'email already exists',
+        },
+      ]);
+    }
+
+    // если находим возвращаем в ответе ошибку.
+    if (isUserExists === ResultsAuthForErrors.login) {
+      throw new BadRequestException([
+        {
+          field: 'login',
+          message: 'login already exists',
         },
       ]);
     }
