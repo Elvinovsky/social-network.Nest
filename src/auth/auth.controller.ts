@@ -2,15 +2,15 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Headers,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
   Post,
   PreconditionFailedException,
-  UseGuards,
-  Headers,
   Request,
   Response,
+  UseGuards,
 } from '@nestjs/common';
 import {
   RegistrationConfirmationCodeModel,
@@ -24,6 +24,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
 import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
 import { refreshCookieOptions } from '../common/helpers';
+import { ResultsAuthForErrors } from './auth.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -36,16 +37,25 @@ export class AuthController {
   @Post('registration')
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
-    const isUserExists: boolean = await this.usersService._isUserExists(
-      inputModel,
-    );
+    const isUserExists: true | ResultsAuthForErrors =
+      await this.usersService._isUserExists(inputModel);
 
     // если находим возвращаем в ответе ошибку.
-    if (isUserExists) {
+    if (isUserExists === ResultsAuthForErrors.email) {
       throw new BadRequestException([
         {
-          field: 'email or login',
-          message: 'email or login invalid',
+          field: 'email',
+          message: 'email already exists',
+        },
+      ]);
+    }
+
+    // если находим возвращаем в ответе ошибку.
+    if (isUserExists === ResultsAuthForErrors.login) {
+      throw new BadRequestException([
+        {
+          field: 'login',
+          message: 'login already exists',
         },
       ]);
     }
