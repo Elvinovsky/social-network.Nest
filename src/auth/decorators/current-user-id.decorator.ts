@@ -8,7 +8,6 @@ export const CurrentUserId = createParamDecorator(
     const request: Request = ctx.getRequest();
 
     const user = request.user as UserViewDTO;
-
     return user.id;
   },
 );
