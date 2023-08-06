@@ -3,7 +3,7 @@ import { createTransport } from 'nodemailer';
 @Injectable()
 export class EmailService {
   async sendEmailConformationMessage(email: string, code: string) {
-    const transporter = createTransport({
+    const transporter = await createTransport({
       host: 'smtp.mail.ru',
       port: 465,
       secure: true, // true for 465, false for other ports
