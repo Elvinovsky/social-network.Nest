@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 export const basicConstants = {
   userName: process.env.BASIC_USER_NAME || 'admin',
-  password: process.env.BASIC_PASS || '123',
+  password: process.env.BASIC_PASS || 'qwerty',
 };
 //todo как убрать undefined;
 export const jwtConstants = {
