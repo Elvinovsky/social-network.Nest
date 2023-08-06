@@ -82,7 +82,7 @@ export class AuthController {
       throw new BadRequestException([
         {
           field: 'code',
-          message: 'user not found',
+          message: 'user not found or code already confirmed',
         },
       ]);
     }
