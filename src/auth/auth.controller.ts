@@ -100,7 +100,12 @@ export class AuthController {
 
     // если юзер не найден или его почта уже подтвержена выдаем ошибку 400 ошибку
     if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException();
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email already exists',
+        },
+      ]);
     }
 
     //обновляем код и отправляем по электронной почте
@@ -109,7 +114,7 @@ export class AuthController {
     );
 
     //если код не отправился выдаем 500 ошибку
-    if (!isSendCode) throw new InternalServerErrorException();
+    if (!isSendCode) throw new PreconditionFailedException();
   }
   @UseGuards(LocalAuthGuard, ThrottlerBehindProxyGuard)
   @Post('login')
