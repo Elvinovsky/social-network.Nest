@@ -84,11 +84,12 @@ export class AuthService {
     );
 
     // если код не отправился удаляем юзера из БД, возвращаем false.
-    if (!emailResending) {
-      await this.usersService.deleteUserByEmail(email);
-      return false;
+    if (emailResending) {
+      return true;
     }
-    return true;
+
+    await this.usersService.deleteUserById(email);
+    return false;
   }
   // async sendPasswordRecovery(email: string): Promise<boolean> {
   //   const newCode = uuidv4();
