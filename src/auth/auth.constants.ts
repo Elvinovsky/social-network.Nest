@@ -12,3 +12,14 @@ export const jwtConstants = {
   accessTokenExpirationTime: '60s',
   refreshTokenExpirationTime: '60s',
 };
+
+export enum ResultsAuthForErrors {
+  email,
+  /**
+   * emails already
+   */
+  login,
+  /**
+   * login already exists
+   */
+}
