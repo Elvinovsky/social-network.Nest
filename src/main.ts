@@ -10,11 +10,13 @@ import {
   HttpExceptionFilter,
   ErrorExceptionFilter,
 } from './http-exception.filter';
+import { TrimPipe } from './common/pipes/trim.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.use(cookieParser());
   app.useGlobalPipes(
+    new TrimPipe(),
     new ValidationPipe({
       transform: true,
       exceptionFactory: (errors: ValidationError[]) => {
