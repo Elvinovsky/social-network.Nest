@@ -5,11 +5,9 @@ import { basicConstants } from '../auth.constants';
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy, 'basic') {
   constructor() {
-    super({
-      passReqToCallback: true,
-    });
+    super();
   }
-  public validate = async (req, userName, password) => {
+  public validate = async (userName, password) => {
     if (
       basicConstants.userName === userName &&
       basicConstants.password === password
