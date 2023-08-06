@@ -4,6 +4,8 @@ import { UserDocument } from './users.schema';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from '../auth/auth.models';
+import { ResultsAuthForErrors } from '../auth/auth.constants';
+
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
@@ -65,14 +67,23 @@ export class UsersService {
     return await bcrypt.hash(password, 7);
   }
 
-  async _isUserExists(inputModel: RegistrationInputModel): Promise<boolean> {
-    const user = await this.usersRepository.findUserByLoginAndEmail(
-      inputModel.login,
+  async _isUserExists(
+    inputModel: RegistrationInputModel,
+  ): Promise<true | ResultsAuthForErrors> {
+    const userEmail = await this.usersRepository.findUserByEmail(
       inputModel.email,
     );
-    if (!user) {
-      return false;
+    if (userEmail) {
+      return ResultsAuthForErrors.email;
     }
+
+    const userLogin = await this.usersRepository.findUserByLogin(
+      inputModel.login,
+    );
+    if (userLogin) {
+      return ResultsAuthForErrors.login;
+    }
+
     return true;
   }
   async findUserByEmail(email: string) {
