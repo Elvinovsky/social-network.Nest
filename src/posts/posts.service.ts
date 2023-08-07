@@ -10,6 +10,9 @@ export class PostsService {
     private readonly postsRepository: PostsRepository,
     private readonly blogService: BlogsService,
   ) {}
+  async findPostById(id: string) {
+    return this.postsRepository.findPostById(id);
+  }
 
   async createPostByBLog(
     blogId: string,
