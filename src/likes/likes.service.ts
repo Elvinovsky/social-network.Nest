@@ -2,10 +2,59 @@ import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Status } from '../common/constants';
+import { UsersService } from '../users/users.service';
+import { UserDocument } from '../users/users.schema';
 
 @Injectable()
 export class LikesService {
-  constructor(private likesRepository: LikesRepository) {}
+  constructor(
+    private likesRepository: LikesRepository,
+    private readonly usersService: UsersService,
+  ) {}
+  async createOrUpdateLike(
+    postOrCommentId: string,
+    userId: string,
+    statusType: string,
+  ) {
+    try {
+      const currentUser: UserDocument | null = await this.usersService.getUser(
+        userId,
+      );
+      if (!currentUser) {
+        return Error;
+      }
+      const isAlreadyLiked: LikeCreateDTO | null =
+        await this.likesRepository.getLikeInfo(userId, postOrCommentId);
+      //если пользователь не ставил ранне оценку коментарию или посту
+      if (!isAlreadyLiked) {
+        const newLikeInfo = await this.likesRepository.addLikeInfo(
+          userId,
+          currentUser.login,
+          postOrCommentId,
+          statusType,
+        );
+
+        return newLikeInfo;
+      }
+
+      // если отправленный статус совпадает с существующим в БД
+      if (isAlreadyLiked.status === statusType) {
+        return true;
+      }
+
+      // если отправленный статус не совпадает с существующий статусом в БД
+      const changeLikeInfo = await this.likesRepository.updateLikeInfo(
+        userId,
+        postOrCommentId,
+        statusType,
+      );
+
+      return changeLikeInfo;
+    } catch (error) {
+      console.log('FeedbackService.createOrUpdateLike', error);
+      return false;
+    }
+  }
   async countLikesDisLikes(id: string) {
     const likes = await this.likesRepository.countLikes(id);
     const disLikes = await this.likesRepository.countDisLikes(id);
