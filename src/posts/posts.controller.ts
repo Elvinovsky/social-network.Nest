@@ -11,6 +11,8 @@ import {
   Post,
   Put,
   Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsQueryRepo } from './posts.query.repo';
@@ -19,12 +21,16 @@ import {
   SearchTitleTerm,
 } from '../pagination/pagination.models';
 import { PostInputModel, PostViewDTO } from './post.models';
+import { LikeStatus } from '../likes/like.models';
+import { JwtBearerGuard } from '../auth/guards/jwt-auth.guard';
+import { LikesService } from '../likes/likes.service';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly postsQueryRepo: PostsQueryRepo,
+    private readonly likesService: LikesService,
   ) {}
   @Get('/')
   async getPosts(@Query() query: QueryInputModel & SearchTitleTerm) {
@@ -81,6 +87,25 @@ export class PostsController {
       throw new NotFoundException('post not found');
     }
   }
+
+  @UseGuards(JwtBearerGuard)
+  @Put(':postId/like-status')
+  async updateLikeStatusPost(
+    @Request() req: { userId: string },
+    @Param('postId') postId: string,
+    @Body() inputModel: LikeStatus,
+  ) {
+    const post = await this.postsService.findPostById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    const result = await this.likesService.createOrUpdateLike(
+      postId,
+      req.userId,
+      inputModel.likeStatus,
+    );
+  }
+
   @Delete(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('postId') postId: string) {
