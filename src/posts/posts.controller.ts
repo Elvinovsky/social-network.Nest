@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -24,6 +23,7 @@ import { PostInputModel, PostViewDTO } from './post.models';
 import { LikeStatus } from '../likes/like.models';
 import { JwtBearerGuard } from '../auth/guards/jwt-auth.guard';
 import { LikesService } from '../likes/likes.service';
+import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 
 @Controller('posts')
 export class PostsController {
@@ -91,7 +91,7 @@ export class PostsController {
   @UseGuards(JwtBearerGuard)
   @Put(':postId/like-status')
   async updateLikeStatusPost(
-    @Request() req: { userId: string },
+    @CurrentUserIdHeaders() userId: string,
     @Param('postId') postId: string,
     @Body() inputModel: LikeStatus,
   ) {
@@ -101,7 +101,7 @@ export class PostsController {
     }
     const result = await this.likesService.createOrUpdateLike(
       postId,
-      req.userId,
+      userId,
       inputModel.likeStatus,
     );
   }
