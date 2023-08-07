@@ -89,6 +89,9 @@ export class UsersService {
   async findUserByEmail(email: string) {
     return this.usersRepository.findUserByEmail(email);
   }
+  async findUserByLogin(email: string) {
+    return this.usersRepository.findUserByLogin(email);
+  }
   async findUserByConfirmCode(code: string) {
     return this.usersRepository.findUserByCode(code);
   }
