@@ -3,6 +3,7 @@ declare global {
     export interface Request {
       issuedAt: number;
       deviceId: string;
+      userId: string;
     }
   }
 }
