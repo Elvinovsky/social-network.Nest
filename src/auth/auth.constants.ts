@@ -9,8 +9,8 @@ export const basicConstants = {
 export const jwtConstants = {
   secretAccess: process.env.ACCESS_JWT_SECRET_KEY || 'string',
   secretRefresh: process.env.REFRESH_JWT_SECRET_KEY || 'string',
-  accessTokenExpirationTime: '60s',
-  refreshTokenExpirationTime: '60s',
+  accessTokenExpirationTime: '60m',
+  refreshTokenExpirationTime: '60m',
 };
 
 export enum ResultsAuthForErrors {
