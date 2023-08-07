@@ -1,3 +1,12 @@
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
+
+export class LikeStatus {
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^Like$|^Dislike$|^None$/)
+  likeStatus: string;
+}
+
 export type ExtendedLikesViewDTO = {
   likesCount: number;
   dislikesCount: number;
