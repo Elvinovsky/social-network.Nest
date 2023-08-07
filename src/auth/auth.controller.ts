@@ -119,18 +119,14 @@ export class AuthController {
   @UseGuards(LocalAuthGuard, ThrottlerBehindProxyGuard)
   @Post('login')
   async login(
-    @CurrentUserId() currentUserId: string,
+    @CurrentUserId() userId: string,
     @Headers() headers,
     @Request() req,
     @Response() res,
   ) {
     const ipAddress = req.ip;
     const deviceName = headers['user-agent'];
-    const tokens = await this.authService.login(
-      currentUserId,
-      deviceName,
-      ipAddress,
-    );
+    const tokens = await this.authService.login(userId, deviceName, ipAddress);
 
     if (tokens === null) {
       throw new PreconditionFailedException();
