@@ -11,6 +11,6 @@ export class JwtBearerStrategy extends PassportStrategy(Strategy, 'bearer') {
     });
   }
   async validate(payload: any) {
-    return { userId: payload.sub, userName: payload.userName };
+    return payload.userId;
   }
 }
