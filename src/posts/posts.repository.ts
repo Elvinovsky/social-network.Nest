@@ -16,6 +16,16 @@ export class PostsRepository {
     @InjectModel(Post.name) private readonly postModel: PostModel,
     private readonly postMapper: PostMapper,
   ) {}
+  async findPostById(id: string) {
+    try {
+      if (!objectIdHelper(id)) return null;
+
+      return await this.postModel.findById(objectIdHelper(id));
+    } catch (e) {
+      console.log(e, 'error findPostById method by PostRepository');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+    }
+  }
 
   async createPostBlog(
     inputDTO: BlogPostInputModel,
