@@ -116,7 +116,7 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new PreconditionFailedException();
   }
-  @UseGuards(LocalAuthGuard, ThrottlerBehindProxyGuard)
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
     @CurrentUserId() userId: string,
