@@ -24,6 +24,7 @@ import { LikeStatus } from '../likes/like.models';
 import { JwtBearerGuard } from '../auth/guards/jwt-auth.guard';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -90,6 +91,7 @@ export class PostsController {
 
   @UseGuards(JwtBearerGuard)
   @Put(':postId/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatusPost(
     @CurrentUserIdHeaders() userId: string,
     @Param('postId') postId: string,
@@ -104,8 +106,10 @@ export class PostsController {
       userId,
       inputModel.likeStatus,
     );
+    return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('postId') postId: string) {
