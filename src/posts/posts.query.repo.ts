@@ -55,7 +55,10 @@ export class PostsQueryRepo {
     };
   }
 
-  async getPostById(postId: string): Promise<PostViewDTO | null> {
+  async getPostById(
+    postId: string,
+    userId?: string,
+  ): Promise<PostViewDTO | null> {
     try {
       const post: PostDocument | null = await this.postModel
         .findById(objectIdHelper(postId))
@@ -64,7 +67,7 @@ export class PostsQueryRepo {
       if (!post) {
         return null;
       }
-      return this.postMapper.mapPost(post);
+      return this.postMapper.mapPost(post, userId);
     } catch (e) {
       console.log(e, 'error getPostById method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
