@@ -43,8 +43,7 @@ export class ErrorExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    if (!process.env.SECRET_KEY) {
-      //todo realize
+    if (process.env.NODE_ENV !== 'production') {
       response
         .status(500)
         .send({ error: exception.toString(), stack: exception.stack });
