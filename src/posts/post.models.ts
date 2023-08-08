@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, Length } from 'class-validator';
+import { IsMongoId, IsNotEmpty, Length, Matches } from 'class-validator';
 import { ExtendedLikesViewDTO } from '../likes/like.models';
 export class PostInputModel {
   /**
@@ -24,6 +24,7 @@ export class PostInputModel {
    */
   @IsNotEmpty()
   @IsMongoId()
+  @Matches(/^[a-fa-f0-9]{24}$/)
   blogId: string;
 }
 
