@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -34,20 +35,24 @@ export class PostsController {
     private readonly likesService: LikesService,
   ) {}
   @Get('/')
-  async getPosts(@Query() query: QueryInputModel & SearchTitleTerm) {
+  async getPosts(
+    @Query() query: QueryInputModel & SearchTitleTerm,
+    @Req() req,
+  ) {
     return await this.postsQueryRepo.getSortedPosts(
       query.searchTitleTerm,
       Number(query.pageNumber),
       Number(query.pageSize),
       query.sortBy,
       query.sortDirection,
-      //user?.id
+      req?.userId,
     );
   }
   @Get(':postId')
-  async getPost(@Param('postId') postId: string) {
+  async getPost(@Param('postId') postId: string, @Req() req) {
     const result: PostViewDTO | null = await this.postsQueryRepo.getPostById(
       postId,
+      req?.userId,
     );
 
     if (result === null) {
