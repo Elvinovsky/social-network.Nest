@@ -26,6 +26,7 @@ import { JwtBearerGuard } from '../auth/guards/jwt-auth.guard';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { JwtBearerStrategy } from '../auth/strategies/jwt-bearer.strategy';
 
 @Controller('posts')
 export class PostsController {
@@ -34,10 +35,12 @@ export class PostsController {
     private readonly postsQueryRepo: PostsQueryRepo,
     private readonly likesService: LikesService,
   ) {}
+
+  @UseGuards(JwtBearerStrategy)
   @Get('/')
   async getPosts(
     @Query() query: QueryInputModel & SearchTitleTerm,
-    @Req() req,
+    @CurrentUserIdHeaders() userId: string,
   ) {
     return await this.postsQueryRepo.getSortedPosts(
       query.searchTitleTerm,
@@ -45,7 +48,7 @@ export class PostsController {
       Number(query.pageSize),
       query.sortBy,
       query.sortDirection,
-      req?.userId,
+      userId,
     );
   }
   @Get(':postId')
