@@ -28,10 +28,12 @@ export class LikesRepository {
     });
   }
   async getLikeInfo(userId: string, postOrCommentId: string) {
-    return this.likeModel.findOne({
-      userId: userId,
-      postOrCommentId: postOrCommentId,
-    });
+    return this.likeModel
+      .findOne({
+        userId: userId,
+        postOrCommentId: postOrCommentId,
+      })
+      .exec();
   }
   async updateLikeInfo(
     userId: string,
