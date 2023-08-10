@@ -120,13 +120,12 @@ export class AuthController {
   @Post('login')
   async login(
     @CurrentUserId() userId: string,
-    @Headers() headers,
+    @Headers('user-agent') userAgent: string,
     @Request() req,
     @Response() res,
   ) {
     const ipAddress = req.ip;
-    const deviceName = headers['user-agent'];
-    const tokens = await this.authService.login(userId, deviceName, ipAddress);
+    const tokens = await this.authService.login(userId, userAgent, ipAddress);
 
     if (tokens === null) {
       throw new PreconditionFailedException();
