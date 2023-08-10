@@ -23,6 +23,8 @@ import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { objectIdHelper } from '../common/helpers';
+import { ObjectIdPipe } from '../common/pipes/trim.pipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -95,7 +97,7 @@ export class BlogsController {
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
-    @Param('blogId') blogId: string,
+    @Param('blogId', ObjectIdPipe) blogId: string, // todo урать везде objectIdHelper() засетать пайп ObjectIdPipe
     @Body() inputModel: BlogPostInputModel,
   ) {
     const foundBlog: PostViewDTO | null =
