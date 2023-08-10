@@ -1,13 +1,18 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Request } from 'express';
-import { UserViewDTO } from '../../users/user.models';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 export const CurrentUserId = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const ctx = context.switchToHttp();
-    const request: Request = ctx.getRequest();
+    const request = ctx.getRequest();
 
-    const user = request.user as UserViewDTO;
-    return user.id;
+    const userId = request.user?.id as string;
+    if (!userId) {
+      throw new UnauthorizedException('userId undefined');
+    }
+    return userId;
   },
 );
