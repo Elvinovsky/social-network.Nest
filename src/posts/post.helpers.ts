@@ -14,7 +14,7 @@ export class PostMapper {
     return Promise.all(
       array.map(async (el) => {
         const status = await this.likesService.getLikeStatusCurrentUser(
-          el._id.toString(),
+          el.id,
           userId,
         );
 
