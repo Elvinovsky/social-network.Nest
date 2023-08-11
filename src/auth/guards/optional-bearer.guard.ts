@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { jwtConstants } from '../auth.constants';
 
 @Injectable()
-export class optionalUserAuth implements CanActivate {
+export class OptionalBearerGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
