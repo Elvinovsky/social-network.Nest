@@ -11,11 +11,12 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UsersModule } from '../users/users.module';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { JwtBearerGuard } from './guards/jwt-auth.guard';
+import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
+import { optionalUserAuth } from './guards/optional-bearer.guard';
 
 @Module({
   imports: [
@@ -26,13 +27,17 @@ import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
     forwardRef(() => UsersModule),
     DevicesModule,
     PassportModule,
-    JwtModule,
+    JwtModule.register({
+      global: true,
+    }),
+
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
     }),
   ],
   providers: [
+    optionalUserAuth,
     ThrottlerBehindProxyGuard,
     AuthService,
     BasicStrategy,
