@@ -22,7 +22,6 @@ import { UsersService } from '../users/users.service';
 import { UserCreateDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
-import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
 import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
 
@@ -116,6 +115,7 @@ export class AuthController {
     //если код не отправился выдаем 500 ошибку
     if (!isSendCode) throw new PreconditionFailedException();
   }
+
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -140,6 +140,7 @@ export class AuthController {
       )
       .send(tokens.createJWTAccessToken);
   }
+
   //
   //   async createRefToken ( req: Request, res: Response ) {
   //     const accessToken = await this.jwtService.createJWTAccessToken(req.userId)
