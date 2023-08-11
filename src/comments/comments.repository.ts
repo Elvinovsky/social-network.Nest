@@ -1,8 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument, CommentModel } from './comment.schemas';
 import { objectIdHelper } from '../common/helpers';
 import { CommentMapper } from './helpers/comment.mapping';
+import { CommentCreateDTO } from './comment.models';
 
 @Injectable()
 export class CommentsRepository {
@@ -23,6 +24,32 @@ export class CommentsRepository {
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);
+    }
+  }
+
+  async getCommentByPostId(postId: string) {
+    try {
+      if (!objectIdHelper(postId)) return null;
+
+      const result: CommentDocument | null = await this.commentModel.findOne({
+        postId: objectIdHelper(postId),
+      });
+      return result;
+    } catch (e) {
+      console.log(e, 'error getCommentByPostId');
+      throw new HttpException('server error', 500);
+    }
+  }
+
+  async addNewComment(newComment: CommentCreateDTO) {
+    try {
+      const comment: CommentDocument = new this.commentModel(newComment);
+      await comment.save();
+
+      return this.commentMapper.map(comment);
+    } catch (e) {
+      console.log(e, 'error addNewComment method');
+      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
 }
