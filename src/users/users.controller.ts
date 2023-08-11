@@ -14,14 +14,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserInputModel } from './user.models';
+import { UserInputModel, UserViewDTO } from './user.models';
 import {
   QueryInputModel,
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
-import { UserDocument } from './users.schema';
 import { AuthService } from '../auth/auth.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { ResultsAuthForErrors } from '../auth/auth.constants';
@@ -90,7 +89,7 @@ export class UsersController {
     @Param('userId') userId: string,
     @Body() inputModel: UserInputModel,
   ) {
-    const user: UserDocument | null = await this.usersService.getUser(userId);
+    const user: UserViewDTO | null = await this.usersService.getUser(userId);
     if (!user) {
       throw new NotFoundException();
     }
