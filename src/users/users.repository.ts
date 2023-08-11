@@ -14,10 +14,19 @@ import { objectIdHelper } from '../common/helpers';
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async getUser(userId: string): Promise<UserDocument | null> {
-    if (!objectIdHelper(userId)) return null;
+  async getUser(userId: string): Promise<UserViewDTO | null> {
+    try {
+      if (!objectIdHelper(userId)) return null;
 
-    return this.userModel.findById(objectIdHelper(userId));
+      const user = await this.userModel.findById(objectIdHelper(userId));
+      if (!user) {
+        return null;
+      }
+      return userMapping(user);
+    } catch (e) {
+      console.log('error usersRepository', e);
+      throw new InternalServerErrorException();
+    }
   }
 
   async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
