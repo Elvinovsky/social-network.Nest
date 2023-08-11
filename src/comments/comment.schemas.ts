@@ -8,10 +8,13 @@ export type CommentModel = Model<Comment>;
 export class Comment {
   @Prop({ required: true })
   postId: string;
+
   @Prop({ required: true })
   content: string;
+
   @Prop({ required: true })
   commentatorInfo: CommentatorInfo;
+
   @Prop({ required: true })
   addedAt: string;
 }
