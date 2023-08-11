@@ -26,8 +26,12 @@ import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { optionalUserAuth } from '../auth/guards/optional-bearer.guard';
+import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
+import { ObjectIdPipe } from '../common/pipes/trim.pipe';
+import { CommentInputModel } from '../comments/comment.models';
+import { CommentsService } from '../comments/comments.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('posts')
 export class PostsController {
@@ -35,10 +39,12 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly postsQueryRepo: PostsQueryRepo,
     private readonly likesService: LikesService,
+    private readonly commentsService: CommentsService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get('/')
-  @UseGuards(optionalUserAuth)
+  @UseGuards(OptionalBearerGuard)
   async getPosts(
     @Query() query: QueryInputModel & SearchTitleTerm,
     @CurrentUserIdOptional() userId?: string,
@@ -127,5 +133,28 @@ export class PostsController {
     if (result === null) {
       throw new NotFoundException('post not found');
     }
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post(':postId/comments')
+  @UseGuards(JwtBearerGuard)
+  async createCommentByPost(
+    @Param('postId', ObjectIdPipe) postId: string,
+    @Body() inputModel: CommentInputModel,
+    @CurrentUserIdHeaders() userId: string,
+  ) {
+    const validatorPostId = await this.postsService.findPostById(postId);
+
+    const user = await this.usersService.getUser(userId);
+    if (!validatorPostId || !user) {
+      throw new NotFoundException();
+    }
+    const comment = await this.commentsService.createComment(
+      postId,
+      userId,
+      user.login,
+      inputModel.content,
+    );
+    return comment;
   }
 }
