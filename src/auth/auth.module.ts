@@ -16,7 +16,7 @@ import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
-import { optionalUserAuth } from './guards/optional-bearer.guard';
+import { OptionalBearerGuard } from './guards/optional-bearer.guard';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { optionalUserAuth } from './guards/optional-bearer.guard';
     }),
   ],
   providers: [
-    optionalUserAuth,
+    OptionalBearerGuard,
     ThrottlerBehindProxyGuard,
     AuthService,
     BasicStrategy,
