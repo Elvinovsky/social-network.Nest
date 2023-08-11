@@ -34,5 +34,6 @@ export type CommentViewDTO = {
 };
 
 export class CommentatorInfo {
-  constructor(public userId: string, public userLogin: string) {}
+  userId: string;
+  userLogin: string;
 }
