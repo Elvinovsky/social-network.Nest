@@ -3,7 +3,7 @@ import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Status } from '../common/constants';
 import { UsersService } from '../users/users.service';
-import { UserDocument } from '../users/users.schema';
+import { UserViewDTO } from '../users/user.models';
 
 @Injectable()
 export class LikesService {
@@ -17,7 +17,7 @@ export class LikesService {
     statusType: string,
   ) {
     try {
-      const currentUser: UserDocument | null = await this.usersService.getUser(
+      const currentUser: UserViewDTO | null = await this.usersService.getUser(
         userId,
       );
       if (!currentUser) {
