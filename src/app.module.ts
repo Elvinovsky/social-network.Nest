@@ -1,5 +1,4 @@
 import { ConfigModule } from '@nestjs/config';
-export const configModule = ConfigModule.forRoot();
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -40,7 +39,7 @@ if (!mongoUrl) {
   imports: [
     UsersModule,
     AuthModule,
-    configModule,
+    ConfigModule.forRoot(),
     MongooseModule.forRoot(mongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
