@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { UserDocument } from './users.schema';
 import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
 import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from '../auth/auth.models';
@@ -9,7 +8,7 @@ import { ResultsAuthForErrors } from '../auth/auth.constants';
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
-  async getUser(userId: string): Promise<UserDocument | null> {
+  async getUser(userId: string): Promise<UserViewDTO | null> {
     return this.usersRepository.getUser(userId);
   }
 
