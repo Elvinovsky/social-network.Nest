@@ -15,9 +15,9 @@ export class TrimPipe implements PipeTransform {
 }
 
 export class ObjectIdPipe implements PipeTransform {
-  transform(value: string): Types.ObjectId | false {
+  transform(value: string): string | false {
     if (typeof value === 'string' && Types.ObjectId.isValid(value)) {
-      return new Types.ObjectId(value);
+      return value;
     }
     return false;
   }
