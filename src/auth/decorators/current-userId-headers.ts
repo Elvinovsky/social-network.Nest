@@ -8,11 +8,3 @@ export const CurrentUserIdHeaders = createParamDecorator(
     return userId;
   },
 );
-
-export const CurrentUserIdOptional = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
-    const request = context.switchToHttp().getRequest();
-
-    return request.userId;
-  },
-);

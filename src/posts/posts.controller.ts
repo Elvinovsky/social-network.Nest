@@ -24,12 +24,10 @@ import { PostInputModel, PostViewDTO } from './post.models';
 import { LikeStatus } from '../likes/like.models';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { LikesService } from '../likes/likes.service';
-import {
-  CurrentUserIdHeaders,
-  CurrentUserIdOptional,
-} from '../auth/decorators/current-userId-headers';
+import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { optionalUserAuth } from '../auth/guards/optional-bearer.guard';
+import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 
 @Controller('posts')
 export class PostsController {
