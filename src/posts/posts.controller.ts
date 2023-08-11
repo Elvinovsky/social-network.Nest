@@ -22,11 +22,14 @@ import {
 } from '../pagination/pagination.models';
 import { PostInputModel, PostViewDTO } from './post.models';
 import { LikeStatus } from '../likes/like.models';
-import { JwtBearerGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { LikesService } from '../likes/likes.service';
-import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
+import {
+  CurrentUserIdHeaders,
+  CurrentUserIdOptional,
+} from '../auth/decorators/current-userId-headers';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { JwtBearerStrategy } from '../auth/strategies/jwt-bearer.strategy';
+import { optionalUserAuth } from '../auth/guards/optional-bearer.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -36,11 +39,11 @@ export class PostsController {
     private readonly likesService: LikesService,
   ) {}
 
-  @UseGuards(JwtBearerStrategy)
   @Get('/')
+  @UseGuards(optionalUserAuth)
   async getPosts(
     @Query() query: QueryInputModel & SearchTitleTerm,
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdOptional() userId?: string,
   ) {
     return await this.postsQueryRepo.getSortedPosts(
       query.searchTitleTerm,
@@ -97,8 +100,8 @@ export class PostsController {
     }
   }
 
-  @UseGuards(JwtBearerGuard)
   @Put(':postId/like-status')
+  @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatusPost(
     @CurrentUserIdHeaders() userId: string,
