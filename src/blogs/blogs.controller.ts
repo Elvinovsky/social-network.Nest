@@ -23,8 +23,9 @@ import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { objectIdHelper } from '../common/helpers';
 import { ObjectIdPipe } from '../common/pipes/trim.pipe';
+import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
+import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -62,9 +63,11 @@ export class BlogsController {
   }
 
   @Get(':blogId/posts')
+  @UseGuards(OptionalBearerGuard)
   async getPostsByBlog(
     @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
+    @CurrentUserIdOptional() userId?: string,
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
       blogId,
@@ -72,7 +75,7 @@ export class BlogsController {
       Number(query.pageSize),
       query.sortBy,
       query.sortDirection,
-      // user?.id,
+      userId,
     );
 
     if (!getPostsByBlogId) {
