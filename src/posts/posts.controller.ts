@@ -75,6 +75,7 @@ export class PostsController {
     return result;
   }
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createPost(@Body() inputModel: PostInputModel) {
     const result = await this.postsService.createPost(inputModel);
 
