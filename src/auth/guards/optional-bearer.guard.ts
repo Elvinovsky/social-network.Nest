@@ -12,13 +12,18 @@ export class OptionalBearerGuard implements CanActivate {
     const accessToken = this.extractTokenFromHeaders(request);
 
     if (!accessToken) {
-      request.userId = null;
+      return true;
     } else {
-      const payload = await this.jwtService.verifyAsync(accessToken, {
-        secret: jwtConstants.secretAccess,
-      });
+      const payload = await this.jwtService
+        .verifyAsync(accessToken, {
+          secret: jwtConstants.secretAccess,
+        })
+        .catch(() => {
+          return true;
+        });
       request.userId = payload.userId;
     }
+
     return true;
   }
 
