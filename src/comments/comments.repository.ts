@@ -20,7 +20,7 @@ export class CommentsRepository {
       );
       if (!result) return null;
 
-      return this.commentMapper.map(result, userId);
+      return this.commentMapper.comment(result, userId);
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);
@@ -43,10 +43,10 @@ export class CommentsRepository {
 
   async addNewComment(newComment: CommentCreateDTO) {
     try {
-      const comment: CommentDocument = new this.commentModel(newComment);
-      await comment.save();
-
-      return this.commentMapper.map(comment);
+      const comment: CommentDocument = await this.commentModel.create(
+        newComment,
+      );
+      return await this.commentMapper.comment(comment);
     } catch (e) {
       console.log(e, 'error addNewComment method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
