@@ -6,25 +6,25 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class CommentMapper {
   constructor(private readonly likesService: LikesService) {}
-  async map(
+  async comment(
     comment: CommentDocument,
-    userId?: string,
+    currentUserId?: string,
   ): Promise<CommentViewDTO> {
     const status = await this.likesService.getLikeStatusCurrentUser(
-      comment._id.toString(),
-      userId,
+      comment.id,
+      currentUserId,
     );
 
     const countsLikeAndDis = await this.likesService.countLikesDisLikes(
-      comment._id.toString(),
+      comment.id,
     );
 
     return {
-      id: comment._id.toString(),
+      id: comment.id,
       content: comment.content,
       commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
+        userId: comment.userId,
+        userLogin: comment.userLogin,
       },
       likesInfo: {
         likesCount: countsLikeAndDis.likes,
@@ -33,5 +33,37 @@ export class CommentMapper {
       },
       createdAt: comment.addedAt,
     };
+  }
+  async comments(
+    array: Array<CommentDocument>,
+    userId?: string,
+  ): Promise<CommentViewDTO[]> {
+    return Promise.all(
+      array.map(async (el) => {
+        const status = await this.likesService.getLikeStatusCurrentUser(
+          el.id,
+          userId,
+        );
+
+        const countsLikeAndDis = await this.likesService.countLikesDisLikes(
+          el.id,
+        );
+
+        return {
+          id: el._id.toString(),
+          content: el.content,
+          commentatorInfo: {
+            userId: el.userId,
+            userLogin: el.userLogin,
+          },
+          likesInfo: {
+            likesCount: countsLikeAndDis.likes,
+            dislikesCount: countsLikeAndDis.disLikes,
+            myStatus: status,
+          },
+          createdAt: el.addedAt,
+        };
+      }),
+    );
   }
 }
