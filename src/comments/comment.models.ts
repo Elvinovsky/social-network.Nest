@@ -14,7 +14,8 @@ export class CommentInputModel {
 export type CommentCreateDTO = {
   postId: string;
   content: string;
-  commentatorInfo: CommentatorInfo;
+  userId: string;
+  userLogin: string;
   addedAt: string;
 };
 
