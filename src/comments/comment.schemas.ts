@@ -1,7 +1,5 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import { CommentatorInfo } from './comment.models';
-
 export type CommentDocument = HydratedDocument<Comment>;
 export type CommentModel = Model<Comment>;
 
@@ -13,7 +11,10 @@ export class Comment {
   content: string;
 
   @Prop({ required: true })
-  commentatorInfo: CommentatorInfo;
+  userId: string;
+
+  @Prop({ required: true })
+  userLogin: string;
 
   @Prop({ required: true })
   addedAt: string;
