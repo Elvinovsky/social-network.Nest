@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -59,10 +58,14 @@ export class PostsController {
     );
   }
   @Get(':postId')
-  async getPost(@Param('postId') postId: string, @Req() req) {
+  @UseGuards(OptionalBearerGuard)
+  async getPost(
+    @Param('postId') postId: string,
+    @CurrentUserIdOptional() userId?: string,
+  ) {
     const result: PostViewDTO | null = await this.postsQueryRepo.getPostById(
       postId,
-      req?.userId,
+      userId,
     );
 
     if (result === null) {
@@ -84,6 +87,7 @@ export class PostsController {
     return result;
   }
   @Put(':postId')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param('postId') postId: string,
