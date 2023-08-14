@@ -31,6 +31,7 @@ import { ObjectIdPipe } from '../common/pipes/trim.pipe';
 import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/users.service';
+import { CommentsQueryRepo } from '../comments/comments.query.repository';
 
 @Controller('posts')
 export class PostsController {
@@ -40,6 +41,7 @@ export class PostsController {
     private readonly likesService: LikesService,
     private readonly commentsService: CommentsService,
     private readonly usersService: UsersService,
+    private readonly commentsQueryRepo: CommentsQueryRepo,
   ) {}
 
   @Get('/')
@@ -138,6 +140,29 @@ export class PostsController {
     if (result === null) {
       throw new NotFoundException('post not found');
     }
+  }
+
+  @Get(':postId/comments')
+  @UseGuards(OptionalBearerGuard)
+  async getCommentsByPostId(
+    @Query() query: QueryInputModel & SearchTitleTerm,
+    @Param('postId', ObjectIdPipe) postId: string,
+    @CurrentUserIdOptional() userId?: string,
+  ) {
+    const getCommentsByPostId =
+      await this.commentsQueryRepo.getCommentsByPostId(
+        postId,
+        Number(query.pageNumber),
+        Number(query.pageSize),
+        query.sortBy,
+        query.sortDirection,
+        userId,
+      );
+
+    if (!getCommentsByPostId) {
+      throw new NotFoundException();
+    }
+    return getCommentsByPostId;
   }
 
   @HttpCode(HttpStatus.CREATED)
