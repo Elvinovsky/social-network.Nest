@@ -20,15 +20,11 @@ export class CommentsService {
     userLogin: string,
     content: string,
   ): Promise<CommentViewDTO> {
-    debugger;
-
     const newComment: CommentCreateDTO = {
       postId: postId,
       content: content,
-      commentatorInfo: {
-        userId: userId,
-        userLogin: userLogin,
-      },
+      userId: userId,
+      userLogin: userLogin,
       addedAt: new Date().toISOString(),
     };
 
