@@ -57,4 +57,8 @@ export class DevicesService {
     );
     return result;
   }
+
+  async findDeviceSessionByIAT(issuedAt: number) {
+    return this.devicesRepository.findDeviceSessionByIAT(issuedAt);
+  }
 }
