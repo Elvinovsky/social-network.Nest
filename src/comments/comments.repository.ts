@@ -52,4 +52,32 @@ export class CommentsRepository {
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
+  async updateCommentById(id: string, content: string): Promise<boolean> {
+    const result = await this.commentModel.updateOne(
+      { _id: objectIdHelper(id) },
+      { $set: { content } },
+    );
+    return result.matchedCount === 1;
+  }
+
+  async findCommentById(id: string) {
+    try {
+      if (!objectIdHelper(id)) return null;
+
+      const result: CommentDocument | null = await this.commentModel.findById(
+        objectIdHelper(id),
+      );
+      return result;
+    } catch (e) {
+      console.log(e, 'error getCommentById');
+      throw new HttpException('server error', 500);
+    }
+  }
+
+  async deleteComment(id: string): Promise<boolean> {
+    const resultDeleted = await this.commentModel.deleteOne({
+      _id: objectIdHelper(id),
+    });
+    return resultDeleted.deletedCount === 1;
+  }
 }
