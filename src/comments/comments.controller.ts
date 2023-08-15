@@ -20,6 +20,7 @@ import { UsersService } from '../users/users.service';
 import { ObjectIdPipe } from '../common/pipes/trim.pipe';
 import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
+import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 
 @Controller('/comments')
 export class CommentsController {
@@ -31,8 +32,11 @@ export class CommentsController {
 
   @Get(':id')
   @UseGuards(OptionalBearerGuard)
-  async getComment(@Param('id', ObjectIdPipe) id: string, user?) {
-    const comment = await this.commentService.getComment(id, user?.id);
+  async getComment(
+    @Param('id', ObjectIdPipe) id: string,
+    @CurrentUserIdOptional() userId?: string,
+  ) {
+    const comment = await this.commentService.getComment(id, userId);
     if (!comment) {
       throw new NotFoundException();
     }
@@ -40,6 +44,7 @@ export class CommentsController {
     return comment;
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Put(':id')
   @UseGuards(JwtBearerGuard)
   async updateComment(
@@ -61,11 +66,11 @@ export class CommentsController {
     }
 
     // Обновляем комментарий
-    const foundCommentForUpdate = await this.commentService.updateCommentById(
+    const updateComment = await this.commentService.updateCommentById(
       id,
       inputModel.content,
     );
-    return foundCommentForUpdate;
+    return updateComment;
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
