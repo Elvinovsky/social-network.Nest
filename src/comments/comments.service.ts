@@ -5,6 +5,9 @@ import { CommentCreateDTO, CommentViewDTO } from './comment.models';
 @Injectable()
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
+  async findCommentById(id: string) {
+    return this.commentsRepository.findCommentById(id);
+  }
   async getComment(
     commentId: string,
     userId?: any,
@@ -31,5 +34,12 @@ export class CommentsService {
     };
 
     return this.commentsRepository.addNewComment(newComment);
+  }
+  async updateCommentById(id: string, content: string): Promise<boolean> {
+    return this.commentsRepository.updateCommentById(id, content);
+  }
+
+  async deleteComment(id: string): Promise<boolean> {
+    return await this.commentsRepository.deleteComment(id);
   }
 }
