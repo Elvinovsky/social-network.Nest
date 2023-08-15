@@ -23,8 +23,8 @@ export class CommentMapper {
       id: comment.id,
       content: comment.content,
       commentatorInfo: {
-        userId: comment.userId,
-        userLogin: comment.userLogin,
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
       },
       likesInfo: {
         likesCount: countsLikeAndDis.likes,
@@ -53,8 +53,8 @@ export class CommentMapper {
           id: el._id.toString(),
           content: el.content,
           commentatorInfo: {
-            userId: el.userId,
-            userLogin: el.userLogin,
+            userId: el.commentatorInfo.userId,
+            userLogin: el.commentatorInfo.userLogin,
           },
           likesInfo: {
             likesCount: countsLikeAndDis.likes,
