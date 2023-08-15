@@ -9,7 +9,6 @@ import { EmailService } from '../email/email.service';
 import { BasicAuthGuard } from './guards/basic-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UsersModule } from '../users/users.module';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
@@ -44,7 +43,7 @@ import { OptionalBearerGuard } from './guards/optional-bearer.guard';
     BasicAuthGuard,
     LocalAuthGuard,
     LocalStrategy,
-    JwtRefreshStrategy,
+    JwtRefreshGuard,
     JwtRefreshGuard,
     JwtBearerGuard,
     JwtBearerStrategy,

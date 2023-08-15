@@ -26,7 +26,7 @@ import { CurrentUserId } from './decorators/current-user-id.decorator';
 import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -146,7 +146,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @UseGuards(JwtRefreshStrategy)
+  @UseGuards(JwtRefreshGuard)
   async createRefToken(@Req() req, @Response() res) {
     debugger;
     // Создание нового access token и refreshToken.
