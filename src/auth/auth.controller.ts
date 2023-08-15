@@ -8,6 +8,7 @@ import {
   InternalServerErrorException,
   Post,
   PreconditionFailedException,
+  Req,
   Request,
   Response,
   UseGuards,
@@ -24,12 +25,15 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
 import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { DevicesService } from '../devices/devices.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly devicesService: DevicesService,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -141,6 +145,32 @@ export class AuthController {
       .send(tokens.createJWTAccessToken);
   }
 
+  @Post('refresh-token')
+  @UseGuards(JwtRefreshGuard)
+  async createRefToken(@Req() req, @Response() res) {
+    const { userId, issuedAt, deviceId } = req.user;
+    debugger;
+    // Создание нового access token и refreshToken.
+    const accessToken = await this.authService.createJWTAccessToken(userId);
+    const newRefreshToken = await this.authService.createJWTRefreshToken(
+      userId,
+      deviceId,
+    );
+
+    // Получение нового времени создания токена.
+    const newIssuedAt = await this.authService.getIATByRefreshToken(
+      newRefreshToken,
+    );
+
+    // Обновление времени создания в сессии устройства.
+    await this.devicesService.updateIATByDeviceSession(newIssuedAt, issuedAt);
+
+    // Отправка нового refreshToken в куках и access token в ответе.
+    return res
+      .status(200)
+      .cookie('refreshToken', newRefreshToken, refreshCookieOptions)
+      .send(accessToken);
+  }
   //
   //   async createRefToken ( req: Request, res: Response ) {
   //     const accessToken = await this.jwtService.createJWTAccessToken(req.userId)
