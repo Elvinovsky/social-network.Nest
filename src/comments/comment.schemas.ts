@@ -1,8 +1,10 @@
 import { HydratedDocument, Model } from 'mongoose';
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { CommentatorInfo } from './comment.models';
 export type CommentDocument = HydratedDocument<Comment>;
 export type CommentModel = Model<Comment>;
 
+@Schema()
 export class Comment {
   @Prop({ required: true })
   postId: string;
@@ -10,11 +12,8 @@ export class Comment {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true })
-  userId: string;
-
-  @Prop({ required: true })
-  userLogin: string;
+  @Prop({ type: CommentatorInfo, required: true })
+  commentatorInfo: CommentatorInfo;
 
   @Prop({ required: true })
   addedAt: string;
