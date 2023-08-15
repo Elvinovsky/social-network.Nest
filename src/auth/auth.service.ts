@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { UsersService } from '../users/users.service';
@@ -248,17 +248,15 @@ export class AuthService {
     }
   }
 
-  async getIATByRefreshToken(
-    token: string,
-  ): Promise<number | undefined | null> {
+  async getIATByRefreshToken(token: string): Promise<number> {
     try {
       const decoded = this.jwtService.decode(token, {
         complete: true,
       }) as { payload: { iat: number } };
       return decoded.payload.iat;
     } catch (error) {
-      console.log('error verify', error);
-      return null;
+      console.log('error getIATByRefreshToken', error);
+      throw new PreconditionFailedException();
     }
   }
 }
