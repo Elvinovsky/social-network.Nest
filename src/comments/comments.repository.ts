@@ -43,10 +43,10 @@ export class CommentsRepository {
 
   async addNewComment(newComment: CommentCreateDTO) {
     try {
-      const comment: CommentDocument = await this.commentModel.create(
-        newComment,
-      );
-      return await this.commentMapper.comment(comment);
+      const comment: CommentDocument = new this.commentModel(newComment);
+      await comment.save();
+
+      return this.commentMapper.comment(comment);
     } catch (e) {
       console.log(e, 'error addNewComment method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
