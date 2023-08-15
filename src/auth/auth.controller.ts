@@ -25,8 +25,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
 import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { DevicesService } from '../devices/devices.service';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Controller('auth')
 export class AuthController {
@@ -146,15 +146,14 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtRefreshStrategy)
   async createRefToken(@Req() req, @Response() res) {
-    const { userId, issuedAt, deviceId } = req.user;
     debugger;
     // Создание нового access token и refreshToken.
-    const accessToken = await this.authService.createJWTAccessToken(userId);
+    const accessToken = await this.authService.createJWTAccessToken(req.userId);
     const newRefreshToken = await this.authService.createJWTRefreshToken(
-      userId,
-      deviceId,
+      req.userId,
+      req.deviceId,
     );
 
     // Получение нового времени создания токена.
@@ -163,7 +162,10 @@ export class AuthController {
     );
 
     // Обновление времени создания в сессии устройства.
-    await this.devicesService.updateIATByDeviceSession(newIssuedAt, issuedAt);
+    await this.devicesService.updateIATByDeviceSession(
+      newIssuedAt,
+      req.issuedAt,
+    );
 
     // Отправка нового refreshToken в куках и access token в ответе.
     return res
