@@ -4,6 +4,8 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Put,
@@ -66,6 +68,7 @@ export class CommentsController {
     return foundCommentForUpdate;
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   @UseGuards(JwtBearerGuard)
   async deleteComment(
@@ -89,6 +92,7 @@ export class CommentsController {
     return deleteComment;
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Put(':id/like-status')
   @UseGuards(JwtBearerGuard)
   async updateLikeStatusComment(
