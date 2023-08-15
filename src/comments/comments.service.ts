@@ -23,8 +23,10 @@ export class CommentsService {
     const newComment: CommentCreateDTO = {
       postId: postId,
       content: content,
-      userId: userId,
-      userLogin: userLogin,
+      commentatorInfo: {
+        userId: userId,
+        userLogin: userLogin,
+      },
       addedAt: new Date().toISOString(),
     };
 
