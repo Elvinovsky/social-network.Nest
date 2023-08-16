@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Headers,
   HttpCode,
   HttpStatus,
@@ -10,12 +11,13 @@ import {
   PreconditionFailedException,
   Req,
   Request,
+  Res,
   Response,
   UseGuards,
 } from '@nestjs/common';
 import {
+  EmailInputModel,
   RegistrationConfirmationCodeModel,
-  RegistrationEmailResending,
   RegistrationInputModel,
 } from './auth.models';
 import { AuthService } from './auth.service';
@@ -96,7 +98,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  async emailResending(@Body() emailModel: RegistrationEmailResending) {
+  async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
       await this.usersService.findUserByEmail(emailModel.email);
@@ -173,40 +175,38 @@ export class AuthController {
       .cookie('refreshToken', newRefreshToken, refreshCookieOptions)
       .send(accessToken);
   }
-  //
-  //   async createRefToken ( req: Request, res: Response ) {
-  //     const accessToken = await this.jwtService.createJWTAccessToken(req.userId)
-  //     const newRefreshToken = await this.jwtService.createJWTRefreshToken(req.userId,
-  //       req.deviceId)
-  //
-  //     const newIssuedAt = await this.jwtService.getIATByRefreshToken(newRefreshToken)
-  //     await this.devicesService.updateIATByDeviceSession(newIssuedAt!,
-  //       req.issuedAt)
-  //
-  //     return res.status(200)
-  //               .cookie('refreshToken',
-  //                 newRefreshToken,
-  //                 refreshCookieOptions)
-  //               .send(accessToken)
-  //   }
-  //
-  //   async logout ( req: Request, res: Response ) {
-  //     await this.devicesSessionsRepository.deleteDeviceSessionByIAT(req.issuedAt)
-  //     return res.clearCookie('refreshToken')
-  //               .sendStatus(204)
-  //   }
-  //
-  //
-  //   async passwordRecovery ( req: RequestInputBody<PasswordRecoveryInputModel>, res: Response ) {
-  //     const isSentCode = await this.authService.sendPasswordRecovery(req.body.email)
-  //     if (isSentCode) {
-  //       res.sendStatus(204)
-  //       return
-  //     }
-  //     res.sendStatus(400)
-  //     return
-  //   }
-  //
+
+  @Delete()
+  @UseGuards(JwtRefreshGuard)
+  async logout(@Req() req, @Res() res) {
+    // Удаление записи о сессии устройства.
+    await this.devicesService.logoutByIAT(req.issuedAt);
+
+    // Удаление refreshToken из куков и отправка успешного статуса.
+    return res.clearCookie('refreshToken').sendStatus(204);
+  }
+
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(@Body() inputModel: EmailInputModel, @Res() res) {
+    //валидация электронной почты
+    const emailValidator = await this.usersService.findUserByEmail(
+      inputModel.email,
+    );
+
+    // валидация не пройдена, возврат успешного ответа.
+    if (!emailValidator || !emailValidator.emailConfirmation.isConfirmed) {
+      res.send(204);
+    }
+
+    // Отправка кода восстановления пароля.
+    const isSentCode = await this.authService.sendPasswordRecovery(
+      inputModel.email,
+    );
+
+    return isSentCode;
+  }
+
   //   async newPassword ( req: RequestInputBody<NewPasswordRecoveryInputModel>, res: Response ) {
   //
   //     const recoveryPassword = await this.authService.passwordRecovery(req.body.newPassword,
