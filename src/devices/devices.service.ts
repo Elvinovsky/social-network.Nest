@@ -61,4 +61,8 @@ export class DevicesService {
   async findDeviceSessionByIAT(issuedAt: number) {
     return this.devicesRepository.findDeviceSessionByIAT(issuedAt);
   }
+
+  async logoutByIAT(issuedAt: number) {
+    return this.devicesRepository.deleteDeviceSessionByIAT(issuedAt);
+  }
 }
