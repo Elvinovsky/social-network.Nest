@@ -23,7 +23,7 @@ export class RegistrationConfirmationCodeModel {
    */
 }
 
-export class RegistrationEmailResending {
+export class EmailInputModel {
   @IsNotEmpty()
   @Matches(/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
@@ -38,9 +38,7 @@ export class LoginInputModel {
   @IsNotEmpty()
   password: string;
 }
-export type PasswordRecoveryInputModel = {
-  email: string;
-};
+
 export type NewPasswordRecoveryInputModel = {
   newPassword: string;
   /**
