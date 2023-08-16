@@ -24,7 +24,7 @@ import { OptionalBearerGuard } from './guards/optional-bearer.guard';
     //   limit: 5,
     // }),
     forwardRef(() => UsersModule),
-    DevicesModule,
+    forwardRef(() => DevicesModule),
     PassportModule,
     JwtModule.register({
       global: true,
@@ -43,7 +43,6 @@ import { OptionalBearerGuard } from './guards/optional-bearer.guard';
     BasicAuthGuard,
     LocalAuthGuard,
     LocalStrategy,
-    JwtRefreshGuard,
     JwtRefreshGuard,
     JwtBearerGuard,
     JwtBearerStrategy,
