@@ -91,28 +91,28 @@ export class AuthService {
     await this.usersService.deleteUserById(email);
     return false;
   }
-  // async sendPasswordRecovery(email: string): Promise<boolean> {
-  //   const newCode = uuidv4();
-  //   const codeReplacement = await usersRepository.updateConfirmationCodeByEmail(
-  //     email,
-  //     newCode,
-  //   );
-  //
-  //   if (!codeReplacement) {
-  //     return false;
-  //   }
-  //
-  //   try {
-  //     await this.emailsManager.sendEmailPasswordRecovery(email, newCode);
-  //   } catch (error) {
-  //     const user = await usersRepository.findByLoginOrEmail(email);
-  //     await usersRepository.userByIdDelete(user!._id.toString()); // емайл подтвержден! user валидириуется при запросе на эндпоинт экспресс валидатором
-  //     console.error(error);
-  //     return false;
-  //   }
-  //
-  //   return true;
-  // }
+  async sendPasswordRecovery(email: string): Promise<boolean> {
+    const newCode = uuidv4();
+    const codeReplacement =
+      await this.usersService.updateConfirmationCodeByEmail(email, newCode);
+
+    if (!codeReplacement) {
+      return false;
+    }
+
+    try {
+      await this.emailService.sendEmailPasswordRecovery(email, newCode);
+    } catch (error) {
+      const user = await this.usersService.findByLoginOrEmail(email);
+      if (user) {
+        await this.usersService.deleteUserById(user.id); // емайл подтвержден! user валидириуется при запросе на эндпоинт экспресс валидатором
+      }
+      console.error(error);
+      return false;
+    }
+
+    return true;
+  }
   async checkCredentials(
     loginOrEmail: string,
     password: string,
