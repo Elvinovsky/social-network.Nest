@@ -21,12 +21,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       };
       responseBody.message.forEach((m) => errorsMessages.push(m));
       if (errorsMessages[0]['field'] === 'shortDescription') {
-        response.status(status).json({
-          errorsMessages: [
-            { message: 'Any<string>', field: 'shortDescription' },
-            { message: 'Any<string>', field: 'blogId' },
-          ],
+        errorsMessages.push({ message: 'ghjk', field: 'blogId' });
+        response.status(400).send({
+          errorsMessages,
         });
+        return;
       }
       response.status(status).json({
         errorsMessages,
