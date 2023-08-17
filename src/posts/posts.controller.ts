@@ -27,7 +27,7 @@ import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers'
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { ObjectIdPipe } from '../common/pipes/trim.pipe';
+import { ObjectBlogIdPipe, ObjectIdPipe } from '../common/pipes/trim.pipe';
 import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/users.service';
@@ -78,7 +78,10 @@ export class PostsController {
   }
   @Post()
   @UseGuards(BasicAuthGuard)
-  async createPost(@Body() inputModel: PostInputModel) {
+  async createPost(
+    @Body(ObjectBlogIdPipe)
+    inputModel: PostInputModel,
+  ) {
     const result = await this.postsService.createPost(inputModel);
 
     if (result === null) {
