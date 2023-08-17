@@ -1,4 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
+const configModule = ConfigModule.forRoot({
+  envFilePath: ['.env.local', '.env'],
+});
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -39,10 +42,10 @@ if (!mongoUrl) {
 }
 @Module({
   imports: [
+    configModule,
     UsersModule,
     AuthModule,
     DevicesModule,
-    ConfigModule.forRoot(),
     MongooseModule.forRoot(mongoUrl),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
