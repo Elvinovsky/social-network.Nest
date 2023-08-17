@@ -12,20 +12,24 @@ import {
 } from './http-exception.filter';
 import { TrimPipe } from './common/pipes/trim.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.use(cookieParser());
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
     new TrimPipe(),
     new ValidationPipe({
+      whitelist: true,
       transform: true,
+      stopAtFirstError: false,
       exceptionFactory: (errors: ValidationError[]) => {
         throw new BadRequestException(
           errors.map((e: ValidationError) => {
             return {
               field: e.property,
-              message: e.property + ' invalid',
+              message: e.property + ' invalid', // todo realize constrains
             };
           }),
         );
