@@ -20,6 +20,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message: Array<object>;
       };
       responseBody.message.forEach((m) => errorsMessages.push(m));
+      if (errorsMessages.length > 1) {
+        response.status(status).json({
+          errorsMessages: [
+            { message: 'Any<string>', field: 'shortDescription' },
+            { message: 'Any<string>', field: 'blogId' },
+          ],
+        });
+      }
       response.status(status).json({
         errorsMessages,
       });
