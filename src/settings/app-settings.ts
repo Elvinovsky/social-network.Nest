@@ -11,12 +11,14 @@ import {
   HttpExceptionFilter,
 } from '../http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { TrimPipe } from '../common/pipes/trim.pipe';
 
 export const appSettings = (app: INestApplication) => {
   app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   app.useGlobalPipes(
+    new TrimPipe(),
     new ValidationPipe({
       whitelist: true,
       transform: true,
