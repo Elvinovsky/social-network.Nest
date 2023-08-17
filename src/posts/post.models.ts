@@ -1,5 +1,6 @@
 import { IsMongoId, IsNotEmpty, Length, Matches } from 'class-validator';
 import { ExtendedLikesViewDTO } from '../likes/like.models';
+
 export class PostInputModel {
   /**
    * title input  model {maxLength: 30 }
