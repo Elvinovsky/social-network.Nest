@@ -775,6 +775,13 @@
     path-to-regexp "3.2.0"
     tslib "2.6.0"
 
+"@nestjs/cqrs@^10.2.5":
+  version "10.2.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/cqrs/-/cqrs-10.2.5.tgz#e6525dc87e82fe2c4c278d26b5bf71569f6ffbb4"
+  integrity sha512-730hVSJAz3Hk8UjNwMRug40o4A0+whck+nGsiW80ON4Ir/7By2F0wkr4myH3dgfzYcJifHIsQzlRsd586la82g==
+  dependencies:
+    uuid "9.0.0"
+
 "@nestjs/jwt@^10.1.0":
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@nestjs/jwt/-/jwt-10.1.0.tgz#7899b68d68b998cc140bc0af392c63fc00755236"
