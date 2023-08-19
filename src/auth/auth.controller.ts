@@ -44,8 +44,8 @@ export class AuthController {
     private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(WsThrottlerGuard)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
