@@ -23,9 +23,9 @@ import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { ObjectIdPipe } from '../common/pipes/trim.pipe';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
+import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('blogs')
 export class BlogsController {
