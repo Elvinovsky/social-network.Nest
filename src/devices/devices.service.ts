@@ -50,6 +50,12 @@ export class DevicesService {
     );
   }
 
+  /**
+   * Выход из всех сессий устройств для указанного пользователя.
+   * @param issuedAt Время создания токена.
+   * @param userId Идентификатор пользователя (строка).
+   * @returns Промис с результатом удаления сессий устройств.
+   */
   async logoutDevicesSessionsByUser(issuedAt: number, userId: string) {
     const result = await this.devicesRepository.deleteDevicesSessionsByUser(
       issuedAt,
