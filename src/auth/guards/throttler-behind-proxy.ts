@@ -17,11 +17,8 @@ export class WsThrottlerGuard extends ThrottlerGuard {
     limit: number,
     ttl: number,
   ): Promise<boolean> {
-    const client = context.switchToWs().getClient();
-    const ip =
-      client._socket.remoteAddress || client.ips.length
-        ? client.ips[0]
-        : client.ip;
+    const client = context.switchToHttp().getRequest();
+    const ip = client.headers['x-forwarded-for'] || client.socket.remoteAddress;
     const key = this.generateKey(context, ip);
     const { totalHits } = await this.storageService.increment(key, ttl);
 
