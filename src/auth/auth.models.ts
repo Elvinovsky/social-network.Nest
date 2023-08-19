@@ -1,4 +1,16 @@
-import { IsNotEmpty, IsString, IsUUID, Length, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Length,
+  Matches,
+  Validate,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
+import { Injectable } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
 export class RegistrationInputModel {
   @IsNotEmpty()
@@ -39,11 +51,36 @@ export class LoginInputModel {
   password: string;
 }
 
-export type NewPasswordRecoveryInputModel = {
+@Injectable()
+@ValidatorConstraint({ name: 'CodeExpire', async: true })
+export class CodeExpireCheck implements ValidatorConstraintInterface {
+  constructor(private authService: AuthService) {}
+  async validate(code: string, args: ValidationArguments) {
+    const currentUser = await this.authService.findUserByConfirmCode(code);
+    if (
+      !currentUser ||
+      currentUser.emailConfirmation.expirationDate < new Date()
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return 'your verification code has expired';
+  }
+}
+
+export class NewPasswordRecoveryInputModel {
+  @IsNotEmpty()
+  @IsString()
+  @Length(6, 20)
   newPassword: string;
   /**
    * maxLength: 20
    * minLength: 6
    */
+  @IsNotEmpty()
+  @Validate(CodeExpireCheck)
   recoveryCode: string;
-};
+}
