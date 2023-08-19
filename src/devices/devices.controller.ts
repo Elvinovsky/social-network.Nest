@@ -1,11 +1,9 @@
 import {
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Req,
   Res,
@@ -58,14 +56,15 @@ export class DevicesController {
       await this.devicesService.logoutDeviceSessionByDeviceId(id, userId);
 
     // Обработка различных сценариев удаления устройства
-
     if (logoutDeviceSession === null) {
-      throw new NotFoundException(); // Ошибка: Не найдено.
+      res.sendStatus(404); // Ошибка: Не найдено.
+      return;
     }
-
     if (!logoutDeviceSession) {
-      throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
+      res.sendStatus(403); // Ошибка: Запрещено (отказано в доступе).
+      return;
     }
-    return logoutDeviceSession;
+    res.sendStatus(204); // Успешный статус: OK, без содержимого.
+    return;
   }
 }
