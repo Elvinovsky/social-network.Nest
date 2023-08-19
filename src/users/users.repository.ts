@@ -166,4 +166,16 @@ export class UsersRepository {
       throw new InternalServerErrorException();
     }
   }
+
+  async updatePasswordForUser(hash: string, code: string) {
+    try {
+      const result = await this.userModel
+        .updateOne({ code }, { $set: { hash: hash } })
+        .exec();
+      return result.matchedCount === 1;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
 }
