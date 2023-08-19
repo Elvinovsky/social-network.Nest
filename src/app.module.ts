@@ -34,6 +34,7 @@ import { UsersModule } from './users/users.module';
 import { Device, DeviceSchema } from './devices/device.schemas';
 import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
+import { BlogExistsConstraint } from './posts/post.models';
 
 const mongoUrl = process.env.MONGO_URL;
 //const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
@@ -64,6 +65,7 @@ if (!mongoUrl) {
     CommentsController,
   ],
   providers: [
+    BlogExistsConstraint,
     AppService,
     DeleteDbRepository,
     EmailService,
