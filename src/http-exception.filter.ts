@@ -51,7 +51,7 @@ export class ErrorExceptionFilter implements ExceptionFilter {
         .status(500)
         .send({ error: exception.toString(), stack: exception.stack });
     } else {
-      response.status(500).send('some error occurred');
+      response.status(500).send('Something went wrong');
     }
   }
 }
