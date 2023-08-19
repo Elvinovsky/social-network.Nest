@@ -104,4 +104,7 @@ export class UsersService {
   async updateConfirmationCodeByEmail(email: string, newCode: string) {
     return this.usersRepository.updateConfirmationCodeByEmail(email, newCode);
   }
+  async updatePasswordHash(hash: string, code: string) {
+    return this.usersRepository.updatePasswordForUser(hash, code);
+  }
 }
