@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Headers,
   HttpCode,
   HttpStatus,
@@ -17,6 +18,7 @@ import {
 } from '@nestjs/common';
 import {
   EmailInputModel,
+  NewPasswordRecoveryInputModel,
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
 } from './auth.models';
@@ -29,6 +31,10 @@ import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { UsersQueryRepository } from '../users/users.query.repo';
+import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
+import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -36,10 +42,12 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly devicesService: DevicesService,
+    private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
+  @UseGuards(ThrottlerGuard)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -74,6 +82,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
+  @UseGuards(ThrottlerGuard)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -98,6 +107,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
+  @UseGuards(ThrottlerGuard)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
@@ -122,8 +132,9 @@ export class AuthController {
     if (!isSendCode) throw new PreconditionFailedException();
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
+  @UseGuards(LocalAuthGuard)
+  @UseGuards(ThrottlerGuard)
   async login(
     @CurrentUserId() userId: string,
     @Headers('user-agent') userAgent: string,
@@ -188,6 +199,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(ThrottlerGuard)
   async passwordRecovery(@Body() inputModel: EmailInputModel, @Res() res) {
     //валидация электронной почты
     const emailValidator = await this.usersService.findUserByEmail(
@@ -207,27 +219,27 @@ export class AuthController {
     return isSentCode;
   }
 
-  //   async newPassword ( req: RequestInputBody<NewPasswordRecoveryInputModel>, res: Response ) {
-  //
-  //     const recoveryPassword = await this.authService.passwordRecovery(req.body.newPassword,
-  //       req.body.recoveryCode)
-  //     if (recoveryPassword === null) {
-  //       res.sendStatus(403)
-  //       return
-  //     }
-  //     if (recoveryPassword) {
-  //       res.sendStatus(204)
-  //       return
-  //     }
-  //     res.sendStatus(400)
-  //   }
-  //
-  //   async getMe ( req: Request, res: Response ) {
-  //     const user = await usersQueryRepository.getUserInfo(req.user!.id)
-  //     if (user) {
-  //       res.send(user)
-  //       return
-  //     }
-  //   }
-  // }
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(ThrottlerGuard)
+  async newPassword(
+    @Body()
+    inputModel: NewPasswordRecoveryInputModel,
+  ) {
+    // Установка нового пароля после восстановления.
+    const recoveryPassword = await this.authService.passwordRecovery(
+      inputModel,
+    );
+  }
+
+  @Get('me')
+  @UseGuards(JwtBearerGuard)
+  async getMe(@CurrentUserIdHeaders() userId: string) {
+    // Получение информации о текущем пользователе.
+    const user = await this.usersQueryRepository.getUserInfo(userId);
+    if (user) {
+      return user; // Отправка информации о пользователе.
+    }
+    throw new InternalServerErrorException(); // Ошибка: что то пошло не так.
+  }
 }
