@@ -144,6 +144,7 @@ export class AuthController {
     @Response() res,
   ) {
     const ipAddress = req.ip;
+
     const tokens = await this.authService.login(userId, userAgent, ipAddress);
 
     if (tokens === null) {
