@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Param,
   Req,
   Res,
   UseGuards,
@@ -13,7 +14,6 @@ import {
 import { DevicesService } from './devices.service';
 import { JwtRefreshGuard } from '../auth/guards/jwt-refresh.guard';
 
-@UseGuards(JwtRefreshGuard)
 @Controller('security')
 export class DevicesController {
   constructor(private devicesService: DevicesService) {}
@@ -46,13 +46,16 @@ export class DevicesController {
   @Delete('devices/:deviceId')
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteDeviceById(@Req() req, @Res() res) {
-    const deviceId = req.params.deviceId; // Получаем id устройства из запроса
+  async deleteDeviceById(
+    @Param('deviceId') id: string,
+    @Req() req,
+    @Res() res,
+  ) {
     const userId = req.userId.toString(); // Получаем id пользователя из запроса
 
     // Выход из конкретного устройства пользователя
     const logoutDeviceSession =
-      await this.devicesService.logoutDeviceSessionByDeviceId(deviceId, userId);
+      await this.devicesService.logoutDeviceSessionByDeviceId(id, userId);
 
     // Обработка различных сценариев удаления устройства
 
