@@ -16,7 +16,7 @@ export const jwtConstants = {
 export enum ResultsAuthForErrors {
   email,
   /**
-   * emails already
+   * emails already exists
    */
   login,
   /**
