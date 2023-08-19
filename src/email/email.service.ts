@@ -32,7 +32,7 @@ export class EmailService {
     };
     // send mail
     try {
-      await transporter.sendMail(mailOptions);
+      transporter.sendMail(mailOptions);
       // обработка успешного результата
       return true;
     } catch (err) {
@@ -77,7 +77,7 @@ export class EmailService {
 
     // send mail
     try {
-      await transporter.sendMail(mailOptions, (r, e) => {
+      transporter.sendMail(mailOptions, (r, e) => {
         console.log(e);
       });
       // обработка успешного результата
