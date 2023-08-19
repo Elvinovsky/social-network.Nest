@@ -14,6 +14,7 @@ import {
   pagesCountOfBlogs,
 } from '../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../common/constants';
+import { objectIdHelper } from '../common/helpers';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -45,15 +46,17 @@ export class UsersQueryRepository {
       items: usersMapping(foundUsers),
     };
   }
-  // async getUserInfo(id: string): Promise<MeViewModel | null> {
-  //   const user = await UserModelClass.findOne({ _id: new ObjectId(id) });
-  //   if (!user) {
-  //     return null;
-  //   }
-  //   return {
-  //     email: user.email,
-  //     login: user.login,
-  //     userId: user._id.toString(),
-  //   };
-  // },
+  async getUserInfo(id: string): Promise<MeViewModel | null> {
+    const user = await this.userModel
+      .findOne({ _id: objectIdHelper(id) })
+      .exec();
+    if (!user) {
+      return null;
+    }
+    return {
+      email: user.email,
+      login: user.login,
+      userId: user.id,
+    };
+  }
 }
