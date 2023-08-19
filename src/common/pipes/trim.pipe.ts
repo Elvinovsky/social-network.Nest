@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
-import { Types } from 'mongoose';
+
 @Injectable()
 export class TrimPipe implements PipeTransform {
   transform(value: any) {
@@ -11,15 +11,5 @@ export class TrimPipe implements PipeTransform {
         typeof value[el] === 'string' ? value[el].trim() : value[el]);
     });
     return value;
-  }
-}
-
-@Injectable()
-export class ObjectIdPipe implements PipeTransform {
-  transform(value: string): string | false {
-    if (typeof value === 'string' && Types.ObjectId.isValid(value)) {
-      return value;
-    }
-    return false;
   }
 }
