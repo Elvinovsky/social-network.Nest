@@ -34,6 +34,7 @@ import { UsersQueryRepository } from '../users/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -46,7 +47,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(WsThrottlerGuard)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -106,7 +108,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  @UseGuards(WsThrottlerGuard)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
