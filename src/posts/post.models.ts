@@ -13,14 +13,14 @@ import { BlogsRepository } from '../blogs/blogs.repository';
 
 @Injectable()
 @ValidatorConstraint({ name: 'BlogExists', async: true })
-export class BlogExistsConstraint implements ValidatorConstraintInterface {
+export class BlogIdExistenceCheck implements ValidatorConstraintInterface {
   constructor(private blogsRepository: BlogsRepository) {}
   async validate(id: string, args: ValidationArguments) {
     const blog = await this.blogsRepository.findBlogById(id);
     return !!blog;
   }
   defaultMessage(args: ValidationArguments) {
-    return "Blog with this id doesn't exist";
+    return 'Blog with given id does not exist';
   }
 }
 export class PostInputModel {
@@ -47,7 +47,7 @@ export class PostInputModel {
    */
   @IsNotEmpty()
   @IsMongoId()
-  @Validate(BlogExistsConstraint)
+  @Validate(BlogIdExistenceCheck)
   blogId: string;
 }
 
