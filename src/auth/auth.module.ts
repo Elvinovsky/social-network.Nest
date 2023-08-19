@@ -30,11 +30,6 @@ import { CodeExpireCheck } from './auth.models';
     JwtModule.register({
       global: true,
     }),
-
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
   ],
   providers: [
     CodeExpireCheck,
