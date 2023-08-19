@@ -23,9 +23,7 @@ export class PostInputModel {
   /**
    * ID existing Blog {linked to a post}
    */
-  @IsNotEmpty()
-  @IsMongoId()
-  @Matches(/^[a-fa-f0-9]{24}$/)
+
   blogId: string;
 }
 
