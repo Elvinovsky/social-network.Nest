@@ -18,14 +18,16 @@ export class DevicesRepository {
   ): Promise<DeviceDocument | null> {
     return this.deviceModel.findOne({ deviceId: deviceID });
   }
+
+  // Метод для поиска всех устройств сессии по идентификатору пользователя
   async findDevicesSessionsByUserId(
     userId: string,
   ): Promise<DeviceViewDTO[] | null> {
     const devicesSessions = await this.deviceModel.find({ userId: userId });
     if (!devicesSessions) {
-      return null;
+      return null; // Возвращаем null, если устройства не найдены.
     }
-    return devicesMapper(devicesSessions);
+    return devicesMapper(devicesSessions); // Применяем функцию маппинга и возвращаем массив устройств.
   }
   async addDeviceSession(
     deviceSession: SessionCreateDTO,
@@ -57,6 +59,8 @@ export class DevicesRepository {
     });
     return result.deletedCount === 1;
   }
+
+  // Метод для удаления всех сессий устройств пользователя, кроме определенной по времени создания (issuedAt)
   async deleteDevicesSessionsByUser(
     issuedAt: number,
     userId: string,
