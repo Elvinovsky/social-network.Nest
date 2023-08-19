@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   Headers,
   HttpCode,
@@ -187,7 +186,7 @@ export class AuthController {
       .send(accessToken);
   }
 
-  @Delete()
+  @Post()
   @UseGuards(JwtRefreshGuard)
   async logout(@Req() req, @Res() res) {
     // Удаление записи о сессии устройства.
@@ -230,6 +229,7 @@ export class AuthController {
     const recoveryPassword = await this.authService.passwordRecovery(
       inputModel,
     );
+    return recoveryPassword;
   }
 
   @Get('me')
