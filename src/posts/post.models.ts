@@ -1,6 +1,28 @@
-import { IsMongoId, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  Length,
+  Validate,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 import { ExtendedLikesViewDTO } from '../likes/like.models';
+import { Injectable } from '@nestjs/common';
+import { BlogsRepository } from '../blogs/blogs.repository';
 
+@Injectable()
+@ValidatorConstraint({ name: 'BlogExists', async: true })
+export class BlogExistsConstraint implements ValidatorConstraintInterface {
+  constructor(private blogsRepository: BlogsRepository) {}
+  async validate(id: string, args: ValidationArguments) {
+    const blog = await this.blogsRepository.findBlogById(id);
+    return !!blog;
+  }
+  defaultMessage(args: ValidationArguments) {
+    return "Blog with this id doesn't exist";
+  }
+}
 export class PostInputModel {
   /**
    * title input  model {maxLength: 30 }
@@ -25,6 +47,7 @@ export class PostInputModel {
    */
   @IsNotEmpty()
   @IsMongoId()
+  @Validate(BlogExistsConstraint)
   blogId: string;
 }
 
