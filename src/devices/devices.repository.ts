@@ -53,10 +53,12 @@ export class DevicesRepository {
     deviceId: string,
     userId: string,
   ): Promise<boolean> {
-    const result = await this.deviceModel.deleteOne({
-      userId: userId,
-      deviceId: deviceId,
-    });
+    const result = await this.deviceModel
+      .deleteOne({
+        userId: userId,
+        deviceId: deviceId,
+      })
+      .exec();
     return result.deletedCount === 1;
   }
 
