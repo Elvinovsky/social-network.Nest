@@ -22,7 +22,7 @@ export class WsThrottlerGuard extends ThrottlerGuard {
     const key = this.generateKey(context, ip);
     const { totalHits } = await this.storageService.increment(key, ttl);
 
-    if (totalHits >= limit) {
+    if (totalHits > limit) {
       throw new ThrottlerException();
     }
 
