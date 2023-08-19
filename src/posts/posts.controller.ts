@@ -27,11 +27,11 @@ import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers'
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { ObjectIdPipe } from '../common/pipes/trim.pipe';
 import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
+import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('posts')
 export class PostsController {
