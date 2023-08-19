@@ -16,13 +16,14 @@ import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerBehindProxyGuard } from './guards/throttler-behind-proxy';
 import { OptionalBearerGuard } from './guards/optional-bearer.guard';
+import { CodeExpireCheck } from './auth.models';
 
 @Module({
   imports: [
-    // ThrottlerModule.forRoot({
-    //   ttl: 60,
-    //   limit: 5,
-    // }),
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5,
+    }),
     forwardRef(() => UsersModule),
     forwardRef(() => DevicesModule),
     PassportModule,
@@ -36,6 +37,7 @@ import { OptionalBearerGuard } from './guards/optional-bearer.guard';
     }),
   ],
   providers: [
+    CodeExpireCheck,
     OptionalBearerGuard,
     ThrottlerBehindProxyGuard,
     AuthService,
