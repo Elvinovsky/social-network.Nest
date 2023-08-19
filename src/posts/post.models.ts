@@ -23,7 +23,8 @@ export class PostInputModel {
   /**
    * ID existing Blog {linked to a post}
    */
-
+  @IsNotEmpty()
+  @IsMongoId()
   blogId: string;
 }
 
