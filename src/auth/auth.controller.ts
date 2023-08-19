@@ -33,7 +33,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { UsersQueryRepository } from '../users/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 
 @Controller('auth')
 export class AuthController {
@@ -46,7 +46,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -81,7 +81,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -106,7 +106,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
@@ -133,7 +133,7 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async login(
     @CurrentUserId() userId: string,
     @Headers('user-agent') userAgent: string,
@@ -160,7 +160,6 @@ export class AuthController {
   @Post('refresh-token')
   @UseGuards(JwtRefreshGuard)
   async createRefToken(@Req() req, @Response() res) {
-    debugger;
     // Создание нового access token и refreshToken.
     const accessToken = await this.authService.createJWTAccessToken(req.userId);
     const newRefreshToken = await this.authService.createJWTRefreshToken(
@@ -186,7 +185,7 @@ export class AuthController {
       .send(accessToken);
   }
 
-  @Post()
+  @Post('logout')
   @UseGuards(JwtRefreshGuard)
   async logout(@Req() req, @Res() res) {
     // Удаление записи о сессии устройства.
@@ -198,7 +197,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async passwordRecovery(@Body() inputModel: EmailInputModel, @Res() res) {
     //валидация электронной почты
     const emailValidator = await this.usersService.findUserByEmail(
@@ -220,7 +219,7 @@ export class AuthController {
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(WsThrottlerGuard)
   async newPassword(
     @Body()
     inputModel: NewPasswordRecoveryInputModel,
