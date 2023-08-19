@@ -66,5 +66,6 @@ export class DevicesController {
     if (!logoutDeviceSession) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
+    return logoutDeviceSession;
   }
 }
