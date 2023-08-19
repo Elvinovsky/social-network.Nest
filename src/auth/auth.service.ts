@@ -3,13 +3,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { UsersService } from '../users/users.service';
 import bcrypt from 'bcrypt';
-import { RegistrationInputModel } from './auth.models';
+import {
+  NewPasswordRecoveryInputModel,
+  RegistrationInputModel,
+} from './auth.models';
 import { UserInputModel, UserViewDTO } from '../users/user.models';
 import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
 import { jwtConstants } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -58,20 +62,23 @@ export class AuthService {
   async confirmationEmail(code: string) {
     return this.usersService.confirmationEmail(code);
   }
-  // async passwordRecovery(
-  //   password: string,
-  //   code: string,
-  // ): Promise<boolean | null> {
-  //   const isConfirmed = await this.confirmCode(code);
-  //   const isOneUser = await usersRepository.getUsersByConfirmationCode(code);
-  //   if (!isConfirmed && isOneUser) {
-  //     return null;
-  //   }
-  //
-  //   const hash = await this._generateHash(password);
-  //   const isRestored = await usersRepository.updatePasswordHash(hash, code);
-  //   return isRestored;
-  // }
+  async passwordRecovery(
+    inputModel: NewPasswordRecoveryInputModel,
+  ): Promise<boolean | null> {
+    const user = await this.usersService.findUserByConfirmCode(
+      inputModel.recoveryCode,
+    );
+    if (!user?.emailConfirmation.isConfirmed) {
+      return null;
+    }
+
+    const hash = await this._generateHash(inputModel.newPassword);
+    const isRestored = await this.usersService.updatePasswordHash(
+      hash,
+      inputModel.recoveryCode,
+    );
+    return isRestored;
+  }
   async sendUpdateConfirmCodeByEmail(email: string): Promise<boolean> {
     //обновляем код подтверждения юзера в БД.
     const newCode = uuidv4();
@@ -258,5 +265,9 @@ export class AuthService {
       console.log('error getIATByRefreshToken', error);
       throw new PreconditionFailedException();
     }
+  }
+
+  async findUserByConfirmCode(code: string) {
+    return this.usersService.findUserByConfirmCode(code);
   }
 }
