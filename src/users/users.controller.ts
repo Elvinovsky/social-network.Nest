@@ -61,7 +61,7 @@ export class UsersController {
     const isUserExists: true | ResultsAuthForErrors =
       await this.usersService._isUserExists(inputModel);
 
-    // если находим возвращаем в ответе ошибку.
+    // если находим совпадения по емайлу возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.email) {
       throw new BadRequestException([
         {
@@ -71,7 +71,7 @@ export class UsersController {
       ]);
     }
 
-    // если находим возвращаем в ответе ошибку.
+    // если находим совпадения по логину возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.login) {
       throw new BadRequestException([
         {
@@ -84,17 +84,6 @@ export class UsersController {
     return this.authService.userRegistrationSA(inputModel);
   }
 
-  @Put(':userId')
-  async updateUser(
-    @Param('userId') userId: string,
-    @Body() inputModel: UserInputModel,
-  ) {
-    const user: UserViewDTO | null = await this.usersService.getUser(userId);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return this.usersService.updateUser(userId, inputModel);
-  }
   @UseGuards(BasicAuthGuard)
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
