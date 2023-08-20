@@ -9,6 +9,7 @@ import {
   InternalServerErrorException,
   Post,
   PreconditionFailedException,
+  Put,
   Req,
   Request,
   Res,
@@ -23,7 +24,7 @@ import {
 } from './auth.models';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { UserCreateDTO } from '../users/user.models';
+import { UserCreateDTO, UserInputModel } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
 import { refreshCookieOptions } from '../common/helpers';
@@ -54,7 +55,7 @@ export class AuthController {
     const isUserExists: true | ResultsAuthForErrors =
       await this.usersService._isUserExists(inputModel);
 
-    // если находим возвращаем в ответе ошибку.
+    // если находим совпадения по емайлу возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.email) {
       throw new BadRequestException([
         {
@@ -64,7 +65,7 @@ export class AuthController {
       ]);
     }
 
-    // если находим возвращаем в ответе ошибку.
+    // если находим совпадения по логину возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.login) {
       throw new BadRequestException([
         {
@@ -244,5 +245,37 @@ export class AuthController {
       return user; // Отправка информации о пользователе.
     }
     throw new InternalServerErrorException(); // Ошибка: что то пошло не так.
+  }
+
+  @Put('email-or-login-recovery')
+  @UseGuards(JwtRefreshGuard)
+  async updateUser(
+    @CurrentUserIdHeaders('userId') userId: string,
+    @Body() inputModel: UserInputModel,
+  ) {
+    //ищем юзера в БД по эл/почте
+    const isUserExists: true | ResultsAuthForErrors =
+      await this.usersService._isUserExists(inputModel);
+
+    // если находим возвращаем в ответе ошибку.
+    if (isUserExists === ResultsAuthForErrors.email) {
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email already exists',
+        },
+      ]);
+    }
+
+    // если находим возвращаем в ответе ошибку.
+    if (isUserExists === ResultsAuthForErrors.login) {
+      throw new BadRequestException([
+        {
+          field: 'login',
+          message: 'login already exists',
+        },
+      ]);
+    }
+    return this.usersService.updateUser(userId, inputModel);
   }
 }
