@@ -14,10 +14,7 @@ import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-import {
-  ThrottlerBehindProxyGuard,
-  WsThrottlerGuard,
-} from './guards/throttler-behind-proxy';
+import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { OptionalBearerGuard } from './guards/optional-bearer.guard';
 import { CodeExpireCheck } from './auth.models';
 
