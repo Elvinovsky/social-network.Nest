@@ -1,11 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../auth.constants';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OptionalBearerGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -16,7 +19,7 @@ export class OptionalBearerGuard implements CanActivate {
     } else {
       const payload = await this.jwtService
         .verifyAsync(accessToken, {
-          secret: jwtConstants.secretAccess,
+          secret: this.configService.get('SECRET_REFRESH_KEY'),
         })
         .catch(() => {
           return true;
