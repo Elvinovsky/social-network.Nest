@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
 import { DevicesService } from '../devices/devices.service';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../configuration/config.module';
+import { ConfigType } from '../configuration/getConfiguration';
 
 @Injectable()
 export class AuthService {

@@ -1,5 +1,5 @@
 // this module should be first line of app.module.ts
-import { configModule } from './configuration/configuration';
+import { configModule } from './configuration/config-module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -33,7 +33,7 @@ import { Device, DeviceSchema } from './devices/device.schemas';
 import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
-import { getConfiguration } from './configuration/config.module';
+import { getConfiguration } from './configuration/getConfiguration';
 
 @Module({
   imports: [
