@@ -1,7 +1,5 @@
-import { ConfigModule } from '@nestjs/config';
-const configModule = ConfigModule.forRoot({
-  envFilePath: ['.env.local', '.env'],
-});
+// this module should be first line of app.module.ts
+import { configModule } from './configuration/configuration';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -35,19 +33,15 @@ import { Device, DeviceSchema } from './devices/device.schemas';
 import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
+import { getConfiguration } from './configuration/config.module';
 
-const mongoUrl = process.env.MONGO_URL;
-//const mongoUrl = `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`;
-if (!mongoUrl) {
-  throw new Error('not db connect');
-}
 @Module({
   imports: [
     configModule,
     UsersModule,
     AuthModule,
     DevicesModule,
-    MongooseModule.forRoot(mongoUrl),
+    MongooseModule.forRoot(getConfiguration().db.MONGO_URI),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
