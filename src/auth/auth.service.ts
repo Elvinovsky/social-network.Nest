@@ -11,8 +11,9 @@ import { UserInputModel, UserViewDTO } from '../users/user.models';
 import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
-import { jwtConstants } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../configuration/config.module';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
     private readonly devicesService: DevicesService,
+    private configService: ConfigService<ConfigType>,
   ) {}
   async userRegistrationSA(inputModel: UserInputModel) {
     //создаем хэш пароля.
@@ -189,8 +191,12 @@ export class AuthService {
         userId: userId,
       },
       {
-        expiresIn: jwtConstants.accessTokenExpirationTime,
-        secret: jwtConstants.secretAccess,
+        expiresIn: this.configService.get('auth.ACCESS_TOKEN_EXPIRATION_TIME', {
+          infer: true,
+        }),
+        secret: this.configService.get('auth.SECRET_ACCESS_KEY', {
+          infer: true,
+        }),
       },
     );
     return {
@@ -208,8 +214,13 @@ export class AuthService {
         deviceId: deviceId,
       },
       {
-        expiresIn: jwtConstants.refreshTokenExpirationTime,
-        secret: jwtConstants.secretRefresh,
+        expiresIn: this.configService.get(
+          'auth.REFRESH_TOKEN_EXPIRATION_TIME',
+          { infer: true },
+        ),
+        secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
+          infer: true,
+        }),
       },
     );
   }
@@ -217,7 +228,9 @@ export class AuthService {
   async getUserIdByAccessToken(token: string) {
     try {
       const payload = (await this.jwtService.verify(token, {
-        secret: jwtConstants.secretAccess,
+        secret: this.configService.get('auth.SECRET_ACCESS_KEY', {
+          infer: true,
+        }),
       })) as {
         userId: string;
       };
@@ -231,7 +244,9 @@ export class AuthService {
   async getUserIdByRefreshToken(token: string) {
     try {
       const payload = (await this.jwtService.verify(token, {
-        secret: jwtConstants.secretRefresh,
+        secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
+          infer: true,
+        }),
       })) as {
         userId: string;
       };
@@ -244,7 +259,9 @@ export class AuthService {
   async getDeviceIdRefreshToken(token: string) {
     try {
       const payload = (await this.jwtService.verify(token, {
-        secret: jwtConstants.secretRefresh,
+        secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
+          infer: true,
+        }),
       })) as {
         deviceId: string;
       };
