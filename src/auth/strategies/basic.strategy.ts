@@ -1,16 +1,16 @@
 import { BasicStrategy as Strategy } from 'passport-http';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { basicConstants } from '../auth.constants';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy, 'basic') {
-  constructor() {
+  constructor(private configService: ConfigService) {
     super();
   }
   public validate = async (userName, password) => {
     if (
-      basicConstants.userName === userName &&
-      basicConstants.password === password
+      this.configService.get('USER_NAME_BASIC_GUARD') === userName &&
+      this.configService.get('PASSWORD_BASIC_GUARD') === password
     ) {
       return true;
     }
