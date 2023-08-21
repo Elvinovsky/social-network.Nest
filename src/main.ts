@@ -5,12 +5,9 @@ import { appSettings } from './settings/app-settings';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   await appSettings(app);
-  await app.listen(3000);
+  await app.listen(3000, () => {
+    console.log('app started');
+  });
 }
 
-try {
-  bootstrap();
-  console.log('it is ok');
-} catch (e) {
-  console.log('no connection');
-}
+bootstrap();
