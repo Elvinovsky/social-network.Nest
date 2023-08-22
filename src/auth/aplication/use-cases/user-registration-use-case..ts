@@ -1,22 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../../users/users.service';
-import { EmailService } from '../../email/email.service';
-import { RegistrationInputModel } from '../auth.models';
+import { UsersService } from '../../../users/aplication/users.service';
+import { EmailService } from '../../../email/email.service';
+import { RegistrationInputModel } from '../../auth.models';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
-import { UserViewDTO } from '../../users/user.models';
+import { UserViewDTO } from '../../../users/user.models';
 import bcrypt from 'bcrypt';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class UserRegistrationUseCase {
+export class UserRegistrationCommand {
+  constructor(public inputModel: RegistrationInputModel) {}
+}
+
+@CommandHandler(UserRegistrationCommand)
+export class UserRegistrationUseCase
+  implements ICommandHandler<UserRegistrationCommand>
+{
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
   ) {}
 
-  async execute(inputModel: RegistrationInputModel): Promise<boolean> {
+  async execute(command: UserRegistrationCommand): Promise<boolean> {
     //создаем хэш пароля, код подтверждения, задаем дату протухания коду
-    const hash: string = await this._generateHash(inputModel.password);
+    const hash: string = await this._generateHash(command.inputModel.password);
     const code: string = uuidv4();
     const expirationDate: Date = add(new Date(), {
       hours: 1,
@@ -25,7 +31,7 @@ export class UserRegistrationUseCase {
 
     //отправляем сгенерированные данные для создания нового юзера в сервис.
     const newUser: UserViewDTO = await this.usersService.createUserRegistration(
-      inputModel,
+      command.inputModel,
       hash,
       code,
       expirationDate,
@@ -36,7 +42,7 @@ export class UserRegistrationUseCase {
       newUser.email,
       code,
     );
-    // для корректной валидации отправки письма, требуется дождаться отправки. ( add await transporter function)
+    // для корректной валидации отправки письма, требуется дождаться отправки. ( add await SMTP transporter function)
     if (send) {
       return true;
     }
