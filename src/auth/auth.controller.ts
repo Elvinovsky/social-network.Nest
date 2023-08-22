@@ -36,6 +36,7 @@ import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { UserRegistrationUseCase } from './use-cases/user-registration-use-case.';
 
 @Controller('auth')
 export class AuthController {
@@ -44,6 +45,7 @@ export class AuthController {
     private readonly usersService: UsersService,
     private readonly devicesService: DevicesService,
     private readonly usersQueryRepository: UsersQueryRepository,
+    private userRegistrationUseCase: UserRegistrationUseCase,
   ) {}
 
   @Post('registration')
@@ -76,7 +78,7 @@ export class AuthController {
     }
 
     //регистрируем юзера отправляем код по эл/почте
-    const isRegistered = await this.authService.userRegistration(inputModel);
+    const isRegistered = await this.userRegistrationUseCase.execute(inputModel);
     if (!isRegistered) {
       throw new InternalServerErrorException();
     }
