@@ -22,8 +22,8 @@ import {
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
 } from './auth.models';
-import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
+import { AuthService } from './aplication/auth.service';
+import { UsersService } from '../users/aplication/users.service';
 import { UserCreateDTO, UserInputModel } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserId } from './decorators/current-user-id.decorator';
@@ -31,12 +31,13 @@ import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { UsersQueryRepository } from '../users/users.query.repo';
+import { UsersQueryRepository } from '../users/infrastructure/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { UserRegistrationUseCase } from './use-cases/user-registration-use-case.';
+import { UserRegistrationCommand } from './aplication/use-cases/user-registration-use-case.';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('auth')
 export class AuthController {
@@ -45,7 +46,7 @@ export class AuthController {
     private readonly usersService: UsersService,
     private readonly devicesService: DevicesService,
     private readonly usersQueryRepository: UsersQueryRepository,
-    private userRegistrationUseCase: UserRegistrationUseCase,
+    private commandBus: CommandBus,
   ) {}
 
   @Post('registration')
@@ -78,7 +79,9 @@ export class AuthController {
     }
 
     //регистрируем юзера отправляем код по эл/почте
-    const isRegistered = await this.userRegistrationUseCase.execute(inputModel);
+    const isRegistered = await this.commandBus.execute(
+      new UserRegistrationCommand(inputModel),
+    );
     if (!isRegistered) {
       throw new InternalServerErrorException();
     }
@@ -123,7 +126,7 @@ export class AuthController {
       throw new BadRequestException([
         {
           field: 'email',
-          message: 'email already exists',
+          message: 'invalid email',
         },
       ]);
     }
