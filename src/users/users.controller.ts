@@ -12,24 +12,25 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UsersService } from './aplication/users.service';
 import { UserInputModel } from './user.models';
 import {
   QueryInputModel,
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../pagination/pagination.models';
-import { UsersQueryRepository } from './users.query.repo';
+import { UsersQueryRepository } from './infrastructure/users.query.repo';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { ResultsAuthForErrors } from '../auth/auth.constants';
-import { UserRegistrationToAdminUseCase } from './use-cases/user-registration-to-admin-use-case.service';
+import { UserRegistrationToAdminCommand } from './aplication/use-cases/user-registration-to-admin-use-case.service';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepo: UsersQueryRepository,
-    private userRegistrationToAdminUseCase: UserRegistrationToAdminUseCase,
+    private commandBus: CommandBus,
   ) {}
   @Get()
   async getUsers(
@@ -81,7 +82,9 @@ export class UsersController {
     }
 
     //регистрируем юзера в БД.
-    return this.userRegistrationToAdminUseCase.execute(inputModel);
+    return this.commandBus.execute(
+      new UserRegistrationToAdminCommand(inputModel),
+    );
   }
 
   @UseGuards(BasicAuthGuard)
