@@ -1,13 +1,9 @@
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { add } from 'date-fns';
 import { UsersService } from '../users/users.service';
 import bcrypt from 'bcrypt';
-import {
-  NewPasswordRecoveryInputModel,
-  RegistrationInputModel,
-} from './auth.models';
-import { UserInputModel, UserViewDTO } from '../users/user.models';
+import { NewPasswordRecoveryInputModel } from './auth.models';
+import { UserViewDTO } from '../users/user.models';
 import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../users/user.helpers';
@@ -24,43 +20,7 @@ export class AuthService {
     private readonly devicesService: DevicesService,
     private configService: ConfigService<ConfigType>,
   ) {}
-  async userRegistrationSA(inputModel: UserInputModel) {
-    //создаем хэш пароля.
-    const hash: string = await this._generateHash(inputModel.password);
-    const newUser: UserViewDTO = await this.usersService.createUserForSA(
-      inputModel,
-      hash,
-    );
-    return newUser;
-  }
-  async userRegistration(inputModel: RegistrationInputModel): Promise<boolean> {
-    //создаем хэш пароля, код подтверждения, задаем дату протухания коду
-    const hash: string = await this._generateHash(inputModel.password);
-    const code: string = uuidv4();
-    const expirationDate: Date = add(new Date(), {
-      hours: 1,
-      minutes: 10,
-    });
 
-    //отправляем сгенерированные данные для создания нового юзера в сервис.
-    const newUser: UserViewDTO = await this.usersService.createUserRegistration(
-      inputModel,
-      hash,
-      code,
-      expirationDate,
-    );
-
-    const send = await this.emailService.sendEmailConformationMessage(
-      newUser.email,
-      code,
-    );
-    if (send) {
-      return true;
-    }
-
-    await this.usersService.deleteUserById(newUser.id);
-    return false;
-  }
   async confirmationEmail(code: string) {
     return this.usersService.confirmationEmail(code);
   }
@@ -223,22 +183,6 @@ export class AuthService {
         }),
       },
     );
-  }
-
-  async getUserIdByAccessToken(token: string) {
-    try {
-      const payload = (await this.jwtService.verify(token, {
-        secret: this.configService.get('auth.SECRET_ACCESS_KEY', {
-          infer: true,
-        }),
-      })) as {
-        userId: string;
-      };
-      return payload.userId;
-    } catch (error) {
-      console.log('error verify', error);
-      return null;
-    }
   }
 
   async getUserIdByRefreshToken(token: string) {
