@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Status } from '../common/constants';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/aplication/users.service';
 import { UserViewDTO } from '../users/user.models';
 
 @Injectable()

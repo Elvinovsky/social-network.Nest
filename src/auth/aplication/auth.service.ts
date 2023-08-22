@@ -1,15 +1,15 @@
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../../users/aplication/users.service';
 import bcrypt from 'bcrypt';
-import { NewPasswordRecoveryInputModel } from './auth.models';
-import { UserViewDTO } from '../users/user.models';
-import { EmailService } from '../email/email.service';
+import { NewPasswordRecoveryInputModel } from '../auth.models';
+import { UserViewDTO } from '../../users/user.models';
+import { EmailService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
-import { userMapping } from '../users/user.helpers';
-import { DevicesService } from '../devices/devices.service';
+import { userMapping } from '../../users/user.helpers';
+import { DevicesService } from '../../devices/devices.service';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../configuration/getConfiguration';
+import { ConfigType } from '../../configuration/getConfiguration';
 
 @Injectable()
 export class AuthService {

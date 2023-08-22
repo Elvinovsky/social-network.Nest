@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from './users.repository';
-import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
+import { UsersRepository } from '../infrastructure/users.repository';
+import { UserCreateDTO, UserInputModel, UserViewDTO } from '../user.models';
 import bcrypt from 'bcrypt';
-import { RegistrationInputModel } from '../auth/auth.models';
-import { ResultsAuthForErrors } from '../auth/auth.constants';
+import { RegistrationInputModel } from '../../auth/auth.models';
+import { ResultsAuthForErrors } from '../../auth/auth.constants';
 
 @Injectable()
 export class UsersService {
@@ -69,6 +69,7 @@ export class UsersService {
   async _isUserExists(
     inputModel: RegistrationInputModel,
   ): Promise<true | ResultsAuthForErrors> {
+    debugger;
     const userEmail = await this.usersRepository.findUserByEmail(
       inputModel.email,
     );

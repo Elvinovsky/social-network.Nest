@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PaginatorType } from '../pagination/pagination.models';
-import { MeViewModel, UserViewDTO } from './user.models';
+import { PaginatorType } from '../../pagination/pagination.models';
+import { MeViewModel, UserViewDTO } from '../user.models';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './users.schema';
+import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
-import { filterLoginOrEmail, usersMapping } from './user.helpers';
+import { filterLoginOrEmail, usersMapping } from '../user.helpers';
 import {
   getDirection,
   getPageNumber,
@@ -12,9 +12,9 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../common/constants';
-import { objectIdHelper } from '../common/helpers';
+} from '../../pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../common/constants';
+import { objectIdHelper } from '../../common/helpers';
 
 @Injectable()
 export class UsersQueryRepository {

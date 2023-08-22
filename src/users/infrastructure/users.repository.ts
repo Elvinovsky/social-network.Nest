@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './users.schema';
+import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
-import { UserCreateDTO, UserInputModel, UserViewDTO } from './user.models';
-import { userMapping } from './user.helpers';
-import { objectIdHelper } from '../common/helpers';
+import { UserCreateDTO, UserInputModel, UserViewDTO } from '../user.models';
+import { userMapping } from '../user.helpers';
+import { objectIdHelper } from '../../common/helpers';
 
 @Injectable()
 export class UsersRepository {
