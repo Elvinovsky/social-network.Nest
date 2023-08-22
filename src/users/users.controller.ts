@@ -9,28 +9,27 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserInputModel, UserViewDTO } from './user.models';
+import { UserInputModel } from './user.models';
 import {
   QueryInputModel,
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './users.query.repo';
-import { AuthService } from '../auth/auth.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { ResultsAuthForErrors } from '../auth/auth.constants';
+import { UserRegistrationToAdminUseCase } from './use-cases/user-registration-to-admin-use-case.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepo: UsersQueryRepository,
-    private readonly authService: AuthService,
+    private userRegistrationToAdminUseCase: UserRegistrationToAdminUseCase,
   ) {}
   @Get()
   async getUsers(
@@ -81,7 +80,8 @@ export class UsersController {
       ]);
     }
 
-    return this.authService.userRegistrationSA(inputModel);
+    //регистрируем юзера в БД.
+    return this.userRegistrationToAdminUseCase.execute(inputModel);
   }
 
   @UseGuards(BasicAuthGuard)
