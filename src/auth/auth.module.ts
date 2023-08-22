@@ -17,14 +17,16 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { OptionalBearerGuard } from './guards/optional-bearer.guard';
 import { CodeExpireCheck } from './auth.models';
+import { UserRegistrationUseCase } from './use-cases/user-registration-use-case.';
 
+const useCases = [UserRegistrationUseCase];
 @Module({
   imports: [
     ThrottlerModule.forRoot({
       ttl: 10,
       limit: 5,
     }),
-    forwardRef(() => UsersModule),
+    UsersModule,
     forwardRef(() => DevicesModule),
     PassportModule,
     JwtModule.register({
@@ -32,6 +34,7 @@ import { CodeExpireCheck } from './auth.models';
     }),
   ],
   providers: [
+    ...useCases,
     CodeExpireCheck,
     OptionalBearerGuard,
     WsThrottlerGuard,
