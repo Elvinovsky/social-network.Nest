@@ -2,7 +2,7 @@ import { PaginatorType } from '../pagination/pagination.models';
 import { BlogViewDTO } from './blog.models';
 import * as mongoose from 'mongoose';
 import { Blog, BlogDocument, BlogModel } from './blog.schemas';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   getDirection,
@@ -40,7 +40,7 @@ export class BlogsQueryRepo {
       return blogMapping(foundBlog);
     } catch (e) {
       console.log(e, 'error findBlogById method');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -50,6 +50,48 @@ export class BlogsQueryRepo {
     pageSize?: number,
     sortBy?: string,
     sortDirection?: string,
+  ): Promise<PaginatorType<BlogViewDTO[]>> {
+    debugger;
+    const filter: mongoose.FilterQuery<BlogDocument> = {};
+    try {
+      if (searchNameTerm) {
+        filter.name = {
+          $regex: searchNameTerm,
+          $options: 'i',
+        };
+      }
+
+      const calculateOfFiles = await this.blogModel.countDocuments(filter);
+      const foundBlogs: BlogDocument[] = await this.blogModel
+        .find(filter)
+        .sort({
+          [getSortBy(sortBy)]: getDirection(sortDirection),
+          [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
+        })
+        .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
+        .limit(getPageSize(pageSize))
+        .lean()
+        .exec();
+
+      return {
+        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        page: getPageNumber(pageNumber),
+        pageSize: getPageSize(pageSize),
+        totalCount: calculateOfFiles,
+        items: blogsMapping(foundBlogs),
+      };
+    } catch (e) {
+      console.log(e, 'getSortedBlogs method error');
+      throw new InternalServerErrorException();
+    }
+  }
+  async getSortedBlogsForCurrentBlogger(
+    searchNameTerm?: string,
+    pageNumber?: number,
+    pageSize?: number,
+    sortBy?: string,
+    sortDirection?: string,
+    userId?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
     const filter: mongoose.FilterQuery<BlogDocument> = {};
     try {
@@ -81,7 +123,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
   async getSortedPostsBlog(
@@ -124,7 +166,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'error getSortedPostsByBlogID');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 }
