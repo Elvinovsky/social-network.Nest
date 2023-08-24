@@ -1,3 +1,6 @@
+import { Transform } from 'class-transformer';
+import { IsOptional } from 'class-validator';
+
 export type PaginatorType<T> = {
   pagesCount: number;
   page: number;
@@ -7,13 +10,18 @@ export type PaginatorType<T> = {
 };
 
 export class QueryInputModel {
-  // todo cltkfnm hfpj,hfnmcz
+  @IsOptional()
+  @Transform((value) => Number(value))
   pageNumber: number;
 
+  @IsOptional()
+  @Transform((value) => Number(value))
   pageSize: number;
 
+  @IsOptional()
   sortBy: string;
 
+  @IsOptional()
   sortDirection: string;
 }
 export type SearchNameTerm = { searchNameTerm?: string };

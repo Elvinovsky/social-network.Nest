@@ -25,6 +25,7 @@ export class LikesService {
       }
       const isAlreadyLiked: LikeCreateDTO | null =
         await this.likesRepository.getLikeInfo(userId, postOrCommentId);
+
       //если пользователь не ставил ранне оценку коментарию или посту
       if (!isAlreadyLiked) {
         const newLikeInfo = await this.likesRepository.addLikeInfo(

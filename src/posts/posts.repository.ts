@@ -52,15 +52,15 @@ export class PostsRepository {
     }
   }
   async createPost(
-    inputDTO: PostInputModel,
+    inputModel: PostInputModel,
     blogName: string,
   ): Promise<PostViewDTO | null> {
     try {
       const createPost: PostCreateDTO = {
-        blogId: inputDTO.blogId,
-        title: inputDTO.title,
-        shortDescription: inputDTO.shortDescription,
-        content: inputDTO.content,
+        blogId: inputModel.blogId,
+        title: inputModel.title,
+        shortDescription: inputModel.shortDescription,
+        content: inputModel.content,
         blogName: blogName,
         addedAt: new Date().toISOString(),
       };
