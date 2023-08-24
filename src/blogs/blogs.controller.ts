@@ -42,8 +42,8 @@ export class BlogsController {
   ): Promise<PaginatorType<BlogViewDTO[]>> {
     return await this.blogsQueryRepo.getSortedBlogs(
       query.searchNameTerm,
-      Number(query.pageNumber),
-      Number(query.pageSize),
+      query.pageNumber,
+      query.pageSize,
       query.sortBy,
       query.sortDirection,
     );
