@@ -71,8 +71,8 @@ export class BlogsController {
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
       blogId,
-      Number(query.pageNumber),
-      Number(query.pageSize),
+      query.pageNumber,
+      query.pageSize,
       query.sortBy,
       query.sortDirection,
       userId,
