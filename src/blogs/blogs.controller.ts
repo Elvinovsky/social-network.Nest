@@ -100,7 +100,7 @@ export class BlogsController {
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
-    @Param('blogId', ObjectIdPipe) blogId: string, // todo урать везде objectIdHelper() засетать пайп ObjectIdPipe
+    @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogPostInputModel,
   ) {
     const foundBlog: PostViewDTO | null =
