@@ -32,6 +32,7 @@ export class Blog {
     blog.websiteUrl = inputModel.websiteUrl;
     blog.addedAt = new Date().toISOString();
     blog.isMembership = false;
+
     return blog;
   }
 }
