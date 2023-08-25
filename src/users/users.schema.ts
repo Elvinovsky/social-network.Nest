@@ -6,19 +6,19 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-  @Prop()
+  @Prop({ required: true })
   login: string;
 
-  @Prop()
+  @Prop({ required: true })
   passwordHash: string;
 
-  @Prop()
+  @Prop({ required: true })
   email: string;
 
-  @Prop()
+  @Prop({ required: true })
   addedAt: string;
 
-  @Prop()
+  @Prop({ type: EmailConfirmationModel, required: true })
   emailConfirmation: EmailConfirmationModel;
 
   canBeConfirmed(expirationDate: Date) {
