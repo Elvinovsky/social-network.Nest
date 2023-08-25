@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModel } from './post.schemas';
 import {
@@ -23,7 +28,7 @@ export class PostsRepository {
       return await this.postModel.findById(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error findPostById method by PostRepository');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -48,7 +53,7 @@ export class PostsRepository {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error createPost method');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
   async createPost(
@@ -70,7 +75,7 @@ export class PostsRepository {
       return this.postMapper.mapPost(post);
     } catch (e) {
       console.log(e, 'error createPost method');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -105,7 +110,7 @@ export class PostsRepository {
       return this.postModel.findByIdAndDelete(objectIdHelper(postId));
     } catch (e) {
       console.log(e, 'error deletePost by postsRepository');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 }
