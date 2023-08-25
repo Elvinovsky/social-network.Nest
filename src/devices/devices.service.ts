@@ -39,8 +39,7 @@ export class DevicesService {
   }
 
   async logoutDeviceSessionByDeviceId(deviceId: string, userId: string) {
-    const findDeviceSessionById =
-      await this.devicesRepository.findDeviceIdAmongSessions(deviceId);
+    const findDeviceSessionById = await this.findSessionByDeviceId(deviceId);
     if (!findDeviceSessionById) {
       return null;
     }
@@ -70,5 +69,9 @@ export class DevicesService {
 
   async logoutByIAT(issuedAt: number) {
     return this.devicesRepository.deleteDeviceSessionByIAT(issuedAt);
+  }
+
+  async findSessionByDeviceId(devicesId: string) {
+    return this.devicesRepository.findDeviceIdAmongSession(devicesId);
   }
 }
