@@ -34,6 +34,7 @@ import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
+import { BloggerController } from './blogs/blogger/blogger.controller';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { getConfiguration } from './configuration/getConfiguration';
     AppController,
     DeleteDBController,
     BlogsController,
+    BloggerController,
     PostsController,
     CommentsController,
   ],
