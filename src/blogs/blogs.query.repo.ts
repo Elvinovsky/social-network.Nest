@@ -93,7 +93,7 @@ export class BlogsQueryRepo {
     sortDirection?: string,
     userId?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
-    const filter: mongoose.FilterQuery<BlogDocument> = {};
+    const filter: mongoose.FilterQuery<BlogDocument> = { authorId: userId };
     try {
       if (searchNameTerm) {
         filter.name = {
