@@ -31,6 +31,7 @@ export type BlogCreateDTO = {
    * True if user has not expired membership subscription to blog
    */
   isMembership: boolean;
+  authorId: string;
 };
 
 export type BlogViewDTO = {
