@@ -11,8 +11,11 @@ export class BlogsService {
   async findById(id: string): Promise<BlogDocument | null> {
     return this.blogsRepository.findBlogById(id);
   }
-  async createBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    return await this.blogsRepository.addNewBlog(inputModel);
+  async createBlog(
+    inputModel: BlogInputModel,
+    userId: string,
+  ): Promise<BlogViewDTO> {
+    return await this.blogsRepository.addNewBlog(inputModel, userId);
   }
 
   async updateBlog(
