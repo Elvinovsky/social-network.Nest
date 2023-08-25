@@ -85,18 +85,6 @@ export class BlogsController {
   }
 
   @UseGuards(BasicAuthGuard)
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: BlogInputModel) {
-    const result: BlogViewDTO = await this.blogsService.createBlog(inputModel);
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
-    return result;
-  }
-
-  @UseGuards(BasicAuthGuard)
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
