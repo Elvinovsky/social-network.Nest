@@ -2,25 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
 @Injectable()
 export class EmailService {
-  async sendEmailConformationMessage(email: string, code: string) {
-    const transporter = await createTransport({
-      host: 'smtp.mail.ru',
-      port: 465,
-      secure: true, // true for 465, false for other ports
-      auth: {
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.AUTH_PASS,
-      },
-    });
-    try {
-      await transporter.verify((r, e) => {
-        console.log(e);
-      });
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-
+  async sendEmailConformationMessage(
+    email: string,
+    code: string,
+  ): Promise<boolean> {
     const mailOptions = {
       from: 'ELVIN <elov2024@mail.ru>', // sender address
       to: email, // list of receivers
@@ -31,40 +16,13 @@ export class EmailService {
         </p>`, // plain text body
     };
     // send mail
-    try {
-      transporter.sendMail(mailOptions);
-      // обработка успешного результата
-      return true;
-    } catch (err) {
-      // обработка ошибки
-      console.error(err);
-      return false;
-    }
+    return this._isSent(mailOptions);
   }
-  //todo разобраться с отправкой??
+
   async sendEmailPasswordRecovery(
     email: string,
     newCode: string,
   ): Promise<boolean> {
-    const transporter = await createTransport({
-      host: 'smtp.mail.ru',
-      port: 465,
-      secure: true, // true for 465, false for other ports
-      auth: {
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.AUTH_PASS,
-      },
-    });
-
-    try {
-      await transporter.verify((r, e) => {
-        console.log(e);
-      });
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-
     const mailOptions = {
       from: 'ELVIN <elov2024@mail.ru>', // sender address
       to: email, // list of receivers
@@ -76,11 +34,28 @@ export class EmailService {
     };
 
     // send mail
+    return this._isSent(mailOptions);
+  }
+  async _isSent(mailOptions) {
     try {
+      const transporter = await createTransport({
+        host: 'smtp.mail.ru',
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: process.env.AUTH_EMAIL,
+          pass: process.env.AUTH_PASS,
+        },
+      });
+
+      await transporter.verify((r, e) => {
+        console.log(e);
+      });
+
       transporter.sendMail(mailOptions, (r, e) => {
         console.log(e);
       });
-      // обработка успешного результата
+
       return true;
     } catch (err) {
       // обработка ошибки
