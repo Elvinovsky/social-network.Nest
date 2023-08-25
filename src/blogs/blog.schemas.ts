@@ -6,6 +6,11 @@ export type BlogDocument = HydratedDocument<Blog>;
 
 export type BlogModel = Model<BlogDocument>;
 
+export class AuthorInfo {
+  userId: string;
+  userName: string;
+}
+
 @Schema()
 export class Blog {
   @Prop({ required: true })
@@ -18,6 +23,8 @@ export class Blog {
   addedAt: string;
   @Prop({ required: true, default: false })
   isMembership: boolean;
+  @Prop({ type: AuthorInfo, required: true })
+  author: AuthorInfo;
   static createBlog(inputModel: BlogInputModel): BlogCreateDTO {
     const blog: Blog = new Blog();
     blog.name = inputModel.name;
