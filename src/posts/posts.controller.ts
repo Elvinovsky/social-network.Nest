@@ -23,7 +23,6 @@ import { PostInputModel, PostViewDTO } from './post.models';
 import { LikeStatus } from '../likes/like.models';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { LikesService } from '../likes/likes.service';
-import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
@@ -32,6 +31,7 @@ import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/aplication/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
+import { CurrentUserIdFromJWT } from '../auth/decorators/current-userId-jwt';
 
 @Controller('posts')
 export class PostsController {
@@ -84,12 +84,6 @@ export class PostsController {
   ) {
     const result = await this.postsService.createPost(inputModel);
 
-    if (result === null) {
-      throw new BadRequestException([
-        { field: 'blogId', message: 'blogId invalid' },
-      ]);
-    }
-
     return result;
   }
   @Put(':postId')
@@ -118,7 +112,7 @@ export class PostsController {
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatusPost(
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdFromJWT() sessionInfo: { userId: string; deviceId: string },
     @Param('postId') postId: string,
     @Body() inputModel: LikeStatus,
   ) {
@@ -128,7 +122,7 @@ export class PostsController {
     }
     const result = await this.likesService.createOrUpdateLike(
       postId,
-      userId,
+      sessionInfo.userId,
       inputModel.likeStatus,
     );
     return result;
@@ -174,17 +168,17 @@ export class PostsController {
   async createCommentByPost(
     @Param('postId', ObjectIdPipe) postId: string,
     @Body() inputModel: CommentInputModel,
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdFromJWT() sessionInfo: { userId: string; deviceId: string },
   ) {
     const validatorPostId = await this.postsService.findPostById(postId);
 
-    const user = await this.usersService.getUser(userId);
+    const user = await this.usersService.getUser(sessionInfo.userId);
     if (!validatorPostId || !user) {
       throw new NotFoundException();
     }
     const comment = await this.commentsService.createComment(
       postId,
-      userId,
+      sessionInfo.userId,
       user.login,
       inputModel.content,
     );
