@@ -120,7 +120,10 @@ export class AuthService {
       }
 
       const deviceId = uuidv4();
-      const createJWTAccessToken = await this.createJWTAccessToken(userId);
+      const createJWTAccessToken = await this.createJWTAccessToken(
+        userId,
+        deviceId,
+      );
       const createJWTRefreshToken = await this.createJWTRefreshToken(
         userId,
         deviceId,
@@ -145,10 +148,11 @@ export class AuthService {
       return null;
     }
   }
-  async createJWTAccessToken(userId: string) {
+  async createJWTAccessToken(userId: string, deviceId: string) {
     const accessToken = this.jwtService.sign(
       {
         userId: userId,
+        deviceId: deviceId,
       },
       {
         expiresIn: this.configService.get('auth.ACCESS_TOKEN_EXPIRATION_TIME', {
