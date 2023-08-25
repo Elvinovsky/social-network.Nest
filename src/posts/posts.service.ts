@@ -33,6 +33,7 @@ export class PostsService {
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
+    // валидация избыточна так как проверям блог на существование через pipe
     const foundBlog: BlogDocument | null = await this.blogService.findById(
       inputModel.blogId,
     );
