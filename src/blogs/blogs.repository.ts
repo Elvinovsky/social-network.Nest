@@ -26,9 +26,12 @@ export class BlogsRepository {
 
   // Добавляет новый блог на основе входной модели BlogInputModel
   // Возвращает BlogViewDTO созданного блога
-  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
+  async addNewBlog(
+    inputModel: BlogInputModel,
+    userId: string,
+  ): Promise<BlogViewDTO> {
     try {
-      const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
+      const createBlog: BlogCreateDTO = Blog.createBlog(inputModel, userId);
       const createdBlog = await new this.blogModel(createBlog);
       await createdBlog.save();
 
