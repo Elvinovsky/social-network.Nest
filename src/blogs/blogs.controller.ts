@@ -18,7 +18,6 @@ import {
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogViewDTO } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
-import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
@@ -29,7 +28,6 @@ import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 export class BlogsController {
   constructor(
     private readonly blogsQueryRepo: BlogsQueryRepo,
-    protected blogsService: BlogsService,
     private readonly postsService: PostsService,
   ) {}
 
