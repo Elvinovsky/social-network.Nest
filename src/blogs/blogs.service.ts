@@ -23,17 +23,10 @@ export class BlogsService {
     inputModel: BlogInputModel,
     userId: string,
   ): Promise<boolean | null | number> {
-    // поиск блога в базе данных.
-    const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
-      id,
-    );
-    if (!blog) {
-      return null;
-    }
-
-    // проверка принадлежности блога автору
-    if (blog.authorId !== userId) {
-      return false;
+    const validateResult: BlogDocument | null | boolean =
+      await this._isOwnerFoundBlog(id, userId);
+    if (!validateResult) {
+      return validateResult;
     }
 
     return this.blogsRepository.updateBlogById(id, inputModel);
@@ -43,6 +36,16 @@ export class BlogsService {
     id: string,
     userId: string,
   ): Promise<Document | null | boolean> {
+    const validateResult: BlogDocument | null | boolean =
+      await this._isOwnerFoundBlog(id, userId);
+    if (!validateResult) {
+      return validateResult;
+    }
+
+    return this.blogsRepository.deleteBlogById(id);
+  }
+
+  async _isOwnerFoundBlog(id: string, userId: string) {
     // поиск блога в базе данных.
     const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
       id,
@@ -56,6 +59,6 @@ export class BlogsService {
       return false;
     }
 
-    return this.blogsRepository.deleteBlogById(id);
+    return blog;
   }
 }
