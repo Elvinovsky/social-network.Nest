@@ -1,8 +1,6 @@
 import {
-  BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -78,28 +76,6 @@ export class PostsController {
     return result;
   }
 
-  @Put(':postId')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(
-    @Param('postId') postId: string,
-    @Body() inputModel: PostInputModel,
-  ) {
-    const result: boolean | null = await this.postsService.updatePost(
-      postId,
-      inputModel,
-    );
-
-    if (result === null) {
-      throw new BadRequestException([
-        { field: 'blogId', message: 'blogId invalid' },
-      ]);
-    }
-    if (!result) {
-      throw new NotFoundException('post not found');
-    }
-  }
-
   @Put(':postId/like-status')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -119,17 +95,6 @@ export class PostsController {
       inputModel.likeStatus,
     );
     return result;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Delete(':postId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('postId') postId: string) {
-    const result: Document | null = await this.postsService.deletePost(postId);
-
-    if (result === null) {
-      throw new NotFoundException('post not found');
-    }
   }
 
   @Get(':postId/comments')
