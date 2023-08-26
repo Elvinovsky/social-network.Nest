@@ -59,6 +59,7 @@ export class PostsController {
       userId,
     );
   }
+
   @Get(':postId')
   @UseGuards(OptionalBearerGuard)
   async getPost(
@@ -76,16 +77,7 @@ export class PostsController {
 
     return result;
   }
-  @Post()
-  @UseGuards(BasicAuthGuard)
-  async createPost(
-    @Body()
-    inputModel: PostInputModel,
-  ) {
-    const result = await this.postsService.createPost(inputModel);
 
-    return result;
-  }
   @Put(':postId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -185,5 +177,16 @@ export class PostsController {
       inputModel.content,
     );
     return comment;
+  }
+
+  @Post()
+  @UseGuards(BasicAuthGuard)
+  async createPost(
+    @Body()
+    inputModel: PostInputModel,
+  ) {
+    const result = await this.postsService.createPost(inputModel);
+
+    return result;
   }
 }

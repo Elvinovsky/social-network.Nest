@@ -17,18 +17,19 @@ export class PostsService {
   async createPostByBLog(
     blogId: string,
     inputModel: BlogPostInputModel,
-  ): Promise<PostViewDTO | null> {
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
-      blogId,
-    );
-    if (!foundBlog) {
-      return null;
+    userId: string,
+  ): Promise<PostViewDTO | null | boolean> {
+    const validateResult: BlogDocument | null | boolean =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
+
+    if (!validateResult) {
+      return validateResult;
     }
 
     return this.postsRepository.createPostBlog(
       inputModel,
       blogId,
-      foundBlog.name,
+      validateResult.name,
     );
   }
 
