@@ -26,7 +26,7 @@ import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentMapper } from './comments/helpers/comment.mapping';
-import { EmailService } from './email/email.service';
+import { EmailSenderService } from './email/email.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { Device, DeviceSchema } from './devices/device.schemas';
@@ -35,6 +35,7 @@ import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
 import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.controller';
+import { SendSMTPAdapter } from './email/send-smtp-adapter';
 
 @Module({
   imports: [
@@ -64,7 +65,9 @@ import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.contro
     BlogIdExistenceCheck,
     AppService,
     DeleteDbRepository,
-    EmailService,
+
+    EmailSenderService,
+    SendSMTPAdapter,
 
     BlogsQueryRepo,
     BlogsRepository,
