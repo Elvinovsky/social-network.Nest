@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { BlogPostInputModel, PostInputModel, PostViewDTO } from './post.models';
-import { BlogsService } from '../blogs/blogs.service';
+import { BlogsService } from '../blogs/application/blogs.service';
 import { BlogDocument } from '../blogs/blog.schemas';
 
 @Injectable()

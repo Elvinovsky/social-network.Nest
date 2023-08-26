@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from '../aplication/auth.service';
+import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/devices.service';
 import { UsersService } from '../../users/aplication/users.service';
 @Injectable()

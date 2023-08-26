@@ -1,7 +1,7 @@
-import { PaginatorType } from '../pagination/pagination.models';
-import { BlogViewDTO } from './blog.models';
+import { PaginatorType } from '../../../pagination/pagination.models';
+import { BlogViewDTO } from '../../blog.models';
 import * as mongoose from 'mongoose';
-import { Blog, BlogDocument, BlogModel } from './blog.schemas';
+import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -11,13 +11,13 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../common/constants';
-import { blogMapping, blogsMapping } from './blog.helpers';
-import { objectIdHelper } from '../common/helpers';
-import { PostViewDTO } from '../posts/post.models';
-import { Post, PostDocument, PostModel } from '../posts/post.schemas';
-import { PostMapper } from '../posts/post.helpers';
+} from '../../../pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../../common/constants';
+import { blogMapping, blogsMapping } from '../../blog.helpers';
+import { objectIdHelper } from '../../../common/helpers';
+import { PostViewDTO } from '../../../posts/post.models';
+import { Post, PostDocument, PostModel } from '../../../posts/post.schemas';
+import { PostMapper } from '../../../posts/post.helpers';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(

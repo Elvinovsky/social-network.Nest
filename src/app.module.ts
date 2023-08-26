@@ -5,15 +5,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/users.schema';
-import { BlogsController } from './blogs/blogs.controller';
-import { BlogsQueryRepo } from './blogs/blogs.query.repo';
+import { PublicBlogsController } from './blogs/api/public/public-blogs.controller';
+import { BlogsQueryRepo } from './blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesService } from './likes/likes.service';
 import { LikesRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
 import { Post, PostSchema } from './posts/post.schemas';
-import { BlogsService } from './blogs/blogs.service';
-import { BlogsRepository } from './blogs/blogs.repository';
+import { BlogsService } from './blogs/application/blogs.service';
+import { BlogsRepository } from './blogs/infrastructure/repositories/blogs.repository';
 import { DeleteDBController } from './db-clear.testing/delete.db.controller';
 import { DeleteDbRepository } from './db-clear.testing/delete.db.repository';
 import { PostsService } from './posts/posts.service';
@@ -34,7 +34,7 @@ import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
-import { BloggerController } from './blogs/blogger/blogger.controller';
+import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.controller';
 
 @Module({
   imports: [
@@ -55,8 +55,8 @@ import { BloggerController } from './blogs/blogger/blogger.controller';
   controllers: [
     AppController,
     DeleteDBController,
-    BlogsController,
-    BloggerController,
+    PublicBlogsController,
+    BloggerBlogsController,
     PostsController,
     CommentsController,
   ],

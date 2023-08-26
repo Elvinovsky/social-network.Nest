@@ -10,7 +10,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { AuthService } from './aplication/auth.service';
+import { AuthService } from './application/auth.service';
 
 export class RegistrationInputModel {
   @IsNotEmpty()

@@ -22,7 +22,7 @@ import {
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
 } from './auth.models';
-import { AuthService } from './aplication/auth.service';
+import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
 import { UserCreateDTO, UserInputModel } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -35,7 +35,7 @@ import { UsersQueryRepository } from '../users/infrastructure/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { UserRegistrationCommand } from './aplication/use-cases/user-registration-use-case.';
+import { UserRegistrationCommand } from './application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserIdFromBearerJWT } from './decorators/current-userId-jwt';
 

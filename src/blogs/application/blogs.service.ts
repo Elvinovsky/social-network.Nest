@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { BlogInputModel, BlogViewDTO } from './blog.models';
-import { BlogsRepository } from './blogs.repository';
-import { BlogDocument } from './blog.schemas';
+import { BlogInputModel, BlogViewDTO } from '../blog.models';
+import { BlogsRepository } from '../infrastructure/repositories/blogs.repository';
+import { BlogDocument } from '../blog.schemas';
 
 //input: BlogViewDTO, output: BlogViewDTO, BlogDocument
 // производится проверка заданной бизнес логики, никаких трансформаций с сущностми только передача запросов между сервисами и валидация бизнес задач

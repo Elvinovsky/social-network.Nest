@@ -1,4 +1,4 @@
-import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
+import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../../blog.models';
 import {
   HttpException,
   HttpStatus,
@@ -6,9 +6,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModel } from './blog.schemas';
-import { blogMapping } from './blog.helpers';
-import { objectIdHelper } from '../common/helpers';
+import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
+import { blogMapping } from '../../blog.helpers';
+import { objectIdHelper } from '../../../common/helpers';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 // принимает 'BlogInputModel' трансформирует его для заданного хранения схемы 'BlogCreateDTO', вся логика изменения данных для входа и выхода производится в репозитории
