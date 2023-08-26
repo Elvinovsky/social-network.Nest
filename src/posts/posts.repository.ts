@@ -25,7 +25,7 @@ export class PostsRepository {
     try {
       if (!objectIdHelper(id)) return null;
 
-      return await this.postModel.findById(objectIdHelper(id));
+      return await this.postModel.findById(objectIdHelper(id)).exec();
     } catch (e) {
       console.log(e, 'error findPostById method by PostRepository');
       throw new InternalServerErrorException();
@@ -81,7 +81,7 @@ export class PostsRepository {
 
   async updatePostById(
     postId: string,
-    inputModel: PostInputModel,
+    inputModel: BlogPostInputModel,
   ): Promise<boolean> {
     try {
       if (!objectIdHelper(postId)) return false;
