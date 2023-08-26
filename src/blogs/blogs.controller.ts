@@ -1,12 +1,10 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
-  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -17,19 +15,13 @@ import {
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
 import { BlogViewDTO } from './blog.models';
-import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
-import { PostsService } from '../posts/posts.service';
-import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { PostViewDTO } from '../posts/post.models';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(
-    private readonly blogsQueryRepo: BlogsQueryRepo,
-    private readonly postsService: PostsService,
-  ) {}
+  constructor(private readonly blogsQueryRepo: BlogsQueryRepo) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -78,21 +70,5 @@ export class BlogsController {
       throw new NotFoundException();
     }
     return getPostsByBlogId;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Post(':blogId/posts')
-  @HttpCode(HttpStatus.CREATED)
-  async createPostByBlog(
-    @Param('blogId', ObjectIdPipe) blogId: string,
-    @Body() inputModel: BlogPostInputModel,
-  ) {
-    const foundBlog: PostViewDTO | null =
-      await this.postsService.createPostByBLog(blogId, inputModel);
-
-    if (foundBlog === null) {
-      throw new NotFoundException();
-    }
-    return foundBlog;
   }
 }
