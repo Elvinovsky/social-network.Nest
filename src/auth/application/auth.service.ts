@@ -4,7 +4,7 @@ import { UsersService } from '../../users/aplication/users.service';
 import bcrypt from 'bcrypt';
 import { NewPasswordRecoveryInputModel } from '../auth.models';
 import { UserViewDTO } from '../../users/user.models';
-import { EmailService } from '../../email/email.service';
+import { EmailSenderService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../../users/user.helpers';
 import { DevicesService } from '../../devices/devices.service';
@@ -15,7 +15,7 @@ import { ConfigType } from '../../configuration/getConfiguration';
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly emailService: EmailService,
+    private readonly emailService: EmailSenderService,
     private readonly jwtService: JwtService,
     private readonly devicesService: DevicesService,
     private configService: ConfigService<ConfigType>,
