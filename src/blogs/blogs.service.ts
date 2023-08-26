@@ -21,18 +21,41 @@ export class BlogsService {
   async updateBlog(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean | null> {
+    userId: string,
+  ): Promise<boolean | null | number> {
+    // поиск блога в базе данных.
     const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
       id,
     );
-    if (blog) {
-      return this.blogsRepository.updateBlogById(id, inputModel);
+    if (!blog) {
+      return null;
     }
 
-    return blog;
+    // проверка принадлежности блога автору
+    if (blog.authorId !== userId) {
+      return false;
+    }
+
+    return this.blogsRepository.updateBlogById(id, inputModel);
   }
 
-  async deleteBlog(id: string): Promise<Document | null> {
+  async deleteBlog(
+    id: string,
+    userId: string,
+  ): Promise<Document | null | boolean> {
+    // поиск блога в базе данных.
+    const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
+      id,
+    );
+    if (!blog) {
+      return null;
+    }
+
+    // проверка принадлежности блога автору
+    if (blog.authorId !== userId) {
+      return false;
+    }
+
     return this.blogsRepository.deleteBlogById(id);
   }
 }

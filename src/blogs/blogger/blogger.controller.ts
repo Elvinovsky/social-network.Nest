@@ -1,10 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
   Post,
+  Put,
   Query,
   UnauthorizedException,
   UseGuards,
@@ -19,8 +24,9 @@ import { BlogInputModel, BlogViewDTO } from '../blog.models';
 import { JwtBearerGuard } from '../../auth/guards/jwt-bearer-auth.guard';
 import { BlogsService } from '../blogs.service';
 import { DevicesService } from '../../devices/devices.service';
+import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 
-@Controller('blogger')
+@Controller('blogger/blogs')
 export class BloggerController {
   constructor(
     private blogsQueryRepo: BlogsQueryRepo,
@@ -52,7 +58,7 @@ export class BloggerController {
     @CurrentUserIdFromBearerJWT()
     sessionInfo: { userId: string; deviceId: string },
   ) {
-    //todo как по другому реализовать логику валидации на 'logout' действие юзера
+    //todo как иначе реализовать логику валидации на 'logout' юзера
     const isSessionLogged = await this.devicesService.findSessionByDeviceId(
       sessionInfo.deviceId,
     );
@@ -62,5 +68,51 @@ export class BloggerController {
       sessionInfo.userId,
     );
     return result;
+  }
+
+  @Put(':blogId')
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(
+    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Body() inputModel: BlogInputModel,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
+  ) {
+    const result: boolean | null | number = await this.blogsService.updateBlog(
+      blogId,
+      inputModel,
+      sessionInfo.userId,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
+  }
+
+  @Delete(':blogId')
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(
+    @Param('blogId', ObjectIdPipe) blogId: string,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
+  ) {
+    const result = await this.blogsService.deleteBlog(
+      blogId,
+      sessionInfo.userId,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
   }
 }

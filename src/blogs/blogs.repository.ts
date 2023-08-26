@@ -1,5 +1,10 @@
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModel } from './blog.schemas';
 import { blogMapping } from './blog.helpers';
@@ -47,24 +52,24 @@ export class BlogsRepository {
   async updateBlogById(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean> {
+  ): Promise<number> {
     try {
-      if (!objectIdHelper(id)) return false;
-
-      const result = await this.blogModel.updateOne(
-        { _id: objectIdHelper(id) },
-        {
-          $set: {
-            name: inputModel.name,
-            description: inputModel.description,
-            websiteUrl: inputModel.websiteUrl,
+      const result = await this.blogModel
+        .updateOne(
+          { _id: objectIdHelper(id) },
+          {
+            $set: {
+              name: inputModel.name,
+              description: inputModel.description,
+              websiteUrl: inputModel.websiteUrl,
+            },
           },
-        },
-      );
-      return result.matchedCount === 1;
+        )
+        .exec();
+      return result.matchedCount;
     } catch (e) {
       console.log('error updateBlogById', e);
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -72,8 +77,6 @@ export class BlogsRepository {
   // Возвращает удаленный документ или null, если блог не найден
   async deleteBlogById(id: string): Promise<Document | null> {
     try {
-      if (!objectIdHelper(id)) return null;
-
       return await this.blogModel.findByIdAndDelete(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error deleteBlogById');

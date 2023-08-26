@@ -1,14 +1,12 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -18,7 +16,7 @@ import {
   SearchNameTerm,
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './blogs.query.repo';
-import { BlogInputModel, BlogViewDTO } from './blog.models';
+import { BlogViewDTO } from './blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
 import { BlogsService } from './blogs.service';
 import { PostsService } from '../posts/posts.service';
@@ -98,33 +96,5 @@ export class BlogsController {
       throw new NotFoundException();
     }
     return foundBlog;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Put(':blogId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(
-    @Param('blogId') blogId: string,
-    @Body() inputModel: BlogInputModel,
-  ) {
-    const result: boolean | null = await this.blogsService.updateBlog(
-      blogId,
-      inputModel,
-    );
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Delete(':blogId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('blogId') blogId: string) {
-    const result = await this.blogsService.deleteBlog(blogId);
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
   }
 }
