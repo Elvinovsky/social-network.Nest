@@ -46,21 +46,45 @@ export class PostsService {
   }
 
   async updatePost(
-    id: string,
-    inputModel: PostInputModel,
+    postId: string,
+    blogId: string,
+    userId: string,
+    inputModel: BlogPostInputModel,
   ): Promise<boolean | null> {
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
-      inputModel.blogId,
-    );
+    const validateResult: boolean | BlogDocument | null =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
 
-    if (foundBlog) {
-      return this.postsRepository.updatePostById(id, inputModel);
+    if (!validateResult) {
+      return validateResult;
     }
 
-    return foundBlog;
+    const foundPost = await this.findPostById(postId);
+
+    if (foundPost?.blogId !== blogId) {
+      return false;
+    }
+
+    return this.postsRepository.updatePostById(postId, inputModel);
   }
 
-  async deletePost(id: string): Promise<Document | null> {
-    return this.postsRepository.deletePost(id);
+  async deletePost(
+    postId: string,
+    blogId: string,
+    userId: string,
+  ): Promise<Document | null | boolean> {
+    // поиск блога и его принадлежности пользователю
+    const validateResult: boolean | BlogDocument | null =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
+
+    if (!validateResult) {
+      return validateResult;
+    }
+    // поиск поста по айди
+    const foundPost = await this.findPostById(postId);
+    // проверка на совпадение предаваемого айди блога через params внутри документа поста
+    if (foundPost?.blogId !== blogId) {
+      return false;
+    }
+    return this.postsRepository.deletePost(postId);
   }
 }
