@@ -38,7 +38,7 @@ export class BloggerController {
   ) {}
   @Get('blogs')
   @UseGuards(JwtBearerGuard)
-  async getBlogsForOwner(
+  async getBlogs(
     @Query() query: QueryInputModel & SearchNameTerm,
     @CurrentUserIdFromBearerJWT()
     sessionInfo: { userId: string; deviceId: string },
@@ -122,27 +122,73 @@ export class BloggerController {
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
-  async createPostByBlog(
+  async createPost(
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogPostInputModel,
     @CurrentUserIdFromBearerJWT()
     sessionInfo: { userId: string; deviceId: string },
   ) {
-    const createResult: boolean | PostViewDTO | null =
+    const result: boolean | PostViewDTO | null =
       await this.postsService.createPostByBLog(
         blogId,
         inputModel,
         sessionInfo.userId,
       );
 
-    if (createResult === null) {
+    if (result === null) {
       throw new NotFoundException();
     }
 
-    if (createResult === false) {
+    if (result === false) {
       throw new ForbiddenException();
     }
 
-    return createResult;
+    return result;
+  }
+
+  @Put('blogId/posts/:postId')
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Param('postId', ObjectIdPipe) postId: string,
+    @Body() inputModel: BlogPostInputModel,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
+  ) {
+    const result: boolean | null = await this.postsService.updatePost(
+      postId,
+      blogId,
+      sessionInfo.userId,
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+    if (result === false) {
+      throw new ForbiddenException();
+    }
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Delete('blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(
+    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Param('postId', ObjectIdPipe) postId: string,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
+  ) {
+    const result: Document | null | boolean =
+      await this.postsService.deletePost(postId, blogId, sessionInfo.userId);
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
   }
 }
