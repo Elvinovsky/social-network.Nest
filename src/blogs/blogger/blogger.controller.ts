@@ -25,6 +25,8 @@ import { JwtBearerGuard } from '../../auth/guards/jwt-bearer-auth.guard';
 import { BlogsService } from '../blogs.service';
 import { DevicesService } from '../../devices/devices.service';
 import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
+import { PostsService } from '../../posts/posts.service';
+import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 
 @Controller('blogger/blogs')
 export class BloggerController {
@@ -32,6 +34,7 @@ export class BloggerController {
     private blogsQueryRepo: BlogsQueryRepo,
     private blogsService: BlogsService,
     private devicesService: DevicesService,
+    private postsService: PostsService,
   ) {}
   @Get('blogs')
   @UseGuards(JwtBearerGuard)
@@ -114,5 +117,32 @@ export class BloggerController {
     if (result === false) {
       throw new ForbiddenException();
     }
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Post(':blogId/posts')
+  @HttpCode(HttpStatus.CREATED)
+  async createPostByBlog(
+    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Body() inputModel: BlogPostInputModel,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
+  ) {
+    const createResult: boolean | PostViewDTO | null =
+      await this.postsService.createPostByBLog(
+        blogId,
+        inputModel,
+        sessionInfo.userId,
+      );
+
+    if (createResult === null) {
+      throw new NotFoundException();
+    }
+
+    if (createResult === false) {
+      throw new ForbiddenException();
+    }
+
+    return createResult;
   }
 }
