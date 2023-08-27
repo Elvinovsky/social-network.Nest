@@ -23,21 +23,14 @@ export class Post {
   blogName: string;
   @Prop({ required: true })
   addedAt: string;
-  static createPost(
-    inputModel: PostInputModel | BlogPostInputModel,
+  static create(
+    inputModel: BlogPostInputModel,
     blogName: string,
-    blogId?: string,
+    blogId: string,
   ): PostCreateDTO {
     const post: Post = new Post();
 
-    if (blogId) {
-      post.blogId = blogId;
-    }
-
-    if (!(inputModel instanceof BlogPostInputModel)) {
-      post.blogId = inputModel.blogId;
-    }
-
+    post.blogId = blogId;
     post.title = inputModel.title;
     post.shortDescription = inputModel.shortDescription;
     post.content = inputModel.content;
