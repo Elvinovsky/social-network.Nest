@@ -1,17 +1,7 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModel } from './post.schemas';
-import {
-  BlogPostInputModel,
-  PostCreateDTO,
-  PostInputModel,
-  PostViewDTO,
-} from './post.models';
+import { BlogPostInputModel, PostCreateDTO, PostViewDTO } from './post.models';
 import { PostMapper } from './post.helpers';
 import { objectIdHelper } from '../common/helpers';
 
@@ -56,20 +46,9 @@ export class PostsRepository {
       throw new InternalServerErrorException();
     }
   }
-  async createPost(
-    inputModel: PostInputModel,
-    blogName: string,
-  ): Promise<PostViewDTO | null> {
+  async createPost(inputModel: PostCreateDTO): Promise<PostViewDTO | null> {
     try {
-      const createPost: PostCreateDTO = {
-        blogId: inputModel.blogId,
-        title: inputModel.title,
-        shortDescription: inputModel.shortDescription,
-        content: inputModel.content,
-        blogName: blogName,
-        addedAt: new Date().toISOString(),
-      };
-      const post: PostDocument = new this.postModel(createPost);
+      const post: PostDocument = new this.postModel(inputModel);
       await post.save();
 
       return this.postMapper.mapPost(post);
@@ -99,7 +78,7 @@ export class PostsRepository {
       return result.matchedCount === 1;
     } catch (e) {
       console.log(e, 'error updatePostById by postsRepository');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
