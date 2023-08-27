@@ -69,7 +69,6 @@ export class UsersService {
   async _isUserExists(
     inputModel: RegistrationInputModel,
   ): Promise<true | ResultsAuthForErrors> {
-    debugger;
     const userEmail = await this.usersRepository.findUserByEmail(
       inputModel.email,
     );

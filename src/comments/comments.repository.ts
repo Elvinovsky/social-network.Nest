@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument, CommentModel } from './comment.schemas';
 import { objectIdHelper } from '../common/helpers';
@@ -49,9 +53,10 @@ export class CommentsRepository {
       return this.commentMapper.comment(comment);
     } catch (e) {
       console.log(e, 'error addNewComment method');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
+
   async updateCommentById(id: string, content: string): Promise<boolean> {
     const result = await this.commentModel.updateOne(
       { _id: objectIdHelper(id) },

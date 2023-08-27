@@ -36,7 +36,7 @@ export class BloggerBlogsController {
     private devicesService: DevicesService,
     private postsService: PostsService,
   ) {}
-  @Get('blogs')
+  @Get()
   @UseGuards(JwtBearerGuard)
   async getBlogs(
     @Query() query: QueryInputModel & SearchNameTerm,
@@ -53,7 +53,7 @@ export class BloggerBlogsController {
     );
   }
 
-  @Post('blogs')
+  @Post()
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.CREATED)
   async createBlog(
