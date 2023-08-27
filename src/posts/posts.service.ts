@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
-import { BlogPostInputModel, PostInputModel, PostViewDTO } from './post.models';
+import {
+  BlogPostInputModel,
+  PostCreateDTO,
+  PostInputModel,
+  PostViewDTO,
+} from './post.models';
 import { BlogsService } from '../blogs/application/blogs.service';
 import { BlogDocument } from '../blogs/blog.schemas';
 
@@ -42,7 +47,16 @@ export class PostsService {
       return null;
     }
 
-    return this.postsRepository.createPost(inputModel, foundBlog.name);
+    const newPost: PostCreateDTO = {
+      blogId: inputModel.blogId,
+      title: inputModel.title,
+      shortDescription: inputModel.shortDescription,
+      content: inputModel.content,
+      blogName: foundBlog.name,
+      addedAt: new Date().toISOString(),
+    };
+
+    return this.postsRepository.createPost(newPost);
   }
 
   async updatePost(
