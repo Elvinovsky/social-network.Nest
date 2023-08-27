@@ -1,7 +1,7 @@
-import add from 'date-fns/add';
 import { Injectable } from '@nestjs/common';
 import { DevicesRepository } from './devices.repository';
 import { SessionCreateDTO } from './device.models';
+import { Device } from './device.schemas';
 @Injectable()
 export class DevicesService {
   constructor(protected devicesRepository: DevicesRepository) {}
@@ -13,22 +13,18 @@ export class DevicesService {
     userId: string,
     deviceId: string,
     issuedAt: number,
-    ip: string | null,
-    deviceName?: string,
+    ip: string,
+    deviceName: string,
   ) {
-    const createDeviceSession: SessionCreateDTO = {
-      deviceId: deviceId,
-      issuedAt: issuedAt,
-      userId: userId,
-      ip: ip || null,
-      title: deviceName || null,
-      lastActiveDate: new Date().toISOString(),
-      expirationDate: add(new Date(), {
-        seconds: 20,
-        //minutes:20
-      }),
-    };
-    return await this.devicesRepository.addDeviceSession(createDeviceSession);
+    const newDeviceSession: SessionCreateDTO = Device.create(
+      userId,
+      deviceId,
+      issuedAt,
+      ip,
+      deviceName,
+    );
+
+    return await this.devicesRepository.addDeviceSession(newDeviceSession);
   }
 
   async updateIATByDeviceSession(newIssuedAt: number, issuedAt: number) {
@@ -39,8 +35,7 @@ export class DevicesService {
   }
 
   async logoutDeviceSessionByDeviceId(deviceId: string, userId: string) {
-    const findDeviceSessionById =
-      await this.devicesRepository.findDeviceIdAmongSessions(deviceId);
+    const findDeviceSessionById = await this.findSessionByDeviceId(deviceId);
     if (!findDeviceSessionById) {
       return null;
     }
@@ -70,5 +65,9 @@ export class DevicesService {
 
   async logoutByIAT(issuedAt: number) {
     return this.devicesRepository.deleteDeviceSessionByIAT(issuedAt);
+  }
+
+  async findSessionByDeviceId(devicesId: string) {
+    return this.devicesRepository.findDeviceIdAmongSession(devicesId);
   }
 }

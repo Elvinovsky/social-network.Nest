@@ -22,22 +22,23 @@ import {
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
 } from './auth.models';
-import { AuthService } from './aplication/auth.service';
+import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
 import { UserCreateDTO, UserInputModel } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { CurrentUserId } from './decorators/current-user-id.decorator';
+import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
 import { refreshCookieOptions } from '../common/helpers';
 import { ResultsAuthForErrors } from './auth.constants';
 import { DevicesService } from '../devices/devices.service';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { UsersQueryRepository } from '../users/infrastructure/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
-import { CurrentUserIdHeaders } from './decorators/current-userId-headers';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { UserRegistrationCommand } from './aplication/use-cases/user-registration-use-case.';
+import { UserRegistrationCommand } from './application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
+import { CurrentUserIdFromBearerJWT } from './decorators/current-userId-jwt';
+import requestIp from 'request-ip';
 
 @Controller('auth')
 export class AuthController {
@@ -144,12 +145,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @UseGuards(WsThrottlerGuard)
   async login(
-    @CurrentUserId() userId: string,
+    @CurrentUserIdLocal() userId: string,
     @Headers('user-agent') userAgent: string,
     @Request() req,
     @Response() res,
   ) {
-    const ipAddress = req.ip;
+    const ipAddress = requestIp.getClientIp(req);
 
     const tokens = await this.authService.login(userId, userAgent, ipAddress);
 
@@ -171,7 +172,10 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async createRefToken(@Req() req, @Response() res) {
     // Создание нового access token и refreshToken.
-    const accessToken = await this.authService.createJWTAccessToken(req.userId);
+    const newAccessToken = await this.authService.createJWTAccessToken(
+      req.userId,
+      req.deviceId,
+    );
     const newRefreshToken = await this.authService.createJWTRefreshToken(
       req.userId,
       req.deviceId,
@@ -192,7 +196,7 @@ export class AuthController {
     return res
       .status(200)
       .cookie('refreshToken', newRefreshToken, refreshCookieOptions)
-      .send(accessToken);
+      .send(newAccessToken);
   }
 
   @Post('logout')
@@ -243,9 +247,17 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtBearerGuard)
-  async getMe(@CurrentUserIdHeaders() userId: string) {
+  async getMe(
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: {
+      userId: string;
+      deviceId: string;
+    },
+  ) {
     // Получение информации о текущем пользователе.
-    const user = await this.usersQueryRepository.getUserInfo(userId);
+    const user = await this.usersQueryRepository.getUserInfo(
+      sessionInfo.userId,
+    );
     if (user) {
       return user; // Отправка информации о пользователе.
     }
@@ -254,10 +266,7 @@ export class AuthController {
 
   @Put('email-or-login-recovery')
   @UseGuards(JwtRefreshGuard)
-  async updateUser(
-    @CurrentUserIdHeaders('userId') userId: string,
-    @Body() inputModel: UserInputModel,
-  ) {
+  async updateUser(@Req() req, @Body() inputModel: UserInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
       await this.usersService._isUserExists(inputModel);
@@ -281,6 +290,6 @@ export class AuthController {
         },
       ]);
     }
-    return this.usersService.updateUser(userId, inputModel);
+    return this.usersService.updateUser(req.userId, inputModel);
   }
 }

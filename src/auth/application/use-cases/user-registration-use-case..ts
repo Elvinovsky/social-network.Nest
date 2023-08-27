@@ -1,5 +1,5 @@
 import { UsersService } from '../../../users/aplication/users.service';
-import { EmailService } from '../../../email/email.service';
+import { EmailSenderService } from '../../../email/email.service';
 import { RegistrationInputModel } from '../../auth.models';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
@@ -17,7 +17,7 @@ export class UserRegistrationUseCase
 {
   constructor(
     private readonly usersService: UsersService,
-    private readonly emailService: EmailService,
+    private readonly emailService: EmailSenderService,
   ) {}
 
   async execute(command: UserRegistrationCommand): Promise<boolean> {

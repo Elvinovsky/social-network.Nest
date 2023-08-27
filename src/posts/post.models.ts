@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { ExtendedLikesViewDTO } from '../likes/like.models';
 import { Injectable } from '@nestjs/common';
-import { BlogsRepository } from '../blogs/blogs.repository';
+import { BlogsRepository } from '../blogs/infrastructure/repositories/blogs.repository';
 
 @Injectable()
 @ValidatorConstraint({ name: 'BlogExists', async: true })

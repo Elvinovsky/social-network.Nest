@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
-import { CommentCreateDTO, CommentViewDTO } from './comment.models';
+import {
+  CommentatorInfo,
+  CommentCreateDTO,
+  CommentViewDTO,
+} from './comment.models';
+import { Comment } from './comment.schemas';
 
 @Injectable()
 export class CommentsService {
@@ -23,15 +28,12 @@ export class CommentsService {
     userLogin: string,
     content: string,
   ): Promise<CommentViewDTO> {
-    const newComment: CommentCreateDTO = {
-      postId: postId,
-      content: content,
-      commentatorInfo: {
-        userId: userId,
-        userLogin: userLogin,
-      },
-      addedAt: new Date().toISOString(),
-    };
+    const commentatorInfo = { userId, userLogin };
+    const newComment: CommentCreateDTO = Comment.create(
+      postId,
+      commentatorInfo as CommentatorInfo,
+      content,
+    );
 
     return this.commentsRepository.addNewComment(newComment);
   }

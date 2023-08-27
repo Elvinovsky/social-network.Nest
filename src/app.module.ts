@@ -5,15 +5,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/users.schema';
-import { BlogsController } from './blogs/blogs.controller';
-import { BlogsQueryRepo } from './blogs/blogs.query.repo';
+import { PublicBlogsController } from './blogs/api/public/public-blogs.controller';
+import { BlogsQueryRepo } from './blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesService } from './likes/likes.service';
 import { LikesRepository } from './likes/likes.repository';
 import { PostMapper } from './posts/post.helpers';
 import { Post, PostSchema } from './posts/post.schemas';
-import { BlogsService } from './blogs/blogs.service';
-import { BlogsRepository } from './blogs/blogs.repository';
+import { BlogsService } from './blogs/application/blogs.service';
+import { BlogsRepository } from './blogs/infrastructure/repositories/blogs.repository';
 import { DeleteDBController } from './db-clear.testing/delete.db.controller';
 import { DeleteDbRepository } from './db-clear.testing/delete.db.repository';
 import { PostsService } from './posts/posts.service';
@@ -26,7 +26,7 @@ import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentMapper } from './comments/helpers/comment.mapping';
-import { EmailService } from './email/email.service';
+import { EmailSenderService } from './email/email.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { Device, DeviceSchema } from './devices/device.schemas';
@@ -34,6 +34,8 @@ import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
+import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.controller';
+import { SendSMTPAdapter } from './email/send-smtp-adapter';
 
 @Module({
   imports: [
@@ -54,7 +56,8 @@ import { getConfiguration } from './configuration/getConfiguration';
   controllers: [
     AppController,
     DeleteDBController,
-    BlogsController,
+    PublicBlogsController,
+    BloggerBlogsController,
     PostsController,
     CommentsController,
   ],
@@ -62,7 +65,9 @@ import { getConfiguration } from './configuration/getConfiguration';
     BlogIdExistenceCheck,
     AppService,
     DeleteDbRepository,
-    EmailService,
+
+    EmailSenderService,
+    SendSMTPAdapter,
 
     BlogsQueryRepo,
     BlogsRepository,

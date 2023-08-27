@@ -1,9 +1,14 @@
-import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from './blog.models';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../../blog.models';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModel } from './blog.schemas';
-import { blogMapping } from './blog.helpers';
-import { objectIdHelper } from '../common/helpers';
+import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
+import { blogMapping } from '../../blog.helpers';
+import { objectIdHelper } from '../../../common/helpers';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 // принимает 'BlogInputModel' трансформирует его для заданного хранения схемы 'BlogCreateDTO', вся логика изменения данных для входа и выхода производится в репозитории
@@ -23,13 +28,12 @@ export class BlogsRepository {
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
-
+  //todo
   // Добавляет новый блог на основе входной модели BlogInputModel
   // Возвращает BlogViewDTO созданного блога
-  async addNewBlog(inputModel: BlogInputModel): Promise<BlogViewDTO> {
+  async addNewBlog(blog: BlogCreateDTO): Promise<BlogViewDTO> {
     try {
-      const createBlog: BlogCreateDTO = Blog.createBlog(inputModel);
-      const createdBlog = await new this.blogModel(createBlog);
+      const createdBlog = await new this.blogModel(blog);
       await createdBlog.save();
 
       return blogMapping(createdBlog);
@@ -44,24 +48,24 @@ export class BlogsRepository {
   async updateBlogById(
     id: string,
     inputModel: BlogInputModel,
-  ): Promise<boolean> {
+  ): Promise<number> {
     try {
-      if (!objectIdHelper(id)) return false;
-
-      const result = await this.blogModel.updateOne(
-        { _id: objectIdHelper(id) },
-        {
-          $set: {
-            name: inputModel.name,
-            description: inputModel.description,
-            websiteUrl: inputModel.websiteUrl,
+      const result = await this.blogModel
+        .updateOne(
+          { _id: objectIdHelper(id) },
+          {
+            $set: {
+              name: inputModel.name,
+              description: inputModel.description,
+              websiteUrl: inputModel.websiteUrl,
+            },
           },
-        },
-      );
-      return result.matchedCount === 1;
+        )
+        .exec();
+      return result.matchedCount;
     } catch (e) {
       console.log('error updateBlogById', e);
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -69,8 +73,6 @@ export class BlogsRepository {
   // Возвращает удаленный документ или null, если блог не найден
   async deleteBlogById(id: string): Promise<Document | null> {
     try {
-      if (!objectIdHelper(id)) return null;
-
       return await this.blogModel.findByIdAndDelete(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error deleteBlogById');

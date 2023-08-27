@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
-import { BlogPostInputModel, PostInputModel, PostViewDTO } from './post.models';
-import { BlogsService } from '../blogs/blogs.service';
+import {
+  BlogPostInputModel,
+  PostCreateDTO,
+  PostInputModel,
+  PostViewDTO,
+} from './post.models';
+import { BlogsService } from '../blogs/application/blogs.service';
 import { BlogDocument } from '../blogs/blog.schemas';
 
 @Injectable()
@@ -17,22 +22,24 @@ export class PostsService {
   async createPostByBLog(
     blogId: string,
     inputModel: BlogPostInputModel,
-  ): Promise<PostViewDTO | null> {
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
-      blogId,
-    );
-    if (!foundBlog) {
-      return null;
+    userId: string,
+  ): Promise<PostViewDTO | null | boolean> {
+    const validateResult: BlogDocument | null | boolean =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
+
+    if (!validateResult) {
+      return validateResult;
     }
 
     return this.postsRepository.createPostBlog(
       inputModel,
       blogId,
-      foundBlog.name,
+      validateResult.name,
     );
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
+    // валидация избыточна так как проверям блог на существование через pipe
     const foundBlog: BlogDocument | null = await this.blogService.findById(
       inputModel.blogId,
     );
@@ -40,25 +47,58 @@ export class PostsService {
       return null;
     }
 
-    return this.postsRepository.createPost(inputModel, foundBlog.name);
+    const newPost: PostCreateDTO = {
+      blogId: inputModel.blogId,
+      title: inputModel.title,
+      shortDescription: inputModel.shortDescription,
+      content: inputModel.content,
+      blogName: foundBlog.name,
+      addedAt: new Date().toISOString(),
+    };
+
+    return this.postsRepository.createPost(newPost);
   }
 
   async updatePost(
-    id: string,
-    inputModel: PostInputModel,
+    postId: string,
+    blogId: string,
+    userId: string,
+    inputModel: BlogPostInputModel,
   ): Promise<boolean | null> {
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
-      inputModel.blogId,
-    );
+    const validateResult: boolean | BlogDocument | null =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
 
-    if (foundBlog) {
-      return this.postsRepository.updatePostById(id, inputModel);
+    if (!validateResult) {
+      return validateResult;
     }
 
-    return foundBlog;
+    const foundPost = await this.findPostById(postId);
+
+    if (foundPost?.blogId !== blogId) {
+      return false;
+    }
+
+    return this.postsRepository.updatePostById(postId, inputModel);
   }
 
-  async deletePost(id: string): Promise<Document | null> {
-    return this.postsRepository.deletePost(id);
+  async deletePost(
+    postId: string,
+    blogId: string,
+    userId: string,
+  ): Promise<Document | null | boolean> {
+    // поиск блога и его принадлежности пользователю
+    const validateResult: boolean | BlogDocument | null =
+      await this.blogService._isOwnerFoundBlog(blogId, userId);
+
+    if (!validateResult) {
+      return validateResult;
+    }
+    // поиск поста по айди
+    const foundPost = await this.findPostById(postId);
+    // проверка на совпадение предаваемого айди блога через params внутри документа поста
+    if (foundPost?.blogId !== blogId) {
+      return false;
+    }
+    return this.postsRepository.deletePost(postId);
   }
 }

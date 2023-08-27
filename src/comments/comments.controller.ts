@@ -15,12 +15,12 @@ import { CommentsService } from './comments.service';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { CommentInputModel } from './comment.models';
-import { CurrentUserIdHeaders } from '../auth/decorators/current-userId-headers';
 import { UsersService } from '../users/aplication/users.service';
 import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
+import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
 
 @Controller('/comments')
 export class CommentsController {
@@ -50,7 +50,8 @@ export class CommentsController {
   async updateComment(
     @Param('id', ObjectIdPipe) id: string,
     @Body() inputModel: CommentInputModel,
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
     const comment = await this.commentService.getComment(id);
@@ -60,7 +61,7 @@ export class CommentsController {
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.getUser(userId);
+    const currentUser = await this.usersService.getUser(sessionInfo.userId);
     if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
@@ -78,7 +79,8 @@ export class CommentsController {
   @UseGuards(JwtBearerGuard)
   async deleteComment(
     @Param('id', ObjectIdPipe) id: string,
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
     const comment = await this.commentService.findCommentById(id);
@@ -87,7 +89,7 @@ export class CommentsController {
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.getUser(userId);
+    const currentUser = await this.usersService.getUser(sessionInfo.userId);
     if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
@@ -103,7 +105,8 @@ export class CommentsController {
   async updateLikeStatusComment(
     @Param('id', ObjectIdPipe) id: string,
     @Body() inputModel: LikeStatus,
-    @CurrentUserIdHeaders() userId: string,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userId: string; deviceId: string },
   ) {
     // Получаем комментарий по id
     const comment = await this.commentService.findCommentById(id);
@@ -114,7 +117,7 @@ export class CommentsController {
     // Создаем или обновляем лайк для комментария
     const result = await this.likesService.createOrUpdateLike(
       id,
-      userId,
+      sessionInfo.userId,
       inputModel.likeStatus,
     );
     return result;

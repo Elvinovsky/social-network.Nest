@@ -3,9 +3,9 @@ import { BasicStrategy } from './strategies/basic.strategy';
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { AuthService } from './aplication/auth.service';
+import { AuthService } from './application/auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
-import { EmailService } from '../email/email.service';
+import { EmailSenderService } from '../email/email.service';
 import { BasicAuthGuard } from './guards/basic-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UsersModule } from '../users/users.module';
@@ -17,8 +17,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { OptionalBearerGuard } from './guards/optional-bearer.guard';
 import { CodeExpireCheck } from './auth.models';
-import { UserRegistrationUseCase } from './aplication/use-cases/user-registration-use-case.';
+import { UserRegistrationUseCase } from './application/use-cases/user-registration-use-case.';
 import { CqrsModule } from '@nestjs/cqrs';
+import { SendSMTPAdapter } from '../email/send-smtp-adapter';
 
 const useCases = [UserRegistrationUseCase];
 @Module({
@@ -48,9 +49,10 @@ const useCases = [UserRegistrationUseCase];
     JwtRefreshGuard,
     JwtBearerGuard,
     JwtBearerStrategy,
-
     JwtService,
-    EmailService,
+
+    EmailSenderService,
+    SendSMTPAdapter,
   ],
   controllers: [AuthController],
   exports: [AuthService],

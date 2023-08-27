@@ -13,10 +13,10 @@ export class DevicesRepository {
     });
     return !!deviceSession;
   }
-  async findDeviceIdAmongSessions(
-    deviceID: string,
+  async findDeviceIdAmongSession(
+    deviceId: string,
   ): Promise<DeviceDocument | null> {
-    return this.deviceModel.findOne({ deviceId: deviceID });
+    return this.deviceModel.findOne({ deviceId: deviceId });
   }
 
   // Метод для поиска всех устройств сессии по идентификатору пользователя
@@ -32,7 +32,7 @@ export class DevicesRepository {
   async addDeviceSession(
     deviceSession: SessionCreateDTO,
   ): Promise<mongoose.Document> {
-    return await this.deviceModel.create(deviceSession);
+    return this.deviceModel.create(deviceSession);
   }
   async updateDeviceSession(
     newIssuedAt: number,
