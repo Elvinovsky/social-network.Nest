@@ -120,8 +120,8 @@ export class PostsController {
     return getCommentsByPostId;
   }
 
-  @HttpCode(HttpStatus.CREATED)
   @Post(':postId/comments')
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtBearerGuard)
   async createCommentByPost(
     @Param('postId', ObjectIdPipe) postId: string,
