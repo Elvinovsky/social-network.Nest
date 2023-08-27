@@ -38,6 +38,7 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserRegistrationCommand } from './application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
 import { CurrentUserIdFromBearerJWT } from './decorators/current-userId-jwt';
+import requestIp from 'request-ip';
 
 @Controller('auth')
 export class AuthController {
@@ -149,7 +150,7 @@ export class AuthController {
     @Request() req,
     @Response() res,
   ) {
-    const ipAddress = req.ip;
+    const ipAddress = requestIp.getClientIp(req);
 
     const tokens = await this.authService.login(userId, userAgent, ipAddress);
 
