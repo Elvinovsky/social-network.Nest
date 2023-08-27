@@ -28,16 +28,12 @@ export class BlogsRepository {
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
     }
   }
-
+  //todo
   // Добавляет новый блог на основе входной модели BlogInputModel
   // Возвращает BlogViewDTO созданного блога
-  async addNewBlog(
-    inputModel: BlogInputModel,
-    userId: string,
-  ): Promise<BlogViewDTO> {
+  async addNewBlog(blog: BlogCreateDTO): Promise<BlogViewDTO> {
     try {
-      const createBlog: BlogCreateDTO = Blog.createBlog(inputModel, userId);
-      const createdBlog = await new this.blogModel(createBlog);
+      const createdBlog = await new this.blogModel(blog);
       await createdBlog.save();
 
       return blogMapping(createdBlog);
