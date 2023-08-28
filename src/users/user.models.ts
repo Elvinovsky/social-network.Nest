@@ -44,9 +44,14 @@ export type MeViewModel = {
   login: string;
   userId: string;
 };
-export type UserViewDTO = {
+export class UserViewDTO {
   id: string;
   login: string;
   email: string;
   createdAt: string;
-};
+}
+
+export class UserInfo {
+  userId: string;
+  userLogin: string;
+}

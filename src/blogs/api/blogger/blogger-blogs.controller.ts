@@ -27,6 +27,7 @@ import { DevicesService } from '../../../devices/devices.service';
 import { ObjectIdPipe } from '../../../common/pipes/object-id.pipe';
 import { PostsService } from '../../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../../posts/post.models';
+import { UserInfo } from '../../../users/user.models';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -41,15 +42,15 @@ export class BloggerBlogsController {
   async getBlogs(
     @Query() query: QueryInputModel & SearchNameTerm,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
+      sessionInfo.userInfo,
       query.searchNameTerm,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
-      sessionInfo.userId,
     );
   }
 
@@ -59,7 +60,7 @@ export class BloggerBlogsController {
   async createBlog(
     @Body() inputModel: BlogInputModel,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     //todo как иначе реализовать логику валидации на 'logout' юзера
     const isSessionLogged = await this.devicesService.findSessionByDeviceId(
@@ -68,7 +69,7 @@ export class BloggerBlogsController {
     if (!isSessionLogged) throw new UnauthorizedException();
     const result: BlogViewDTO = await this.blogsService.createBlog(
       inputModel,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
     );
     return result;
   }
@@ -80,12 +81,12 @@ export class BloggerBlogsController {
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogInputModel,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | null | number = await this.blogsService.updateBlog(
       blogId,
       inputModel,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
     );
 
     if (result === null) {
@@ -103,11 +104,11 @@ export class BloggerBlogsController {
   async deleteBlog(
     @Param('blogId', ObjectIdPipe) blogId: string,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result = await this.blogsService.deleteBlog(
       blogId,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
     );
 
     if (result === null) {
@@ -126,13 +127,13 @@ export class BloggerBlogsController {
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogPostInputModel,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | PostViewDTO | null =
       await this.postsService.createPostByBLog(
         blogId,
         inputModel,
-        sessionInfo.userId,
+        sessionInfo.userInfo,
       );
 
     if (result === null) {
@@ -154,12 +155,12 @@ export class BloggerBlogsController {
     @Param('postId', ObjectIdPipe) postId: string,
     @Body() inputModel: BlogPostInputModel,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | null = await this.postsService.updatePost(
       postId,
       blogId,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
       inputModel,
     );
 
@@ -178,10 +179,10 @@ export class BloggerBlogsController {
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Param('postId', ObjectIdPipe) postId: string,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: Document | null | boolean =
-      await this.postsService.deletePost(postId, blogId, sessionInfo.userId);
+      await this.postsService.deletePost(postId, blogId, sessionInfo.userInfo);
 
     if (result === null) {
       throw new NotFoundException('Not Found');

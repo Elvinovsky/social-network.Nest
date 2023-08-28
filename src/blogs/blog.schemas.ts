@@ -1,6 +1,7 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BlogCreateDTO, BlogInputModel } from './blog.models';
+import { UserInfo } from '../users/user.models';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
@@ -18,17 +19,20 @@ export class Blog {
   addedAt: string;
   @Prop({ required: true, default: false })
   isMembership: boolean;
-  @Prop({ required: true })
-  authorId: string;
-  static createBlog(inputModel: BlogInputModel, userId: string): BlogCreateDTO {
+  @Prop({ type: UserInfo, required: true })
+  blogOwnerInfo: UserInfo;
+
+  static createBlog(
+    inputModel: BlogInputModel,
+    blogOwnerInfo: UserInfo,
+  ): BlogCreateDTO {
     const blog: Blog = new Blog();
     blog.name = inputModel.name;
     blog.description = inputModel.description;
     blog.websiteUrl = inputModel.websiteUrl;
     blog.addedAt = new Date().toISOString();
     blog.isMembership = true;
-    blog.authorId = userId;
-
+    blog.blogOwnerInfo = blogOwnerInfo;
     return blog;
   }
 }

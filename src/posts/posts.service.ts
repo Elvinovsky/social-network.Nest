@@ -8,6 +8,7 @@ import {
 } from './post.models';
 import { BlogsService } from '../blogs/application/blogs.service';
 import { BlogDocument } from '../blogs/blog.schemas';
+import { UserInfo } from '../users/user.models';
 
 @Injectable()
 export class PostsService {
@@ -22,10 +23,10 @@ export class PostsService {
   async createPostByBLog(
     blogId: string,
     inputModel: BlogPostInputModel,
-    userId: string,
+    userInfo: UserInfo,
   ): Promise<PostViewDTO | null | boolean> {
     const validateResult: BlogDocument | null | boolean =
-      await this.blogService._isOwnerFoundBlog(blogId, userId);
+      await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
     if (!validateResult) {
       return validateResult;
@@ -62,11 +63,11 @@ export class PostsService {
   async updatePost(
     postId: string,
     blogId: string,
-    userId: string,
+    userInfo: UserInfo,
     inputModel: BlogPostInputModel,
   ): Promise<boolean | null> {
     const validateResult: boolean | BlogDocument | null =
-      await this.blogService._isOwnerFoundBlog(blogId, userId);
+      await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
     if (!validateResult) {
       return validateResult;
@@ -84,11 +85,11 @@ export class PostsService {
   async deletePost(
     postId: string,
     blogId: string,
-    userId: string,
+    userInfo: UserInfo,
   ): Promise<Document | null | boolean> {
     // поиск блога и его принадлежности пользователю
     const validateResult: boolean | BlogDocument | null =
-      await this.blogService._isOwnerFoundBlog(blogId, userId);
+      await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
     if (!validateResult) {
       return validateResult;

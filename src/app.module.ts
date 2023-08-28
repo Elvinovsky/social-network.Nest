@@ -36,6 +36,7 @@ import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
 import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.controller';
 import { SendSMTPAdapter } from './email/send-smtp-adapter';
+import { SaBlogsController } from './blogs/api/sa/sa-blogs.controller';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { SendSMTPAdapter } from './email/send-smtp-adapter';
     ]),
   ],
   controllers: [
+    SaBlogsController,
     AppController,
     DeleteDBController,
     PublicBlogsController,

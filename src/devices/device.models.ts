@@ -1,3 +1,5 @@
+import { UserInfo } from '../users/user.models';
+
 export class SessionInputModel {
   ip: string;
   /**
@@ -17,9 +19,9 @@ export class SessionInputModel {
    */
 }
 export type SessionCreateDTO = {
+  userInfo: UserInfo;
   deviceId: string;
   issuedAt: number;
-  userId: string;
   ip: string | null;
   title: string | null;
   lastActiveDate: string;
