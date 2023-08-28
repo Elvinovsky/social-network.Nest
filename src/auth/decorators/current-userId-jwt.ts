@@ -9,7 +9,7 @@ export const CurrentUserIdFromBearerJWT = createParamDecorator(
     const request = context.switchToHttp().getRequest();
 
     const sessionInfo = request.user;
-    if (!sessionInfo.userId) {
+    if (!sessionInfo.userInfo) {
       throw new UnauthorizedException();
     }
     if (!sessionInfo.deviceId) {
