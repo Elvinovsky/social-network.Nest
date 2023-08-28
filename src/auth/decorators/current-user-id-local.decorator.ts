@@ -9,10 +9,10 @@ export const CurrentUserIdLocal = createParamDecorator(
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
 
-    const userId = request.user.id as string;
-    if (!userId) {
-      throw new UnauthorizedException('userId undefined');
+    if (!request.user) {
+      throw new UnauthorizedException();
     }
-    return userId;
+
+    return request.user;
   },
 );
