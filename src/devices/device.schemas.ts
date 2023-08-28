@@ -2,18 +2,19 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import add from 'date-fns/add';
 import { SessionCreateDTO } from './device.models';
+import { UserInfo } from '../users/user.models';
 
 export type DeviceDocument = HydratedDocument<Device>;
 
 export type DeviceModel = Model<DeviceDocument>;
 @Schema()
 export class Device {
+  @Prop({ type: UserInfo, required: true })
+  userInfo: UserInfo;
   @Prop({ required: true })
   deviceId: string;
   @Prop({ required: true })
   issuedAt: number;
-  @Prop({ required: true })
-  userId: string;
   @Prop({ required: true })
   ip: string;
   @Prop({ required: true })
@@ -24,7 +25,7 @@ export class Device {
   expirationDate: Date;
 
   static create(
-    userId: string,
+    userInfo: UserInfo,
     deviceId: string,
     issuedAt: number,
     ip: string,
@@ -32,9 +33,9 @@ export class Device {
   ): SessionCreateDTO {
     const newSession: Device = new Device();
 
+    newSession.userInfo = userInfo;
     newSession.deviceId = deviceId;
     newSession.issuedAt = issuedAt;
-    newSession.userId = userId;
     newSession.ip = ip ?? 'ip';
     newSession.title = deviceName ?? 'deviceName';
     newSession.lastActiveDate = new Date().toISOString();
