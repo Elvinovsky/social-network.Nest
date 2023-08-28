@@ -18,6 +18,7 @@ import { objectIdHelper } from '../../../common/helpers';
 import { PostViewDTO } from '../../../posts/post.models';
 import { Post, PostDocument, PostModel } from '../../../posts/post.schemas';
 import { PostMapper } from '../../../posts/post.helpers';
+import { UserInfo } from '../../../users/user.models';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(
@@ -86,14 +87,16 @@ export class BlogsQueryRepo {
     }
   }
   async getSortedBlogsForCurrentBlogger(
+    userInfo: UserInfo,
     searchNameTerm?: string,
     pageNumber?: number,
     pageSize?: number,
     sortBy?: string,
     sortDirection?: string,
-    userId?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
-    const filter: mongoose.FilterQuery<BlogDocument> = { authorId: userId };
+    const filter: mongoose.FilterQuery<BlogDocument> = {
+      'blogOwnerInfo.userId': userInfo.userId,
+    };
     try {
       if (searchNameTerm) {
         filter.name = {
