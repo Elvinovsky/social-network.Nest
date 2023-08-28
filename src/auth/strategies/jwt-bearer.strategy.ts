@@ -1,6 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { getConfiguration } from '../../configuration/getConfiguration';
+import { UserInfo } from '../../users/user.models';
 
 export class JwtBearerStrategy extends PassportStrategy(Strategy, 'bearer') {
   constructor() {
@@ -12,7 +13,7 @@ export class JwtBearerStrategy extends PassportStrategy(Strategy, 'bearer') {
   }
   async validate(payload: any) {
     return {
-      userId: payload.userId,
+      userInfo: payload.userInfo as UserInfo,
       deviceId: payload.deviceId,
     };
   }
