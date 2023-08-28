@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../../users/aplication/users.service';
 import bcrypt from 'bcrypt';
 import { NewPasswordRecoveryInputModel } from '../auth.models';
-import { UserViewDTO } from '../../users/user.models';
+import { UserInfo, UserViewDTO } from '../../users/user.models';
 import { EmailSenderService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../../users/user.helpers';
@@ -113,19 +113,19 @@ export class AuthService {
   async _isPasswordCorrect(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
-  async login(userId: string, deviceName: string, ip: string) {
+  async login(userInfo: UserInfo, deviceName: string, ip: string) {
     try {
-      if (!userId) {
+      if (!userInfo.userId) {
         return null;
       }
 
       const deviceId = uuidv4();
       const createJWTAccessToken = await this.createJWTAccessToken(
-        userId,
         deviceId,
+        userInfo,
       );
       const createJWTRefreshToken = await this.createJWTRefreshToken(
-        userId,
+        userInfo,
         deviceId,
       );
 
@@ -135,7 +135,7 @@ export class AuthService {
       }
 
       await this.devicesService.createDeviceSession(
-        userId,
+        userInfo,
         deviceId,
         issuedAt,
         ip,
@@ -148,10 +148,11 @@ export class AuthService {
       return null;
     }
   }
-  async createJWTAccessToken(userId: string, deviceId: string) {
+  async createJWTAccessToken(deviceId: string, userInfo: UserInfo) {
     const accessToken = this.jwtService.sign(
       {
-        userId: userId,
+        userInfo: userInfo,
+
         deviceId: deviceId,
       },
       {
@@ -169,12 +170,12 @@ export class AuthService {
   }
 
   async createJWTRefreshToken(
-    userId: string,
+    userInfo: UserInfo,
     deviceId: string,
   ): Promise<string> {
     return this.jwtService.sign(
       {
-        userId: userId,
+        userInfo: userInfo,
         deviceId: deviceId,
       },
       {
@@ -196,9 +197,9 @@ export class AuthService {
           infer: true,
         }),
       })) as {
-        userId: string;
+        userInfo: UserInfo;
       };
-      return payload.userId;
+      return payload.userInfo.userId;
     } catch (error) {
       return null;
     }
