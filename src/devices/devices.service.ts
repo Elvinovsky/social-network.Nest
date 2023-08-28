@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DevicesRepository } from './devices.repository';
 import { SessionCreateDTO } from './device.models';
 import { Device } from './device.schemas';
+import { UserInfo } from '../users/user.models';
 @Injectable()
 export class DevicesService {
   constructor(protected devicesRepository: DevicesRepository) {}
@@ -10,14 +11,14 @@ export class DevicesService {
   }
 
   async createDeviceSession(
-    userId: string,
+    userInfo: UserInfo,
     deviceId: string,
     issuedAt: number,
     ip: string,
     deviceName: string,
   ) {
     const newDeviceSession: SessionCreateDTO = Device.create(
-      userId,
+      userInfo,
       deviceId,
       issuedAt,
       ip,
