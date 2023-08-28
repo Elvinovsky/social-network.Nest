@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../blog.models';
 import { BlogsRepository } from '../infrastructure/repositories/blogs.repository';
 import { Blog, BlogDocument } from '../blog.schemas';
+import { UserInfo } from '../../users/user.models';
 
-//input: BlogViewDTO, output: BlogViewDTO, BlogDocument
+//input: BlogInputModel, output: BlogViewDTO, BlogDocument
 // производится проверка заданной бизнес логики, никаких трансформаций с сущностми только передача запросов между сервисами и валидация бизнес задач
 @Injectable()
 export class BlogsService {
@@ -13,19 +14,19 @@ export class BlogsService {
   }
   async createBlog(
     inputModel: BlogInputModel,
-    userId: string,
+    userInfo: UserInfo,
   ): Promise<BlogViewDTO> {
-    const createBlog: BlogCreateDTO = Blog.createBlog(inputModel, userId);
+    const createBlog: BlogCreateDTO = Blog.createBlog(inputModel, userInfo);
     return await this.blogsRepository.addNewBlog(createBlog);
   }
 
   async updateBlog(
     id: string,
     inputModel: BlogInputModel,
-    userId: string,
+    userInfo: UserInfo,
   ): Promise<boolean | null | number> {
     const validateResult: BlogDocument | null | boolean =
-      await this._isOwnerFoundBlog(id, userId);
+      await this._isOwnerFoundBlog(id, userInfo.userId);
     if (!validateResult) {
       return validateResult;
     }
@@ -35,10 +36,10 @@ export class BlogsService {
 
   async deleteBlog(
     id: string,
-    userId: string,
+    userInfo: UserInfo,
   ): Promise<Document | null | boolean> {
     const validateResult: BlogDocument | null | boolean =
-      await this._isOwnerFoundBlog(id, userId);
+      await this._isOwnerFoundBlog(id, userInfo.userId);
     if (!validateResult) {
       return validateResult;
     }
@@ -56,7 +57,7 @@ export class BlogsService {
     }
 
     // проверка принадлежности блога автору
-    if (blog.authorId !== userId) {
+    if (blog.blogOwnerInfo.userId !== userId) {
       return false;
     }
 
