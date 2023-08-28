@@ -24,7 +24,12 @@ import {
 } from './auth.models';
 import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
-import { UserCreateDTO, UserInputModel } from '../users/user.models';
+import {
+  UserCreateDTO,
+  UserInfo,
+  UserInputModel,
+  UserViewDTO,
+} from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
 import { refreshCookieOptions } from '../common/helpers';
@@ -145,14 +150,18 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @UseGuards(WsThrottlerGuard)
   async login(
-    @CurrentUserIdLocal() userId: string,
+    @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,
     @Request() req,
     @Response() res,
   ) {
     const ipAddress = requestIp.getClientIp(req);
+    const userInfo: UserInfo = {
+      userId: user.id,
+      userLogin: user.login,
+    };
 
-    const tokens = await this.authService.login(userId, userAgent, ipAddress);
+    const tokens = await this.authService.login(userInfo, userAgent, ipAddress);
 
     if (tokens === null) {
       throw new PreconditionFailedException();
@@ -173,11 +182,11 @@ export class AuthController {
   async createRefToken(@Req() req, @Response() res) {
     // Создание нового access token и refreshToken.
     const newAccessToken = await this.authService.createJWTAccessToken(
-      req.userId,
+      req.userInfo,
       req.deviceId,
     );
     const newRefreshToken = await this.authService.createJWTRefreshToken(
-      req.userId,
+      req.userInfo,
       req.deviceId,
     );
 
