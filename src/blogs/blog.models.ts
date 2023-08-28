@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
+import { UserInfo } from '../users/user.models';
 
 export class BlogInputModel {
   /**
@@ -31,7 +32,7 @@ export type BlogCreateDTO = {
    * True if user has not expired membership subscription to blog
    */
   isMembership: boolean;
-  authorId: string;
+  blogOwnerInfo: UserInfo;
 };
 
 export type BlogViewDTO = {
