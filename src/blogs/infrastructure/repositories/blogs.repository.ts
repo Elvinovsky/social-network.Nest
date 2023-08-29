@@ -1,10 +1,5 @@
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../../blog.models';
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
 import { blogMapping } from '../../blog.helpers';
@@ -12,7 +7,6 @@ import { objectIdHelper } from '../../../common/helpers';
 import { UserInfo } from '../../../users/user.models';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
-// принимает 'BlogInputModel' трансформирует его для заданного хранения схемы 'BlogCreateDTO', вся логика изменения данных для входа и выхода производится в репозитории
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
@@ -26,11 +20,11 @@ export class BlogsRepository {
       return await this.blogModel.findById(objectIdHelper(id)).exec();
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
-  //todo
-  // Добавляет новый блог на основе входной модели BlogInputModel
+
+  // Добавляет новый блог в ДБ на основе входной модели BlogCreateDTO
   // Возвращает BlogViewDTO созданного блога
   async addNewBlog(blog: BlogCreateDTO): Promise<BlogViewDTO> {
     try {
@@ -40,7 +34,7 @@ export class BlogsRepository {
       return blogMapping(createdBlog);
     } catch (e) {
       console.log(e);
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
     }
   }
 
