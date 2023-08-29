@@ -35,6 +35,26 @@ export class Blog {
     blog.blogOwnerInfo = blogOwnerInfo;
     return blog;
   }
+  //todo
+  unbindOwner(blog: BlogDocument) {
+    if (blog.blogOwnerInfo.userId) {
+      throw new Error('someone ');
+    }
+    blog.blogOwnerInfo.userId = '';
+    blog.blogOwnerInfo.userLogin = '';
+  }
+  bindOwner(userInfo: UserInfo, blog: BlogDocument) {
+    if (blog.blogOwnerInfo.userId) {
+      throw new Error('action is not possible');
+    }
+    blog.blogOwnerInfo.userId = userInfo.userId;
+    blog.blogOwnerInfo.userLogin = userInfo.userLogin;
+  }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
+
+BlogSchema.methods = {
+  unbindOwner: Blog.prototype.unbindOwner,
+  bindOwner: Blog.prototype.bindOwner,
+};

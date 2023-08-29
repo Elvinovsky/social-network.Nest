@@ -1,4 +1,4 @@
-import { BlogViewDTO } from './blog.models';
+import { BlogViewDTO, SABlogViewDTO } from './blog.models';
 import { BlogDocument } from './blog.schemas';
 
 export const blogsMapping = (array: Array<BlogDocument>): BlogViewDTO[] => {
@@ -22,4 +22,20 @@ export const blogMapping = (blog: BlogDocument): BlogViewDTO => {
     createdAt: blog.addedAt,
     isMembership: blog.isMembership,
   };
+};
+
+export const blogsMapperSA = (
+  blogArr: Array<BlogDocument>,
+): SABlogViewDTO[] => {
+  return blogArr.map((el) => {
+    return {
+      id: el._id.toString(),
+      name: el.name,
+      description: el.description,
+      websiteUrl: el.websiteUrl,
+      createdAt: el.addedAt,
+      isMembership: el.isMembership,
+      blogOwnerInfo: el.blogOwnerInfo,
+    };
+  });
 };

@@ -63,4 +63,8 @@ export class BlogsService {
 
     return blog;
   }
+
+  async bindWithUser(userId: UserInfo, id: string) {
+    return this.blogsRepository.updateBlogOwnerInfo(userId, id);
+  }
 }

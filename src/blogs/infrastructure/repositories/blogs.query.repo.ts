@@ -1,5 +1,5 @@
 import { PaginatorType } from '../../../pagination/pagination.models';
-import { BlogViewDTO } from '../../blog.models';
+import { BlogViewDTO, SABlogViewDTO } from '../../blog.models';
 import * as mongoose from 'mongoose';
 import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
@@ -13,7 +13,7 @@ import {
   pagesCountOfBlogs,
 } from '../../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../common/constants';
-import { blogMapping, blogsMapping } from '../../blog.helpers';
+import { blogMapping, blogsMapperSA, blogsMapping } from '../../blog.helpers';
 import { objectIdHelper } from '../../../common/helpers';
 import { PostViewDTO } from '../../../posts/post.models';
 import { Post, PostDocument, PostModel } from '../../../posts/post.schemas';
@@ -169,6 +169,47 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'error getSortedPostsByBlogID');
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getSortedBlogsForSA(
+    searchNameTerm?: string,
+    pageNumber?: number,
+    pageSize?: number,
+    sortBy?: string,
+    sortDirection?: string,
+  ): Promise<PaginatorType<SABlogViewDTO[]>> {
+    const filter: mongoose.FilterQuery<BlogDocument> = {};
+    try {
+      if (searchNameTerm) {
+        filter.name = {
+          $regex: searchNameTerm,
+          $options: 'i',
+        };
+      }
+
+      const calculateOfFiles = await this.blogModel.countDocuments(filter);
+      const foundBlogs: BlogDocument[] = await this.blogModel
+        .find(filter)
+        .sort({
+          [getSortBy(sortBy)]: getDirection(sortDirection),
+          [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
+        })
+        .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
+        .limit(getPageSize(pageSize))
+        .lean()
+        .exec();
+
+      return {
+        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        page: getPageNumber(pageNumber),
+        pageSize: getPageSize(pageSize),
+        totalCount: calculateOfFiles,
+        items: blogsMapperSA(foundBlogs),
+      };
+    } catch (e) {
+      console.log(e, 'getSortedBlogs method error');
       throw new InternalServerErrorException();
     }
   }
