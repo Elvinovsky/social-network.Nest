@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
 import { blogMapping } from '../../blog.helpers';
 import { objectIdHelper } from '../../../common/helpers';
+import { UserInfo } from '../../../users/user.models';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 // принимает 'BlogInputModel' трансформирует его для заданного хранения схемы 'BlogCreateDTO', вся логика изменения данных для входа и выхода производится в репозитории
@@ -22,7 +23,7 @@ export class BlogsRepository {
     try {
       if (!objectIdHelper(id)) return null;
 
-      return await this.blogModel.findById(objectIdHelper(id));
+      return await this.blogModel.findById(objectIdHelper(id)).exec();
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
@@ -76,7 +77,21 @@ export class BlogsRepository {
       return await this.blogModel.findByIdAndDelete(objectIdHelper(id));
     } catch (e) {
       console.log(e, 'error deleteBlogById');
-      throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateBlogOwnerInfo(userInfo: UserInfo, id: string) {
+    try {
+      return await this.blogModel
+        .findByIdAndUpdate(
+          { _id: objectIdHelper(id) },
+          { $set: { blogOwnerInfo: userInfo } },
+        )
+        .exec();
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
   }
 }
