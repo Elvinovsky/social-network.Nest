@@ -29,7 +29,13 @@ export class SaBlogsController {
   @Get()
   @UseGuards(BasicAuthGuard)
   async getBlogs(@Query() query: QueryInputModel & SearchNameTerm) {
-    return this.blogsQueryRepo.getSortedBlogsForSA();
+    return this.blogsQueryRepo.getSortedBlogsForSA(
+      query.searchNameTerm,
+      query.pageNumber,
+      query.pageSize,
+      query.sortBy,
+      query.sortDirection,
+    );
   }
 
   @Put(':id/bind-with-user/:userId')
@@ -72,6 +78,5 @@ export class SaBlogsController {
       userLogin: foundUser.login,
     };
     const bind = await this.blogsService.bindWithUser(userInfo, id);
-    return bind;
   }
 }
