@@ -46,3 +46,16 @@ export type BlogViewDTO = {
    */
   isMembership: boolean;
 };
+
+export type SABlogViewDTO = {
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+  /**
+   * True if user has not expired membership subscription to blog
+   */
+  blogOwnerInfo: UserInfo | null;
+};
