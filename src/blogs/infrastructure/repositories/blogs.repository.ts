@@ -76,6 +76,7 @@ export class BlogsRepository {
     }
   }
 
+  // привязывает блог к заданному пользователю
   async updateBlogOwnerInfo(userInfo: UserInfo, id: string) {
     try {
       return await this.blogModel
