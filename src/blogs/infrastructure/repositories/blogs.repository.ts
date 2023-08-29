@@ -46,17 +46,17 @@ export class BlogsRepository {
   ): Promise<number> {
     try {
       const result = await this.blogModel
-                               .updateOne(
-                                 { _id: objectIdHelper(id) },
-                                 {
-                                   $set: {
-                                     name: inputModel.name,
-                                     description: inputModel.description,
-                                     websiteUrl: inputModel.websiteUrl,
-                                   },
-                                 },
-                               )
-                               .exec();
+        .updateOne(
+          { _id: objectIdHelper(id) },
+          {
+            $set: {
+              name: inputModel.name,
+              description: inputModel.description,
+              websiteUrl: inputModel.websiteUrl,
+            },
+          },
+        )
+        .exec();
       return result.matchedCount;
     } catch (e) {
       console.log('error updateBlogById', e);
@@ -78,11 +78,11 @@ export class BlogsRepository {
   async updateBlogOwnerInfo(userInfo: UserInfo, id: string) {
     try {
       return await this.blogModel
-                       .findByIdAndUpdate(
-                         { _id: objectIdHelper(id) },
-                         { $set: { blogOwnerInfo: userInfo } },
-                       )
-                       .exec();
+        .findByIdAndUpdate(
+          { _id: objectIdHelper(id) },
+          { $set: { blogOwnerInfo: userInfo } },
+        )
+        .exec();
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
