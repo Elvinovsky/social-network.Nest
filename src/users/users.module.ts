@@ -5,8 +5,9 @@ import { User, UserSchema } from './users.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
-import { UserRegistrationToAdminUseCase } from './aplication/use-cases/user-registration-to-admin-use-case.service';
+import { UserRegistrationToAdminUseCase } from './aplication/use-cases/user-registration-to-admin-use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { SaUsersController } from '../api/sa/sa-users.controller';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
@@ -14,7 +15,7 @@ const useCases = [UserRegistrationToAdminUseCase];
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     CqrsModule,
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, SaUsersController],
   providers: [...useCases, UsersService, UsersRepository, UsersQueryRepository],
   exports: [UsersService, UsersQueryRepository],
 })
