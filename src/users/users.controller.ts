@@ -1,13 +1,9 @@
 import {
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   NotFoundException,
   Param,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './aplication/users.service';
 import {
@@ -16,7 +12,6 @@ import {
   SearchLoginTerm,
 } from '../pagination/pagination.models';
 import { UsersQueryRepository } from './infrastructure/users.query.repo';
-import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -44,18 +39,5 @@ export class UsersController {
       throw new NotFoundException();
     }
     return result;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Delete(':userId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('userId') userId: string) {
-    const result: Document | null = await this.usersService.deleteUserById(
-      userId,
-    );
-
-    if (result === null) {
-      throw new NotFoundException('user not found');
-    }
   }
 }

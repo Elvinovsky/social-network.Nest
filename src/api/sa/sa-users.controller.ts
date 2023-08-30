@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -68,6 +69,7 @@ export class SaUsersController {
   }
 
   @Get()
+  @UseGuards(BasicAuthGuard)
   async getUsers(
     @Query()
     query: QueryInputModel & SearchEmailTerm & SearchLoginTerm & QueryBanStatus,
@@ -105,5 +107,18 @@ export class SaUsersController {
     }
 
     return result;
+  }
+
+  @UseGuards(BasicAuthGuard)
+  @Delete(':userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('userId') userId: string) {
+    const result: Document | null = await this.usersService.deleteUserById(
+      userId,
+    );
+
+    if (result === null) {
+      throw new NotFoundException('user not found');
+    }
   }
 }
