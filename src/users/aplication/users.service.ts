@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { UserCreateDTO, UserInputModel, UserViewDTO } from '../user.models';
+import {
+  BanUserInputModel,
+  UserCreateDTO,
+  UserInputModel,
+  UserViewDTO,
+} from '../user.models';
 import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from '../../auth/auth.models';
 import { ResultsAuthForErrors } from '../../auth/auth.constants';
+import { User } from '../users.schema';
 
 @Injectable()
 export class UsersService {
@@ -16,17 +22,7 @@ export class UsersService {
     inputModel: UserInputModel,
     hash: string,
   ): Promise<UserViewDTO> {
-    const newUser: UserCreateDTO = {
-      login: inputModel.login,
-      passwordHash: hash,
-      email: inputModel.email,
-      addedAt: new Date().toISOString(),
-      emailConfirmation: {
-        confirmationCode: 'not required',
-        expirationDate: 'not required',
-        isConfirmed: true,
-      },
-    };
+    const newUser: UserCreateDTO = User.Create(inputModel, hash);
 
     return await this.usersRepository.createUser(newUser);
   }
@@ -38,17 +34,13 @@ export class UsersService {
     expirationDate: Date,
   ) {
     //собираем ДТО юзера для отправки в репозиторий.
-    const newUser: UserCreateDTO = {
-      login: inputModel.login,
-      passwordHash: hash,
-      email: inputModel.email,
-      addedAt: new Date().toISOString(),
-      emailConfirmation: {
-        confirmationCode: code,
-        expirationDate: expirationDate,
-        isConfirmed: false,
-      },
-    };
+    const newUser: UserCreateDTO = User.Create(
+      inputModel,
+      hash,
+      code,
+      expirationDate,
+    );
+
     //отправляем ДТО в репозиторий
     return this.usersRepository.createUser(newUser);
   }
@@ -106,5 +98,18 @@ export class UsersService {
   }
   async updatePasswordHash(hash: string, code: string) {
     return this.usersRepository.updatePasswordForUser(hash, code);
+  }
+
+  async banUser(userId: string, inputModel: BanUserInputModel) {
+    const badBoy = await this.usersRepository.getUser(userId);
+
+    if (!badBoy) {
+      return null;
+    }
+    if (badBoy.banInfo.isBanned === inputModel.isBanned) {
+      return false;
+    }
+
+    return this.usersRepository.updateBanStatus(userId, inputModel);
   }
 }
