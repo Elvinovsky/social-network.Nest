@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, Matches } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export type PaginatorType<T> = {
   pagesCount: number;
@@ -26,7 +26,6 @@ export class QueryInputModel {
 }
 export class QueryBanStatus {
   @IsOptional()
-  @Matches(/^banned$|^notBanned$/)
   banStatus: string;
 }
 
