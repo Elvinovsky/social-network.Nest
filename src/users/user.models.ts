@@ -1,4 +1,4 @@
-import { IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsBoolean, IsNotEmpty, Length, Matches } from 'class-validator';
 
 export class UserInputModel {
   @IsNotEmpty()
@@ -28,6 +28,7 @@ export class UserCreateDTO {
   email: string;
   addedAt: string;
   emailConfirmation: EmailConfirmationModel;
+  banInfo: BanInfo;
 }
 
 export type UserMethodType = {
@@ -54,4 +55,27 @@ export class UserViewDTO {
 export class UserInfo {
   userId: string;
   userLogin: string;
+}
+
+export class BanInfo {
+  isBanned: boolean;
+  banDate: string | null;
+  banReason: string | null;
+}
+export class SAUserViewDTO {
+  id: string;
+  login: string;
+  email: string;
+  createdAt: string;
+  banInfo: BanInfo;
+}
+
+export class BanUserInputModel {
+  @IsNotEmpty()
+  @IsBoolean()
+  isBanned: boolean;
+
+  @IsNotEmpty()
+  @Length(20)
+  banReason: string;
 }
