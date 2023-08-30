@@ -12,12 +12,12 @@ import {
   PaginatorType,
   QueryInputModel,
   SearchNameTerm,
-} from '../../../pagination/pagination.models';
-import { BlogsQueryRepo } from '../../infrastructure/repositories/blogs.query.repo';
-import { BlogViewDTO } from '../../blog.models';
-import { PostViewDTO } from '../../../posts/post.models';
-import { OptionalBearerGuard } from '../../../auth/guards/optional-bearer.guard';
-import { CurrentUserIdOptional } from '../../../auth/decorators/current-userId-optional.decorator';
+} from '../../pagination/pagination.models';
+import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
+import { BlogViewDTO } from '../../blogs/blog.models';
+import { PostViewDTO } from '../../posts/post.models';
+import { OptionalBearerGuard } from '../../auth/guards/optional-bearer.guard';
+import { CurrentUserIdOptional } from '../../auth/decorators/current-userId-optional.decorator';
 
 @Controller('blogs')
 export class PublicBlogsController {
