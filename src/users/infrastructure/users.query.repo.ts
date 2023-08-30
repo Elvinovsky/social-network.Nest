@@ -46,6 +46,48 @@ export class UsersQueryRepository {
       items: usersMapping(foundUsers),
     };
   }
+
+  async getSortedUsersForSA(
+    banStatus: string | 'all',
+    searchEmailTerm?: string,
+    searchLoginTerm?: string,
+    pageNumber?: number,
+    pageSize?: number,
+    sortBy?: string,
+    sortDirection?: string,
+  ): Promise<PaginatorType<UserViewDTO[]>> {
+    let banFilter = {};
+
+    if (banStatus === 'notBanned') {
+      banFilter = { 'banInfo.isBanned': false };
+    }
+
+    if (banStatus === 'banned') {
+      banFilter = { 'banInfo.isBanned': true };
+    }
+
+    const calculateOfFiles = await this.userModel.countDocuments(
+      banFilter,
+      filterLoginOrEmail(searchEmailTerm, searchLoginTerm),
+    );
+
+    const foundUsers: UserDocument[] = await this.userModel
+      .find(banFilter, filterLoginOrEmail(searchEmailTerm, searchLoginTerm))
+      .sort({
+        [getSortBy(sortBy)]: getDirection(sortDirection),
+        [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
+      })
+      .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
+      .limit(getPageSize(pageSize));
+    return {
+      pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+      page: getPageNumber(pageNumber),
+      pageSize: getPageSize(pageSize),
+      totalCount: calculateOfFiles,
+      items: usersMapping(foundUsers),
+    };
+  }
+
   async getUserInfo(id: string): Promise<MeViewModel | null> {
     const user = await this.userModel
       .findOne({ _id: objectIdHelper(id) })
