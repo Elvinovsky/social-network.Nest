@@ -57,8 +57,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  //@UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -95,7 +95,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
-  @UseGuards(WsThrottlerGuard)
+  //@UseGuards(WsThrottlerGuard)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -120,8 +120,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  //@Throttle(5, 10)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
@@ -148,7 +148,7 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  @UseGuards(WsThrottlerGuard)
+  // @UseGuards(WsThrottlerGuard)
   async login(
     @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,

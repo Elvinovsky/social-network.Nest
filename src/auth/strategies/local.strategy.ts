@@ -16,7 +16,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
       password,
     );
 
-    if (!user) {
+    if (!user || user.banInfo.isBanned) {
       throw new UnauthorizedException();
     }
     return user as UserViewDTO;

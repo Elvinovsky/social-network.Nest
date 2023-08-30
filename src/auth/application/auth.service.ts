@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../../users/aplication/users.service';
 import bcrypt from 'bcrypt';
 import { NewPasswordRecoveryInputModel } from '../auth.models';
-import { UserInfo, UserViewDTO } from '../../users/user.models';
+import { SAUserViewDTO, UserInfo } from '../../users/user.models';
 import { EmailSenderService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { userMapping } from '../../users/user.helpers';
@@ -85,7 +85,7 @@ export class AuthService {
   async checkCredentials(
     loginOrEmail: string,
     password: string,
-  ): Promise<UserViewDTO | null> {
+  ): Promise<SAUserViewDTO | null> {
     //ищем юзера в БД по логину или эл/почте
     const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
 
@@ -115,10 +115,6 @@ export class AuthService {
   }
   async login(userInfo: UserInfo, deviceName: string, ip: string) {
     try {
-      if (!userInfo.userId) {
-        return null;
-      }
-
       const deviceId = uuidv4();
       const createJWTAccessToken = await this.createJWTAccessToken(
         deviceId,
