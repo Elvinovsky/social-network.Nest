@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/users.schema';
-import { PublicBlogsController } from './blogs/api/public/public-blogs.controller';
+import { PublicBlogsController } from './api/public/public-blogs.controller';
 import { BlogsQueryRepo } from './blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesService } from './likes/likes.service';
@@ -34,9 +34,9 @@ import { CommentsQueryRepo } from './comments/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
-import { BloggerBlogsController } from './blogs/api/blogger/blogger-blogs.controller';
+import { BloggerBlogsController } from './api/blogger/blogger-blogs.controller';
 import { SendSMTPAdapter } from './email/send-smtp-adapter';
-import { SaBlogsController } from './blogs/api/sa/sa-blogs.controller';
+import { SaBlogsController } from './api/sa/sa-blogs.controller';
 
 @Module({
   imports: [
