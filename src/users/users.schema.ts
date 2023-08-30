@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { EmailConfirmationModel } from './user.models';
+import {
+  BanInfo,
+  EmailConfirmationModel,
+  UserCreateDTO,
+  UserInputModel,
+} from './user.models';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -20,6 +25,32 @@ export class User {
 
   @Prop({ type: EmailConfirmationModel, required: true })
   emailConfirmation: EmailConfirmationModel;
+  @Prop({ type: BanInfo, required: true })
+  banInfo: BanInfo;
+
+  static Create(
+    inputModel: UserInputModel,
+    hash: string,
+    code?: string,
+    expireDate?: Date,
+  ): UserCreateDTO {
+    const user: User = new User();
+    user.login = inputModel.login;
+    user.passwordHash = hash;
+    user.email = inputModel.email;
+    user.addedAt = new Date().toISOString();
+    user.emailConfirmation = {
+      confirmationCode: code || 'not required',
+      expirationDate: expireDate || 'not required',
+      isConfirmed: true,
+    };
+    user.banInfo = {
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+    };
+    return user;
+  }
 
   canBeConfirmed(expirationDate: Date) {
     if (expirationDate < new Date()) {
