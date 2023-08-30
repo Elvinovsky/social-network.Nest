@@ -220,7 +220,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(WsThrottlerGuard)
+  //@UseGuards(WsThrottlerGuard)
   async passwordRecovery(@Body() inputModel: EmailInputModel, @Res() res) {
     //валидация электронной почты
     const emailValidator = await this.usersService.findUserByEmail(
@@ -242,7 +242,7 @@ export class AuthController {
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(WsThrottlerGuard)
+  //@UseGuards(WsThrottlerGuard)
   async newPassword(
     @Body()
     inputModel: NewPasswordRecoveryInputModel,
