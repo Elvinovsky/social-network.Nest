@@ -17,17 +17,17 @@ import {
 import {
   QueryInputModel,
   SearchNameTerm,
-} from '../../../pagination/pagination.models';
-import { CurrentUserIdFromBearerJWT } from '../../../auth/decorators/current-userId-jwt';
-import { BlogsQueryRepo } from '../../infrastructure/repositories/blogs.query.repo';
-import { BlogInputModel, BlogViewDTO } from '../../blog.models';
-import { JwtBearerGuard } from '../../../auth/guards/jwt-bearer-auth.guard';
-import { BlogsService } from '../../application/blogs.service';
-import { DevicesService } from '../../../devices/devices.service';
-import { ObjectIdPipe } from '../../../common/pipes/object-id.pipe';
-import { PostsService } from '../../../posts/posts.service';
-import { BlogPostInputModel, PostViewDTO } from '../../../posts/post.models';
-import { UserInfo } from '../../../users/user.models';
+} from '../../pagination/pagination.models';
+import { CurrentUserIdFromBearerJWT } from '../../auth/decorators/current-userId-jwt';
+import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
+import { BlogInputModel, BlogViewDTO } from '../../blogs/blog.models';
+import { JwtBearerGuard } from '../../auth/guards/jwt-bearer-auth.guard';
+import { BlogsService } from '../../blogs/application/blogs.service';
+import { DevicesService } from '../../devices/devices.service';
+import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
+import { PostsService } from '../../posts/posts.service';
+import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
+import { UserInfo } from '../../users/user.models';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
