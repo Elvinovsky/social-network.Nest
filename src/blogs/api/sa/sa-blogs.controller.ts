@@ -26,6 +26,7 @@ export class SaBlogsController {
     private blogsService: BlogsService,
     private usersService: UsersService,
   ) {}
+
   @Get()
   @UseGuards(BasicAuthGuard)
   async getBlogs(@Query() query: QueryInputModel & SearchNameTerm) {
