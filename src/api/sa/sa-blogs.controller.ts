@@ -9,15 +9,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import {
   QueryInputModel,
   SearchNameTerm,
-} from '../../../pagination/pagination.models';
-import { BlogsQueryRepo } from '../../infrastructure/repositories/blogs.query.repo';
-import { ObjectIdPipe } from '../../../common/pipes/object-id.pipe';
-import { UsersService } from '../../../users/aplication/users.service';
-import { BlogsService } from '../../application/blogs.service';
+} from '../../pagination/pagination.models';
+import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
+import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
+import { UsersService } from '../../users/aplication/users.service';
+import { BlogsService } from '../../blogs/application/blogs.service';
 
 @Controller('sa/blogs')
 export class SaBlogsController {
