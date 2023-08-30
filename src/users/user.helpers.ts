@@ -1,5 +1,5 @@
 import { UserDocument } from './users.schema';
-import { UserViewDTO } from './user.models';
+import { SAUserViewDTO, UserViewDTO } from './user.models';
 
 export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
   return array.map((el) => {
@@ -8,15 +8,17 @@ export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
       login: el.login,
       email: el.email,
       createdAt: el.addedAt,
+      banInfo: el.banInfo,
     };
   });
 };
-export const userMapping = (user: UserDocument): UserViewDTO => {
+export const userMapping = (user: UserDocument): SAUserViewDTO => {
   return {
     id: user._id.toString(),
     login: user.login,
     email: user.email,
     createdAt: user.addedAt,
+    banInfo: user.banInfo,
   };
 };
 
