@@ -2,7 +2,13 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
-import { UserCreateDTO, UserInputModel, UserViewDTO } from '../user.models';
+import {
+  BanUserInputModel,
+  SAUserViewDTO,
+  UserCreateDTO,
+  UserInputModel,
+  UserViewDTO,
+} from '../user.models';
 import { userMapping } from '../user.helpers';
 import { objectIdHelper } from '../../common/helpers';
 
@@ -16,7 +22,7 @@ export class UsersRepository {
    * @returns Объект UserViewDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
    */
-  async getUser(userId: string): Promise<UserViewDTO | null> {
+  async getUser(userId: string): Promise<SAUserViewDTO | null> {
     try {
       if (!objectIdHelper(userId)) return null;
 
@@ -264,6 +270,48 @@ export class UsersRepository {
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
+    }
+  }
+
+  async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
+    try {
+      const updateResult = await this.userModel.updateOne(
+        {
+          _id: objectIdHelper(userId),
+        },
+        {
+          $set: {
+            'banInfo.isBanned': inputModel.isBanned,
+            'banInfo.banReason': inputModel.banReason,
+            'banInfo.banDate': new Date(),
+          },
+        },
+      );
+      return updateResult.matchedCount;
+    } catch (e) {
+      console.log(e);
+      throw new Error('something went wrong');
+    }
+  }
+
+  async unBanUser(userId: string, inputModel: BanUserInputModel) {
+    try {
+      const updateResult = await this.userModel.updateOne(
+        {
+          _id: objectIdHelper(userId),
+        },
+        {
+          $set: {
+            'banInfo.isBanned': inputModel.isBanned,
+            'banInfo.banReason': inputModel.banReason,
+            'banInfo.banDate': new Date(),
+          },
+        },
+      );
+      return updateResult.matchedCount;
+    } catch (e) {
+      console.log(e);
+      throw new Error('something went wrong');
     }
   }
 }
