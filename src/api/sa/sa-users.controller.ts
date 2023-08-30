@@ -89,7 +89,7 @@ export class SaUsersController {
     @Param('id') userId: string,
     @Body() inputModel: BanUserInputModel,
   ) {
-    const result = await this.usersService.banUser(userId, inputModel);
+    const result = await this.usersService.updateBanStatus(userId, inputModel);
 
     if (result === null) {
       throw new NotFoundException();

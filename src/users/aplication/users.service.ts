@@ -100,7 +100,7 @@ export class UsersService {
     return this.usersRepository.updatePasswordForUser(hash, code);
   }
 
-  async banUser(userId: string, inputModel: BanUserInputModel) {
+  async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
     const badBoy = await this.usersRepository.getUser(userId);
 
     if (!badBoy) {
@@ -109,7 +109,9 @@ export class UsersService {
     if (badBoy.banInfo.isBanned === inputModel.isBanned) {
       return false;
     }
-
-    return this.usersRepository.updateBanStatus(userId, inputModel);
+    if (inputModel.isBanned === true) {
+      return this.usersRepository.banUser(userId, inputModel);
+    }
+    return this.usersRepository.unBanUser(userId, inputModel);
   }
 }

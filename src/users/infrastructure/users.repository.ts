@@ -273,7 +273,7 @@ export class UsersRepository {
     }
   }
 
-  async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
+  async banUser(userId: string, inputModel: BanUserInputModel) {
     try {
       const updateResult = await this.userModel.updateOne(
         {
@@ -303,8 +303,8 @@ export class UsersRepository {
         {
           $set: {
             'banInfo.isBanned': inputModel.isBanned,
-            'banInfo.banReason': inputModel.banReason,
-            'banInfo.banDate': new Date(),
+            'banInfo.banReason': null,
+            'banInfo.banDate': null,
           },
         },
       );
