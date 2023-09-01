@@ -4,11 +4,7 @@ import { MeViewModel, UserViewDTO } from '../user.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
-import {
-  filterLoginOrEmail,
-  usersMapping,
-  usersMappingSA,
-} from '../user.helpers';
+import { usersMapping, usersMappingSA } from '../user.helpers';
 import {
   getDirection,
   getPageNumber,
@@ -32,11 +28,22 @@ export class UsersQueryRepository {
     sortBy?: string,
     sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
-    const calculateOfFiles = await this.userModel.countDocuments(
-      filterLoginOrEmail(searchEmailTerm, searchLoginTerm),
-    );
+    const filter: mongoose.FilterQuery<UserDocument> = {};
+    if (searchEmailTerm) {
+      filter.email = {
+        $regex: searchEmailTerm,
+        $options: 'i',
+      };
+    }
+    if (searchLoginTerm) {
+      filter.login = {
+        $regex: searchLoginTerm,
+        $options: 'i',
+      };
+    }
+    const calculateOfFiles = await this.userModel.countDocuments(filter);
     const foundUsers: UserDocument[] = await this.userModel
-      .find(filterLoginOrEmail(searchEmailTerm, searchLoginTerm))
+      .find(filter)
       .sort({
         [getSortBy(sortBy)]: getDirection(sortDirection),
         [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
