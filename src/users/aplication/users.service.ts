@@ -11,10 +11,14 @@ import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from '../../auth/auth.models';
 import { ResultsAuthForErrors } from '../../auth/auth.constants';
 import { User } from '../users.schema';
+import { DevicesService } from '../../devices/devices.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private devicesService: DevicesService,
+  ) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.findUser(userId);
   }
@@ -113,6 +117,7 @@ export class UsersService {
       return false;
     }
     if (inputModel.isBanned === true) {
+      await this.devicesService.LogoutAllDevicesAdminOrder(userId);
       return this.usersRepository.banUser(userId, inputModel);
     }
     return this.usersRepository.unBanUser(userId, inputModel);
