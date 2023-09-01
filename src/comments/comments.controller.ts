@@ -41,6 +41,15 @@ export class CommentsController {
       throw new NotFoundException();
     }
 
+    // todo перенести в сервис слой
+    const user = await this.usersService.findUser(
+      comment.commentatorInfo.userId,
+    );
+
+    if (user?.banInfo.isBanned) {
+      throw new NotFoundException();
+    }
+
     return comment;
   }
 
