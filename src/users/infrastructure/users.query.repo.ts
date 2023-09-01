@@ -76,6 +76,22 @@ export class UsersQueryRepository {
       if (banStatus === 'notBanned') {
         filter = { 'banInfo.isBanned': false };
       }
+      if (searchEmailTerm && searchLoginTerm) {
+        filter.$and = [
+          {
+            email: {
+              $regex: searchEmailTerm,
+              $options: 'i',
+            },
+          },
+          {
+            login: {
+              $regex: searchLoginTerm,
+              $options: 'i',
+            },
+          },
+        ];
+      }
       if (searchEmailTerm) {
         filter.$or = [
           {
