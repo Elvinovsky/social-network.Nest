@@ -63,7 +63,7 @@ export class DevicesRepository {
   }
 
   // Метод для удаления всех сессий устройств пользователя, кроме определенной по времени создания (issuedAt)
-  async deleteDevicesSessionsByUser(
+  async deleteDevicesSessionsExceptCurrent(
     issuedAt: number,
     userId: string,
   ): Promise<boolean> {
@@ -72,6 +72,10 @@ export class DevicesRepository {
       issuedAt: { $ne: issuedAt }, // исключаем документы с определенным значением issuedAt
       status: { $nin: ['closed', 'expired'] }, // исключаем документы со статусами 'closed' и 'expired'
     });
+    return result.deletedCount === 1;
+  }
+  async deleteAllDevicesAdminOrder(userId: string): Promise<boolean> {
+    const result = await this.deviceModel.deleteMany({ userId: userId });
     return result.deletedCount === 1;
   }
 }
