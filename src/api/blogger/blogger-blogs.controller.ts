@@ -147,7 +147,7 @@ export class BloggerBlogsController {
     return result;
   }
 
-  @Put('blogId/posts/:postId')
+  @Put(':blogId/posts/:postId')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
@@ -173,7 +173,7 @@ export class BloggerBlogsController {
   }
 
   @UseGuards(JwtBearerGuard)
-  @Delete('blogId/posts/:postId')
+  @Delete(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
     @Param('blogId', ObjectIdPipe) blogId: string,
