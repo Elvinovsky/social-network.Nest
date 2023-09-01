@@ -36,7 +36,10 @@ export class DevicesController {
   async deleteDevices(@Req() req, @Res() res) {
     const userId = req.userId.toString(); // Получаем id пользователя из запроса
 
-    await this.devicesService.logoutDevicesSessionsByUser(req.issuedAt, userId); // Выход из всех устройств пользователя
+    await this.devicesService.logoutDevicesSessionsForUser(
+      req.issuedAt,
+      userId,
+    ); // Выход из всех устройств пользователя кроме текущей
 
     res.sendStatus(204); // Успешный статус: OK, без содержимого
     return;
