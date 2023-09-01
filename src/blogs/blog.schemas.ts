@@ -31,7 +31,7 @@ export class Blog {
     blog.description = inputModel.description;
     blog.websiteUrl = inputModel.websiteUrl;
     blog.addedAt = new Date().toISOString();
-    blog.isMembership = true;
+    blog.isMembership = false;
     blog.blogOwnerInfo = blogOwnerInfo;
     return blog;
   }

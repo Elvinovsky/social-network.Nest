@@ -97,9 +97,9 @@ export class PostsService {
     // поиск поста по айди
     const foundPost = await this.findPostById(postId);
     // проверка на совпадение предаваемого айди блога через params внутри документа поста
-    if (foundPost?.blogId !== blogId) {
-      return false;
-    }
+    // if (foundPost?.blogId !== blogId) {
+    //   return false;
+    // }
     return this.postsRepository.deletePost(postId);
   }
 }
