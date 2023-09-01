@@ -11,7 +11,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     MongooseModule.forFeature([{ name: Device.name, schema: DeviceSchema }]),
     forwardRef(() => AuthModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   controllers: [DevicesController],
   providers: [DevicesService, DevicesRepository],
