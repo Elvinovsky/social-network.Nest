@@ -24,7 +24,7 @@ export class UsersService {
   ): Promise<UserViewDTO> {
     const newUser: UserCreateDTO = User.Create(inputModel, hash);
 
-    return await this.usersRepository.createUser(newUser);
+    return await this.usersRepository.createUserSA(newUser);
   }
 
   async createUserRegistration(

@@ -50,6 +50,13 @@ export class UsersRepository {
     return userMapping(user);
   }
 
+  async createUserSA(inputModel: UserCreateDTO): Promise<UserViewDTO> {
+    const user: UserDocument = new this.userModel(inputModel);
+    await user.save();
+
+    return userMappingSA(user);
+  }
+
   /**
    * Обновление данных пользователя на основе UserInputModel.
    * @param user Объект пользователя для обновления.
