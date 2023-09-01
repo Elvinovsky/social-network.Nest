@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
 import {
   BanUserInputModel,
+  SAUserViewDTO,
   UserCreateDTO,
   UserInputModel,
   UserViewDTO,
@@ -14,10 +15,9 @@ import { User } from '../users.schema';
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
-  async getUser(userId: string): Promise<UserViewDTO | null> {
+  async getUser(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.getUser(userId);
   }
-
   async createUserForSA(
     inputModel: UserInputModel,
     hash: string,

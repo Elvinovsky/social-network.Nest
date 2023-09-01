@@ -9,7 +9,7 @@ import {
   UserInputModel,
   UserViewDTO,
 } from '../user.models';
-import { userMapping } from '../user.helpers';
+import { userMapping, userMappingSA } from '../user.helpers';
 import { objectIdHelper } from '../../common/helpers';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class UsersRepository {
       if (!user) {
         return null;
       }
-      return userMapping(user);
+      return userMappingSA(user);
     } catch (e) {
       console.log('error usersRepository', e);
       throw new InternalServerErrorException();
