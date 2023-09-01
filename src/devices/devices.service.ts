@@ -47,14 +47,22 @@ export class DevicesService {
   }
 
   /**
-   * Выход из всех сессий устройств для указанного пользователя.
+   * Выход из всех сессий устройств, кроме текущего для указанного пользователя.
    * @param issuedAt Время создания токена.
    * @param userId Идентификатор пользователя (строка).
    * @returns Промис с результатом удаления сессий устройств.
    */
-  async logoutDevicesSessionsByUser(issuedAt: number, userId: string) {
-    const result = await this.devicesRepository.deleteDevicesSessionsByUser(
-      issuedAt,
+  async logoutDevicesSessionsForUser(issuedAt: number, userId: string) {
+    const result =
+      await this.devicesRepository.deleteDevicesSessionsExceptCurrent(
+        issuedAt,
+        userId,
+      );
+    return result;
+  }
+
+  async LogoutAllDevicesAdminOrder(userId: string) {
+    const result = await this.devicesRepository.deleteAllDevicesAdminOrder(
       userId,
     );
     return result;
