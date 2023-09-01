@@ -77,16 +77,24 @@ export class UsersQueryRepository {
         filter = { 'banInfo.isBanned': false };
       }
       if (searchEmailTerm) {
-        filter.email = {
-          $regex: searchEmailTerm,
-          $options: 'i',
-        };
+        filter.$or = [
+          {
+            email: {
+              $regex: searchEmailTerm,
+              $options: 'i',
+            },
+          },
+        ];
       }
       if (searchLoginTerm) {
-        filter.login = {
-          $regex: searchLoginTerm,
-          $options: 'i',
-        };
+        filter.$or = [
+          {
+            login: {
+              $regex: searchLoginTerm,
+              $options: 'i',
+            },
+          },
+        ];
       }
 
       const calculateOfFiles = await this.userModel.countDocuments(filter);
