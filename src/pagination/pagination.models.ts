@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsEmail, IsOptional } from 'class-validator';
 
 export type PaginatorType<T> = {
   pagesCount: number;
@@ -29,7 +29,20 @@ export class QueryBanStatus {
   banStatus: string;
 }
 
-export type SearchNameTerm = { searchNameTerm?: string };
-export type SearchTitleTerm = { searchTitleTerm?: string };
-export type SearchEmailTerm = { searchEmailTerm?: string };
-export type SearchLoginTerm = { searchLoginTerm?: string };
+export class SearchNameTerm {
+  @IsOptional()
+  searchNameTerm: string;
+}
+export class SearchTitleTerm {
+  @IsOptional()
+  searchTitleTerm: string;
+}
+export class SearchEmailTerm {
+  @IsOptional()
+  @IsEmail()
+  searchEmailTerm: string;
+}
+export class SearchLoginTerm {
+  @IsOptional()
+  searchLoginTerm: string;
+}
