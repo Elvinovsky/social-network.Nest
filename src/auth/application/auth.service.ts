@@ -6,7 +6,7 @@ import { NewPasswordRecoveryInputModel } from '../auth.models';
 import { SAUserViewDTO, UserInfo } from '../../users/user.models';
 import { EmailSenderService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
-import { userMapping } from '../../users/user.helpers';
+import { userMappingSA } from '../../users/user.helpers';
 import { DevicesService } from '../../devices/devices.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../configuration/getConfiguration';
@@ -100,9 +100,9 @@ export class AuthService {
       user.passwordHash,
     );
 
-    // если сверка прошла успешна возвращаем UserViewDto в ином случае null.
+    // если сверка прошла успешна возвращаем SAUserViewDto в ином случае null.
     if (isHashesEquals) {
-      return userMapping(user);
+      return userMappingSA(user);
     } else {
       return null;
     }
