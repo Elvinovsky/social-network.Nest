@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaginatorType } from '../../pagination/pagination.models';
 import { MeViewModel, UserViewDTO } from '../user.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
-import { filterLoginOrEmail, usersMapping } from '../user.helpers';
+import {
+  filterLoginOrEmail,
+  usersMapping,
+  usersMappingSA,
+} from '../user.helpers';
 import {
   getDirection,
   getPageNumber,
@@ -15,6 +19,7 @@ import {
 } from '../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../common/constants';
 import { objectIdHelper } from '../../common/helpers';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -48,7 +53,7 @@ export class UsersQueryRepository {
   }
 
   async getSortedUsersForSA(
-    banStatus: string | 'all',
+    banStatus?: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
     pageNumber?: number,
@@ -56,36 +61,49 @@ export class UsersQueryRepository {
     sortBy?: string,
     sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
-    let banFilter = {};
+    try {
+      let filter: mongoose.FilterQuery<UserDocument> = {};
+      if (banStatus === 'banned') {
+        filter = { 'banInfo.isBanned': true };
+      }
+      if (banStatus === 'notBanned') {
+        filter = { 'banInfo.isBanned': false };
+      }
+      if (searchEmailTerm) {
+        filter.email = {
+          $regex: searchEmailTerm,
+          $options: 'i',
+        };
+      }
+      if (searchLoginTerm) {
+        filter.login = {
+          $regex: searchLoginTerm,
+          $options: 'i',
+        };
+      }
 
-    if (banStatus === 'notBanned') {
-      banFilter = { 'banInfo.isBanned': false };
+      const calculateOfFiles = await this.userModel.countDocuments(filter);
+
+      const foundUsers: UserDocument[] = await this.userModel
+        .find(filter)
+        .sort({
+          [getSortBy(sortBy)]: getDirection(sortDirection),
+          [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
+        })
+        .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
+        .limit(getPageSize(pageSize));
+
+      return {
+        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        page: getPageNumber(pageNumber),
+        pageSize: getPageSize(pageSize),
+        totalCount: calculateOfFiles,
+        items: usersMappingSA(foundUsers),
+      };
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
-
-    if (banStatus === 'banned') {
-      banFilter = { 'banInfo.isBanned': true };
-    }
-
-    const calculateOfFiles = await this.userModel.countDocuments(
-      banFilter,
-      filterLoginOrEmail(searchEmailTerm, searchLoginTerm),
-    );
-
-    const foundUsers: UserDocument[] = await this.userModel
-      .find(banFilter, filterLoginOrEmail(searchEmailTerm, searchLoginTerm))
-      .sort({
-        [getSortBy(sortBy)]: getDirection(sortDirection),
-        [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
-      })
-      .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
-      .limit(getPageSize(pageSize));
-    return {
-      pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
-      page: getPageNumber(pageNumber),
-      pageSize: getPageSize(pageSize),
-      totalCount: calculateOfFiles,
-      items: usersMapping(foundUsers),
-    };
   }
 
   async getUserInfo(id: string): Promise<MeViewModel | null> {
