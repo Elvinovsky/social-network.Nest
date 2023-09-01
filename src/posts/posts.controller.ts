@@ -43,7 +43,7 @@ export class PostsController {
     private readonly commentsQueryRepo: CommentsQueryRepo,
   ) {}
 
-  @Get('/')
+  @Get()
   @UseGuards(OptionalBearerGuard)
   async getPosts(
     @Query() query: QueryInputModel & SearchTitleTerm,
@@ -108,8 +108,8 @@ export class PostsController {
     const getCommentsByPostId =
       await this.commentsQueryRepo.getCommentsByPostId(
         postId,
-        Number(query.pageNumber),
-        Number(query.pageSize),
+        query.pageNumber,
+        query.pageSize,
         query.sortBy,
         query.sortDirection,
         userId,
