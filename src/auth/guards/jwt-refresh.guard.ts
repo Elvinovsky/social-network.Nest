@@ -38,12 +38,13 @@ export class JwtRefreshGuard implements CanActivate {
     }
 
     const userId = await this.authService.getUserIdByRefreshToken(refreshToken);
+
     if (!userId) {
       throw new UnauthorizedException();
     }
 
-    const userDB = await this.usersService.getUser(userId);
-    if (!userDB) {
+    const userDB = await this.usersService.findUser(userId);
+    if (!userDB || userDB.banInfo.isBanned) {
       throw new UnauthorizedException();
     }
 

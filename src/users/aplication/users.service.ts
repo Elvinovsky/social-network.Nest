@@ -15,10 +15,10 @@ import { User } from '../users.schema';
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
-  async findUser(userId: string): Promise<UserViewDTO | null> {
+  async findUser(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.findUser(userId);
   }
-  async getUser(userId: string): Promise<SAUserViewDTO | null> {
+  async getUserSA(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.getUser(userId);
   }
   async createUserForSA(

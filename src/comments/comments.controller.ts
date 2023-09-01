@@ -61,7 +61,7 @@ export class CommentsController {
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.getUser(sessionInfo.userId);
+    const currentUser = await this.usersService.findUser(sessionInfo.userId);
     if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
@@ -89,7 +89,7 @@ export class CommentsController {
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.getUser(sessionInfo.userId);
+    const currentUser = await this.usersService.getUserSA(sessionInfo.userId);
     if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }

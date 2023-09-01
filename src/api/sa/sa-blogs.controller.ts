@@ -64,7 +64,7 @@ export class SaBlogsController {
       ]);
     }
 
-    const foundUser = await this.usersService.getUser(userId);
+    const foundUser = await this.usersService.getUserSA(userId);
 
     if (!foundUser) {
       throw new BadRequestException([

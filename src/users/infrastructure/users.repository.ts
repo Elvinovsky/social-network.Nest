@@ -15,7 +15,7 @@ import { objectIdHelper } from '../../common/helpers';
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async findUser(userId: string) {
+  async findUser(userId: string): Promise<SAUserViewDTO | null> {
     try {
       if (!objectIdHelper(userId)) return null;
 
@@ -23,7 +23,7 @@ export class UsersRepository {
       if (!user) {
         return null;
       }
-      return userMapping(user);
+      return userMappingSA(user);
     } catch (e) {
       console.log('error usersRepository', e);
       throw new InternalServerErrorException();

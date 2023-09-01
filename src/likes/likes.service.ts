@@ -17,7 +17,7 @@ export class LikesService {
     statusType: string,
   ) {
     try {
-      const currentUser: UserViewDTO | null = await this.usersService.getUser(
+      const currentUser: UserViewDTO | null = await this.usersService.getUserSA(
         userId,
       );
       if (!currentUser) {
