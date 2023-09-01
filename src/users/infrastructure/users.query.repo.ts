@@ -70,43 +70,26 @@ export class UsersQueryRepository {
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
       let filter: mongoose.FilterQuery<UserDocument> = {};
+
       if (banStatus === 'banned') {
         filter = { 'banInfo.isBanned': true };
       }
+
       if (banStatus === 'notBanned') {
         filter = { 'banInfo.isBanned': false };
       }
-      if (searchEmailTerm && searchLoginTerm) {
-        filter.$and = [
-          {
-            email: {
-              $regex: searchEmailTerm,
-              $options: 'i',
-            },
-          },
-          {
-            login: {
-              $regex: searchLoginTerm,
-              $options: 'i',
-            },
-          },
-        ];
-      }
-      if (searchEmailTerm) {
-        filter.$or = [
-          {
-            email: {
-              $regex: searchEmailTerm,
-              $options: 'i',
-            },
-          },
-        ];
-      }
-      if (searchLoginTerm) {
+
+      if (searchEmailTerm || searchLoginTerm) {
         filter.$or = [
           {
             login: {
               $regex: searchLoginTerm,
+              $options: 'i',
+            },
+          },
+          {
+            email: {
+              $regex: searchEmailTerm,
               $options: 'i',
             },
           },
