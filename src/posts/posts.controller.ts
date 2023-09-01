@@ -30,6 +30,7 @@ import { UsersService } from '../users/aplication/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
+import { UserInfo } from '../users/user.models';
 
 @Controller('posts')
 export class PostsController {
@@ -127,17 +128,17 @@ export class PostsController {
     @Param('postId', ObjectIdPipe) postId: string,
     @Body() inputModel: CommentInputModel,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const validatorPostId = await this.postsService.findPostById(postId);
 
-    const user = await this.usersService.getUser(sessionInfo.userId);
+    const user = await this.usersService.findUser(sessionInfo.userInfo.userId);
     if (!validatorPostId || !user) {
       throw new NotFoundException();
     }
     const comment = await this.commentsService.createComment(
       postId,
-      sessionInfo.userId,
+      sessionInfo.userInfo.userId,
       user.login,
       inputModel.content,
     );

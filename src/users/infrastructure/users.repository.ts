@@ -15,6 +15,20 @@ import { objectIdHelper } from '../../common/helpers';
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  async findUser(userId: string) {
+    try {
+      if (!objectIdHelper(userId)) return null;
+
+      const user = await this.userModel.findById(objectIdHelper(userId));
+      if (!user) {
+        return null;
+      }
+      return userMapping(user);
+    } catch (e) {
+      console.log('error usersRepository', e);
+      throw new InternalServerErrorException();
+    }
+  }
 
   /**
    * Получение пользователя по его идентификатору.
