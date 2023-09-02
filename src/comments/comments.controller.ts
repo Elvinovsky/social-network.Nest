@@ -21,6 +21,7 @@ import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
+import { UserInfo } from '../users/user.models';
 
 @Controller('/comments')
 export class CommentsController {
@@ -115,7 +116,7 @@ export class CommentsController {
     @Param('id', ObjectIdPipe) id: string,
     @Body() inputModel: LikeStatus,
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     // Получаем комментарий по id
     const comment = await this.commentService.findCommentById(id);
@@ -126,7 +127,7 @@ export class CommentsController {
     // Создаем или обновляем лайк для комментария
     const result = await this.likesService.createOrUpdateLike(
       id,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
       inputModel.likeStatus,
     );
     return result;

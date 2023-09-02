@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
