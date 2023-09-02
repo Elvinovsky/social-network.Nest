@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { LikeCreateDTO } from './like.models';
 import { Like, LikeModel } from './like.schemas';
 import { Status } from '../common/constants';
+import { UserInfo } from '../users/user.models';
 
 @Injectable()
 export class LikesRepository {
@@ -11,6 +12,7 @@ export class LikesRepository {
     const likes = await this.likeModel.countDocuments({
       postOrCommentId: id,
       status: Status.Like,
+      isBanned: { $ne: true },
     });
     return likes;
   }
@@ -18,6 +20,7 @@ export class LikesRepository {
     const disLikes = await this.likeModel.countDocuments({
       postOrCommentId: id,
       status: Status.Dislike,
+      isBanned: { $ne: true },
     });
     return disLikes;
   }
@@ -25,6 +28,7 @@ export class LikesRepository {
     return this.likeModel.find({
       postOrCommentId: id,
       status: Status.Like,
+      isBanned: { $ne: true },
     });
   }
   async getLikeInfo(userId: string, postOrCommentId: string) {
@@ -32,6 +36,7 @@ export class LikesRepository {
       .findOne({
         userId: userId,
         postOrCommentId: postOrCommentId,
+        isBanned: { $ne: true },
       })
       .exec();
   }
@@ -50,20 +55,37 @@ export class LikesRepository {
     return result.matchedCount === 1;
   }
   async addLikeInfo(
-    userId: string,
-    userLogin: string,
+    userInfo: UserInfo,
     postOrCommentId: string,
     statusType: string,
   ) {
     const newLikeInfo = new this.likeModel({
       status: statusType,
-      userId,
-      userLogin,
+      userId: userInfo.userId,
+      userLogin: userInfo.userLogin,
       postOrCommentId: postOrCommentId,
       createdAt: new Date(),
+      isBanned: false,
     });
 
     await newLikeInfo.save();
     return !!newLikeInfo;
+  }
+  async banLikes(userId: string) {
+    return this.likeModel.updateMany(
+      { userId: userId },
+      {
+        $set: {
+          isBanned: true,
+        },
+      },
+    );
+  }
+
+  unBanLikes(userId: string) {
+    return this.likeModel.updateMany(
+      { userId: userId },
+      { $set: { isBanned: false } },
+    );
   }
 }
