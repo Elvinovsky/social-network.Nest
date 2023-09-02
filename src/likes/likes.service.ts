@@ -2,35 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Status } from '../common/constants';
-import { UsersService } from '../users/aplication/users.service';
-import { UserViewDTO } from '../users/user.models';
-
+import { UserInfo } from '../users/user.models';
 @Injectable()
 export class LikesService {
-  constructor(
-    private likesRepository: LikesRepository,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private likesRepository: LikesRepository) {}
   async createOrUpdateLike(
     postOrCommentId: string,
-    userId: string,
+    userInfo: UserInfo,
     statusType: string,
   ) {
     try {
-      const currentUser: UserViewDTO | null = await this.usersService.getUserSA(
-        userId,
-      );
-      if (!currentUser) {
-        return Error;
-      }
       const isAlreadyLiked: LikeCreateDTO | null =
-        await this.likesRepository.getLikeInfo(userId, postOrCommentId);
+        await this.likesRepository.getLikeInfo(
+          userInfo.userId,
+          postOrCommentId,
+        );
 
       //если пользователь не ставил ранне оценку коментарию или посту
       if (!isAlreadyLiked) {
         const newLikeInfo = await this.likesRepository.addLikeInfo(
-          userId,
-          currentUser.login,
+          userInfo,
           postOrCommentId,
           statusType,
         );
@@ -45,7 +36,7 @@ export class LikesService {
 
       // если отправленный статус не совпадает с существующий статусом в БД
       const changeLikeInfo = await this.likesRepository.updateLikeInfo(
-        userId,
+        userInfo.userId,
         postOrCommentId,
         statusType,
       );
@@ -101,5 +92,11 @@ export class LikesService {
         })
         .slice(0, 3),
     );
+  }
+  async banLikes(userId: string) {
+    return this.likesRepository.banLikes(userId);
+  }
+  async unBanLikes(userId: string) {
+    return this.likesRepository.unBanLikes(userId);
   }
 }
