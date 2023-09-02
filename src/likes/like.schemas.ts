@@ -16,6 +16,8 @@ export class Like {
   postOrCommentId: string;
   @Prop({ required: true })
   createdAt: Date;
+  @Prop()
+  isBanned: boolean;
 }
 
 export const LikeSchema = SchemaFactory.createForClass(Like);
