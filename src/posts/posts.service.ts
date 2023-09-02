@@ -73,11 +73,11 @@ export class PostsService {
       return validateResult;
     }
 
-    const foundPost = await this.findPostById(postId);
-
-    if (foundPost?.blogId !== blogId) {
-      return false;
-    }
+    // const foundPost = await this.findPostById(postId);
+    //
+    // if (foundPost?.blogId !== blogId) {
+    //   return false;
+    // }
 
     return this.postsRepository.updatePostById(postId, inputModel);
   }
@@ -94,12 +94,12 @@ export class PostsService {
     if (!validateResult) {
       return validateResult;
     }
-    // поиск поста по айди
-    const foundPost = await this.findPostById(postId);
-    // проверка на совпадение предаваемого айди блога через params внутри документа поста
-    if (foundPost?.blogId !== blogId) {
-      return false;
-    }
+    // // поиск поста по айди
+    // const foundPost = await this.findPostById(postId);
+    // // проверка на совпадение предаваемого айди блога через params внутри документа поста
+    // if (foundPost?.blogId !== blogId) {
+    //   return false;
+    // }
     return this.postsRepository.deletePost(postId);
   }
 }
