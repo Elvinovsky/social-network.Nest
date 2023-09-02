@@ -19,7 +19,9 @@ export class JwtRefreshGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     const refreshToken = await this.extractTokenFromCookie(request);
-    if (!refreshToken) throw new UnauthorizedException();
+    if (!refreshToken) {
+      throw new UnauthorizedException();
+    }
 
     const issuedAt = await this.authService.getIATByRefreshToken(refreshToken);
 
