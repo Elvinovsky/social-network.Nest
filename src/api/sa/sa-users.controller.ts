@@ -101,7 +101,7 @@ export class SaUsersController {
       throw new BadRequestException([
         {
           field: 'isBanned',
-          message: 'user already',
+          message: 'user already banned',
         },
       ]);
     }
