@@ -259,13 +259,13 @@ export class AuthController {
   async getMe(
     @CurrentUserIdFromBearerJWT()
     sessionInfo: {
-      userId: string;
+      userInfo: UserInfo;
       deviceId: string;
     },
   ) {
     // Получение информации о текущем пользователе.
     const user = await this.usersQueryRepository.getUserInfo(
-      sessionInfo.userId,
+      sessionInfo.userInfo.userId,
     );
     if (user) {
       return user; // Отправка информации о пользователе.
