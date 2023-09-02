@@ -16,7 +16,7 @@ export class DevicesRepository {
   async findDeviceIdAmongSession(
     deviceId: string,
   ): Promise<DeviceDocument | null> {
-    return this.deviceModel.findOne({ deviceId: deviceId });
+    return this.deviceModel.findOne({ deviceId: deviceId }).exec();
   }
 
   // Метод для поиска всех устройств сессии по идентификатору пользователя
