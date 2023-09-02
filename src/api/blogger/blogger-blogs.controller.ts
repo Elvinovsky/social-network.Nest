@@ -62,11 +62,6 @@ export class BloggerBlogsController {
     @CurrentUserIdFromBearerJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
-    //todo как иначе реализовать логику валидации на 'logout' юзера
-    const isSessionLogged = await this.devicesService.findSessionByDeviceId(
-      sessionInfo.deviceId,
-    );
-    if (!isSessionLogged) throw new UnauthorizedException();
     const result: BlogViewDTO = await this.blogsService.createBlog(
       inputModel,
       sessionInfo.userInfo,
