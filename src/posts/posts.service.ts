@@ -9,6 +9,7 @@ import {
 import { BlogsService } from '../blogs/application/blogs.service';
 import { BlogDocument } from '../blogs/blog.schemas';
 import { UserInfo } from '../users/user.models';
+import { Post } from './post.schemas';
 
 @Injectable()
 export class PostsService {
@@ -31,12 +32,9 @@ export class PostsService {
     if (!validateResult) {
       return validateResult;
     }
+    const newPost = Post.create(inputModel, validateResult.name, blogId);
 
-    return this.postsRepository.createPostBlog(
-      inputModel,
-      blogId,
-      validateResult.name,
-    );
+    return this.postsRepository.createPostBlog(newPost);
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
@@ -48,14 +46,11 @@ export class PostsService {
       return null;
     }
 
-    const newPost: PostCreateDTO = {
-      blogId: inputModel.blogId,
-      title: inputModel.title,
-      shortDescription: inputModel.shortDescription,
-      content: inputModel.content,
-      blogName: foundBlog.name,
-      addedAt: new Date().toISOString(),
-    };
+    const newPost: PostCreateDTO = Post.create(
+      inputModel,
+      foundBlog.name,
+      inputModel.blogId,
+    );
 
     return this.postsRepository.createPost(newPost);
   }
