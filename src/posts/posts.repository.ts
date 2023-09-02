@@ -22,22 +22,9 @@ export class PostsRepository {
     }
   }
 
-  async createPostBlog(
-    inputDTO: BlogPostInputModel,
-    blogId: string,
-    blogName: string,
-  ): Promise<PostViewDTO | null> {
+  async createPostBlog(inputDTO: PostCreateDTO): Promise<PostViewDTO | null> {
     try {
-      const createPost: PostCreateDTO = {
-        blogId: blogId,
-        title: inputDTO.title,
-        shortDescription: inputDTO.shortDescription,
-        content: inputDTO.content,
-        blogName: blogName,
-        addedAt: new Date().toISOString(),
-      };
-
-      const post: PostDocument = new this.postModel(createPost);
+      const post: PostDocument = new this.postModel(inputDTO);
       await post.save();
 
       return this.postMapper.mapPost(post);
