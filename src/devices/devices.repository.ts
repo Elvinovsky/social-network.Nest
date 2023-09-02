@@ -23,7 +23,9 @@ export class DevicesRepository {
   async findDevicesSessionsByUserId(
     userId: string,
   ): Promise<DeviceViewDTO[] | null> {
-    const devicesSessions = await this.deviceModel.find({ userId: userId });
+    const devicesSessions = await this.deviceModel.find({
+      'userInfo.userId': userId,
+    });
     if (!devicesSessions) {
       return null; // Возвращаем null, если устройства не найдены.
     }
@@ -55,7 +57,7 @@ export class DevicesRepository {
   ): Promise<boolean> {
     const result = await this.deviceModel
       .deleteOne({
-        userId: userId,
+        'userInfo.userId': userId,
         deviceId: deviceId,
       })
       .exec();
@@ -68,14 +70,16 @@ export class DevicesRepository {
     userId: string,
   ): Promise<boolean> {
     const result = await this.deviceModel.deleteMany({
-      userId: userId,
+      'userInfo.userId': userId,
       issuedAt: { $ne: issuedAt }, // исключаем документы с определенным значением issuedAt
       status: { $nin: ['closed', 'expired'] }, // исключаем документы со статусами 'closed' и 'expired'
     });
     return result.deletedCount === 1;
   }
-  async deleteAllDevicesAdminOrder(userId: string): Promise<boolean> {
-    const result = await this.deviceModel.deleteMany({ userId: userId });
-    return result.deletedCount === 1;
+  async deleteAllDevicesAdminOrder(userId: string): Promise<number> {
+    const result = await this.deviceModel
+      .deleteMany({ 'userInfo.userId': userId })
+      .exec();
+    return result.deletedCount;
   }
 }
