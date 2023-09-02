@@ -82,7 +82,7 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatusPost(
     @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
     @Param('postId') postId: string,
     @Body() inputModel: LikeStatus,
   ) {
@@ -92,7 +92,7 @@ export class PostsController {
     }
     const result = await this.likesService.createOrUpdateLike(
       postId,
-      sessionInfo.userId,
+      sessionInfo.userInfo,
       inputModel.likeStatus,
     );
     return result;
@@ -131,15 +131,14 @@ export class PostsController {
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const validatorPostId = await this.postsService.findPostById(postId);
-
-    const user = await this.usersService.findUser(sessionInfo.userInfo.userId);
-    if (!validatorPostId || !user) {
+    if (!validatorPostId) {
       throw new NotFoundException();
     }
+
     const comment = await this.commentsService.createComment(
       postId,
       sessionInfo.userInfo.userId,
-      user.login,
+      sessionInfo.userInfo.userLogin,
       inputModel.content,
     );
     return comment;
