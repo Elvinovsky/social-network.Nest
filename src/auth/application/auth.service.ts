@@ -194,13 +194,13 @@ export class AuthService {
         }),
       })) as {
         userInfo: UserInfo;
+        deviceId: string;
       };
       return payload.userInfo.userId;
     } catch (error) {
       return null;
     }
   }
-
   async getDeviceIdRefreshToken(token: string) {
     try {
       const payload = (await this.jwtService.verify(token, {
@@ -208,6 +208,7 @@ export class AuthService {
           infer: true,
         }),
       })) as {
+        userInfo: UserInfo;
         deviceId: string;
       };
       return payload.deviceId;
