@@ -11,7 +11,6 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UsersModule } from '../users/users.module';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
-import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
@@ -48,13 +47,12 @@ const useCases = [UserRegistrationUseCase];
     LocalStrategy,
     JwtRefreshGuard,
     JwtBearerGuard,
-    JwtBearerStrategy,
     JwtService,
 
     EmailSenderService,
     SendSMTPAdapter,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtBearerGuard],
 })
 export class AuthModule {}
