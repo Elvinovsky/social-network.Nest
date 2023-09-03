@@ -68,8 +68,12 @@ export class PostsService {
       return validateResult;
     }
 
-    // const foundPost = await this.findPostById(postId);
-    //
+    const foundPost = await this.findPostById(postId);
+
+    if (!foundPost) {
+      return null;
+    }
+
     // if (foundPost?.blogId !== blogId) {
     //   return false;
     // }
@@ -90,7 +94,12 @@ export class PostsService {
       return validateResult;
     }
     // // поиск поста по айди
-    // const foundPost = await this.findPostById(postId);
+    const foundPost = await this.findPostById(postId);
+
+    if (!foundPost) {
+      return null;
+    }
+
     // // проверка на совпадение предаваемого айди блога через params внутри документа поста
     // if (foundPost?.blogId !== blogId) {
     //   return false;
