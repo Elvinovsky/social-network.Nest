@@ -12,6 +12,10 @@ import { DevicesModule } from '../devices/devices.module';
 import { LikesService } from '../likes/likes.service';
 import { LikesRepository } from '../likes/likes.repository';
 import { Like, LikeSchema } from '../likes/like.schemas';
+import { Comment, CommentSchema } from '../comments/comment.schemas';
+import { CommentsService } from '../comments/comments.service';
+import { CommentsRepository } from '../comments/comments.repository';
+import { CommentMapper } from '../comments/helpers/comment.mapping';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
@@ -19,6 +23,7 @@ const useCases = [UserRegistrationToAdminUseCase];
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Like.name, schema: LikeSchema },
+      { name: Comment.name, schema: CommentSchema },
     ]),
     forwardRef(() => DevicesModule),
     CqrsModule,
@@ -28,6 +33,11 @@ const useCases = [UserRegistrationToAdminUseCase];
     ...useCases,
     LikesService,
     LikesRepository,
+
+    CommentsService,
+    CommentsRepository,
+    CommentMapper,
+
     UsersService,
     UsersRepository,
     UsersQueryRepository,
