@@ -13,6 +13,7 @@ import { ResultsAuthForErrors } from '../../auth/auth.constants';
 import { User } from '../users.schema';
 import { DevicesService } from '../../devices/devices.service';
 import { LikesService } from '../../likes/likes.service';
+import { CommentsService } from '../../comments/comments.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private devicesService: DevicesService,
     private likesService: LikesService,
+    private commentsService: CommentsService,
   ) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.findUser(userId);
@@ -119,11 +121,13 @@ export class UsersService {
       return false;
     }
     if (inputModel.isBanned === true) {
+      await this.commentsService.banComments(userId);
       await this.likesService.banLikes(userId);
       await this.devicesService.LogoutAllDevicesAdminOrder(userId);
       return this.usersRepository.banUser(userId, inputModel);
     }
     await this.likesService.unBanLikes(userId);
+    await this.commentsService.unBanComments(userId);
     return this.usersRepository.unBanUser(userId, inputModel);
   }
 }
