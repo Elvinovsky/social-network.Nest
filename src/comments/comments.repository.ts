@@ -19,9 +19,10 @@ export class CommentsRepository {
     try {
       if (!objectIdHelper(commentId)) return null;
 
-      const result: CommentDocument | null = await this.commentModel.findById(
-        objectIdHelper(commentId),
-      );
+      const result: CommentDocument | null = await this.commentModel.findOne({
+        _id: objectIdHelper(commentId),
+        'commentatorInfo.isBanned': { $ne: true },
+      });
       if (!result) return null;
 
       return this.commentMapper.comment(result, userId);
@@ -84,5 +85,18 @@ export class CommentsRepository {
       _id: objectIdHelper(id),
     });
     return resultDeleted.deletedCount === 1;
+  }
+
+  banComments(userId: string) {
+    return this.commentModel.updateMany(
+      { 'commentatorInfo.userId': userId },
+      { $set: { 'commentatorInfo.isBanned': true } },
+    );
+  }
+  unBanComments(userId: string) {
+    return this.commentModel.updateMany(
+      { 'commentatorInfo.userId': userId },
+      { $set: { 'commentatorInfo.isBanned': false } },
+    );
   }
 }
