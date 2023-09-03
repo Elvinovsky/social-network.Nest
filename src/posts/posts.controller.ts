@@ -137,8 +137,7 @@ export class PostsController {
 
     const comment = await this.commentsService.createComment(
       postId,
-      sessionInfo.userInfo.userId,
-      sessionInfo.userInfo.userLogin,
+      sessionInfo.userInfo,
       inputModel.content,
     );
     return comment;
