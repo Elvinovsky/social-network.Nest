@@ -36,4 +36,5 @@ export type CommentViewDTO = {
 export class CommentatorInfo {
   userId: string;
   userLogin: string;
+  isBanned: boolean;
 }
