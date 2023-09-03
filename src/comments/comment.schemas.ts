@@ -1,6 +1,7 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CommentatorInfo, CommentCreateDTO } from './comment.models';
+import { UserInfo } from '../users/user.models';
 export type CommentDocument = HydratedDocument<Comment>;
 export type CommentModel = Model<Comment>;
 
@@ -19,12 +20,16 @@ export class Comment {
   addedAt: string;
   static create(
     postId: string,
-    commentatorInfo: CommentatorInfo,
+    userInfo: UserInfo,
     content: string,
   ): CommentCreateDTO {
     const newComment: Comment = new Comment();
     newComment.postId = postId;
-    newComment.commentatorInfo = commentatorInfo;
+    newComment.commentatorInfo = {
+      userId: userInfo.userId,
+      userLogin: userInfo.userLogin,
+      isBanned: false,
+    };
     newComment.content = content;
     newComment.addedAt = new Date().toISOString();
 
