@@ -34,10 +34,11 @@ export class CommentsQueryRepo {
     }
     const calculateOfFiles = await this.commentModel.countDocuments({
       postId: postId,
+      'commentatorInfo.isBanned': { $ne: true },
     });
 
     const foundComments: CommentDocument[] = await this.commentModel
-      .find({ postId: postId })
+      .find({ postId: postId, 'commentatorInfo.isBanned': { $ne: true } })
       .sort({
         [getSortBy(sortBy)]: getDirection(sortDirection),
         [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
