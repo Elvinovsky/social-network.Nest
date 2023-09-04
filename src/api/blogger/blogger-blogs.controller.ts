@@ -14,6 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  PaginatorType,
   QueryInputModel,
   SearchNameTerm,
 } from '../../pagination/pagination.models';
@@ -27,6 +28,7 @@ import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 import { PostsService } from '../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 import { UserInfo } from '../../users/user.models';
+import { CommentsQueryRepo } from '../../comments/comments.query.repository';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -35,21 +37,18 @@ export class BloggerBlogsController {
     private blogsService: BlogsService,
     private devicesService: DevicesService,
     private postsService: PostsService,
+    private commentsQueryRepo: CommentsQueryRepo,
   ) {}
-  @Get()
+  @Get('comments')
   @UseGuards(JwtBearerGuard)
-  async getBlogs(
-    @Query() query: QueryInputModel & SearchNameTerm,
+  async getAllCommentsForBlogs(
+    @Query() query: QueryInputModel,
     @CurrentUserIdFromBearerJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
-    return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
+    return this.commentsQueryRepo.getAllCommentsForCurrentBlogger(
+      query,
       sessionInfo.userInfo,
-      query.searchNameTerm,
-      query.pageNumber,
-      query.pageSize,
-      query.sortBy,
-      query.sortDirection,
     );
   }
 
@@ -66,6 +65,23 @@ export class BloggerBlogsController {
       sessionInfo.userInfo,
     );
     return result;
+  }
+
+  @Get()
+  @UseGuards(JwtBearerGuard)
+  async getBlogs(
+    @Query() query: QueryInputModel & SearchNameTerm,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
+  ) {
+    return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
+      sessionInfo.userInfo,
+      query.searchNameTerm,
+      query.pageNumber,
+      query.pageSize,
+      query.sortBy,
+      query.sortDirection,
+    );
   }
 
   @Put(':blogId')
@@ -139,6 +155,29 @@ export class BloggerBlogsController {
     }
 
     return result;
+  }
+
+  @Get(':blogId/posts/:postId')
+  @UseGuards(JwtBearerGuard)
+  async getPostsByBlog(
+    @Param('blogId') blogId: string,
+    @Query() query: QueryInputModel,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
+  ): Promise<PaginatorType<PostViewDTO[]>> {
+    const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
+      blogId,
+      query.pageNumber,
+      query.pageSize,
+      query.sortBy,
+      query.sortDirection,
+      sessionInfo.userInfo.userId,
+    );
+
+    if (!getPostsByBlogId) {
+      throw new NotFoundException();
+    }
+    return getPostsByBlogId;
   }
 
   @Put(':blogId/posts/:postId')
