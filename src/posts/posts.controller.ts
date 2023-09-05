@@ -31,8 +31,8 @@ import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/aplication/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
-import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
 import { UserInfo } from '../users/user.models';
+import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 
 @Controller('posts')
 export class PostsController {
@@ -83,7 +83,7 @@ export class PostsController {
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatusPost(
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
     @Param('postId') postId: string,
     @Body() inputModel: LikeStatus,
@@ -129,7 +129,7 @@ export class PostsController {
   async createCommentByPost(
     @Param('postId', ObjectIdPipe) postId: string,
     @Body() inputModel: CommentInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const validatorPostId = await this.postsService.findPostById(postId);
