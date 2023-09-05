@@ -36,7 +36,7 @@ export class UsersRepository {
    * @returns Объект UserViewDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
    */
-  async getUser(userId: string): Promise<SAUserViewDTO | null> {
+  async getUser(userId: string): Promise<UserViewDTO | null> {
     try {
       if (!objectIdHelper(userId)) return null;
 
@@ -44,7 +44,18 @@ export class UsersRepository {
       if (!user) {
         return null;
       }
-      return userMappingSA(user);
+      return userMapping(user);
+    } catch (e) {
+      console.log('error usersRepository', e);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getBadBoy(userId: string): Promise<UserDocument | null> {
+    try {
+      if (!objectIdHelper(userId)) return null;
+
+      return this.userModel.findById(objectIdHelper(userId));
     } catch (e) {
       console.log('error usersRepository', e);
       throw new InternalServerErrorException();
@@ -68,7 +79,7 @@ export class UsersRepository {
     const user: UserDocument = new this.userModel(inputModel);
     await user.save();
 
-    return userMappingSA(user);
+    return userMapping(user);
   }
 
   /**

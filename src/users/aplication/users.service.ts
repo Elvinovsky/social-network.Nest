@@ -26,7 +26,7 @@ export class UsersService {
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
     return this.usersRepository.findUser(userId);
   }
-  async getUserSA(userId: string): Promise<SAUserViewDTO | null> {
+  async getUserSA(userId: string): Promise<UserViewDTO | null> {
     return this.usersRepository.getUser(userId);
   }
   async createUserForSA(
@@ -112,7 +112,7 @@ export class UsersService {
   }
 
   async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
-    const badBoy = await this.usersRepository.getUser(userId);
+    const badBoy = await this.usersRepository.getBadBoy(userId);
 
     if (!badBoy) {
       return null;
