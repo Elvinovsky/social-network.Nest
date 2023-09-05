@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -152,5 +154,38 @@ export class PostsController {
     const result = await this.postsService.createPost(inputModel);
 
     return result;
+  }
+
+  @Put(':postId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('postId', ObjectIdPipe) postId: string,
+    @Body() inputModel: PostInputModel,
+  ) {
+    const result: boolean | null = await this.postsService.updatePostSA(
+      postId,
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+  }
+
+  @Delete(':postId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(@Param('postId', ObjectIdPipe) postId: string) {
+    const result: Document | null | boolean =
+      await this.postsService.deletePost(postId);
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
   }
 }

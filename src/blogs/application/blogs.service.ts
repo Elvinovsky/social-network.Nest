@@ -28,12 +28,14 @@ export class BlogsService {
   async updateBlog(
     id: string,
     inputModel: BlogInputModel,
-    userInfo: UserInfo,
+    userInfo?: UserInfo,
   ): Promise<boolean | null | number> {
-    const validateResult: BlogDocument | null | boolean =
-      await this._isOwnerFoundBlog(id, userInfo.userId);
-    if (!validateResult) {
-      return validateResult;
+    if (userInfo) {
+      const validateResult: BlogDocument | null | boolean =
+        await this._isOwnerFoundBlog(id, userInfo.userId);
+      if (!validateResult) {
+        return validateResult;
+      }
     }
 
     return this.blogsRepository.updateBlogById(id, inputModel);
@@ -41,14 +43,15 @@ export class BlogsService {
 
   async deleteBlog(
     id: string,
-    userInfo: UserInfo,
+    userInfo?: UserInfo,
   ): Promise<Document | null | boolean> {
-    const validateResult: BlogDocument | null | boolean =
-      await this._isOwnerFoundBlog(id, userInfo.userId);
-    if (!validateResult) {
-      return validateResult;
+    if (userInfo) {
+      const validateResult: BlogDocument | null | boolean =
+        await this._isOwnerFoundBlog(id, userInfo.userId);
+      if (!validateResult) {
+        return validateResult;
+      }
     }
-
     return this.blogsRepository.deleteBlogById(id);
   }
 

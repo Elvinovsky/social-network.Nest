@@ -23,6 +23,7 @@ export class BlogIdExistenceCheck implements ValidatorConstraintInterface {
     return 'Blog with given id does not exist';
   }
 }
+
 export class PostInputModel {
   /**
    * title input  model {maxLength: 30 }

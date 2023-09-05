@@ -24,15 +24,23 @@ export class PostsService {
   async createPostByBLog(
     blogId: string,
     inputModel: BlogPostInputModel,
-    userInfo: UserInfo,
+    userInfo?: UserInfo,
   ): Promise<PostViewDTO | null | boolean> {
-    const validateResult: BlogDocument | null | boolean =
-      await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
+    if (userInfo) {
+      const validateResult: BlogDocument | null | boolean =
+        await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
-    if (!validateResult) {
-      return validateResult;
+      if (!validateResult) {
+        return validateResult;
+      }
     }
-    const newPost = Post.create(inputModel, validateResult.name, blogId);
+    const foundBlog: BlogDocument | null = await this.blogService.findById(
+      blogId,
+    );
+    if (!foundBlog) {
+      return null;
+    }
+    const newPost = Post.create(inputModel, foundBlog.name, blogId);
 
     return this.postsRepository.createPostBlog(newPost);
   }
@@ -81,17 +89,36 @@ export class PostsService {
     return this.postsRepository.updatePostById(postId, inputModel);
   }
 
+  async updatePostSA(
+    postId: string,
+    inputModel: PostInputModel,
+  ): Promise<boolean | null> {
+    const foundPost = await this.findPostById(postId);
+
+    if (!foundPost) {
+      return null;
+    }
+
+    // if (foundPost?.blogId !== blogId) {
+    //   return false;
+    // }
+
+    return this.postsRepository.updatePostById(postId, inputModel);
+  }
+
   async deletePost(
     postId: string,
-    blogId: string,
-    userInfo: UserInfo,
+    blogId?: string,
+    userInfo?: UserInfo,
   ): Promise<Document | null | boolean> {
-    // поиск блога и его принадлежности пользователю
-    const validateResult: boolean | BlogDocument | null =
-      await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
+    if (userInfo && blogId) {
+      // поиск блога и его принадлежности пользователю
+      const validateResult: boolean | BlogDocument | null =
+        await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
-    if (!validateResult) {
-      return validateResult;
+      if (!validateResult) {
+        return validateResult;
+      }
     }
     // // поиск поста по айди
     const foundPost = await this.findPostById(postId);
