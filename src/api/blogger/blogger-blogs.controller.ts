@@ -18,7 +18,6 @@ import {
   QueryInputModel,
   SearchNameTerm,
 } from '../../pagination/pagination.models';
-import { CurrentUserIdFromBearerJWT } from '../../auth/decorators/current-userId-jwt';
 import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
 import { BlogInputModel, BlogViewDTO } from '../../blogs/blog.models';
 import { JwtBearerGuard } from '../../auth/guards/jwt-bearer-auth.guard';
@@ -28,6 +27,7 @@ import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 import { PostsService } from '../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 import { UserInfo } from '../../users/user.models';
+import { CurrentSessionInfoFromAccessJWT } from '../../auth/decorators/current-session-info-jwt';
 // import { CommentsQueryRepo } from '../../comments/comments.query.repository';
 
 @Controller('blogger/blogs')
@@ -56,7 +56,7 @@ export class BloggerBlogsController {
   @HttpCode(HttpStatus.CREATED)
   async createBlog(
     @Body() inputModel: BlogInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: BlogViewDTO = await this.blogsService.createBlog(
@@ -70,7 +70,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   async getBlogs(
     @Query() query: QueryInputModel & SearchNameTerm,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
@@ -89,7 +89,7 @@ export class BloggerBlogsController {
   async updateBlog(
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | null | number = await this.blogsService.updateBlog(
@@ -112,7 +112,7 @@ export class BloggerBlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(
     @Param('blogId', ObjectIdPipe) blogId: string,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result = await this.blogsService.deleteBlog(
@@ -135,7 +135,7 @@ export class BloggerBlogsController {
   async createPost(
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Body() inputModel: BlogPostInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | PostViewDTO | null =
@@ -161,7 +161,7 @@ export class BloggerBlogsController {
   async getPostsByBlog(
     @Param('blogId') blogId: string,
     @Query() query: QueryInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
@@ -186,7 +186,7 @@ export class BloggerBlogsController {
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Param('postId', ObjectIdPipe) postId: string,
     @Body() inputModel: BlogPostInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: boolean | null = await this.postsService.updatePost(
@@ -210,7 +210,7 @@ export class BloggerBlogsController {
   async deletePost(
     @Param('blogId', ObjectIdPipe) blogId: string,
     @Param('postId', ObjectIdPipe) postId: string,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     const result: Document | null | boolean =
