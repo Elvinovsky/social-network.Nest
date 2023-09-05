@@ -13,7 +13,7 @@ export class DevicesRepository {
     });
     return !!deviceSession;
   }
-  async findDeviceIdAmongSession(
+  async findDeviceIdAmongSessions(
     deviceId: string,
   ): Promise<DeviceDocument | null> {
     return this.deviceModel.findOne({ deviceId: deviceId }).exec();
