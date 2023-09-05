@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/users.schema';
-import { PublicBlogsController } from './api/public/public-blogs.controller';
+import { BlogsController } from './blogs/blogs.controller';
 import { BlogsQueryRepo } from './blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesService } from './likes/likes.service';
@@ -58,7 +58,7 @@ import { SaBlogsController } from './api/sa/sa-blogs.controller';
     SaBlogsController,
     AppController,
     DeleteDBController,
-    PublicBlogsController,
+    BlogsController,
     BloggerBlogsController,
     PostsController,
     CommentsController,

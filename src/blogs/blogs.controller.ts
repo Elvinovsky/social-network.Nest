@@ -1,10 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -12,16 +14,38 @@ import {
   PaginatorType,
   QueryInputModel,
   SearchNameTerm,
-} from '../../pagination/pagination.models';
-import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
-import { BlogViewDTO } from '../../blogs/blog.models';
-import { PostViewDTO } from '../../posts/post.models';
-import { OptionalBearerGuard } from '../../auth/guards/optional-bearer.guard';
-import { CurrentUserIdOptional } from '../../auth/decorators/current-userId-optional.decorator';
+} from '../pagination/pagination.models';
+import { BlogsQueryRepo } from './infrastructure/repositories/blogs.query.repo';
+import { BlogInputModel, BlogViewDTO } from './blog.models';
+import { PostViewDTO } from '../posts/post.models';
+import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
+import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
+import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
+import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
+import { UserInfo } from '../users/user.models';
+import { BlogsService } from './application/blogs.service';
 
 @Controller('blogs')
-export class PublicBlogsController {
-  constructor(private readonly blogsQueryRepo: BlogsQueryRepo) {}
+export class BlogsController {
+  constructor(
+    private readonly blogsQueryRepo: BlogsQueryRepo,
+    private blogsService: BlogsService,
+  ) {}
+
+  @Post()
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async createBlog(
+    @Body() inputModel: BlogInputModel,
+    @CurrentUserIdFromBearerJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
+  ) {
+    const result: BlogViewDTO = await this.blogsService.createBlog(
+      inputModel,
+      sessionInfo.userInfo,
+    );
+    return result;
+  }
 
   @Get()
   @HttpCode(HttpStatus.OK)

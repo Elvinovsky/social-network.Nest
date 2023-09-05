@@ -28,7 +28,7 @@ import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 import { PostsService } from '../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 import { UserInfo } from '../../users/user.models';
-import { CommentsQueryRepo } from '../../comments/comments.query.repository';
+// import { CommentsQueryRepo } from '../../comments/comments.query.repository';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -36,21 +36,20 @@ export class BloggerBlogsController {
     private blogsQueryRepo: BlogsQueryRepo,
     private blogsService: BlogsService,
     private devicesService: DevicesService,
-    private postsService: PostsService,
-    private commentsQueryRepo: CommentsQueryRepo,
+    private postsService: PostsService, // private commentsQueryRepo: CommentsQueryRepo,
   ) {}
-  @Get('comments')
-  @UseGuards(JwtBearerGuard)
-  async getAllCommentsForBlogs(
-    @Query() query: QueryInputModel,
-    @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string },
-  ) {
-    return this.commentsQueryRepo.getAllCommentsForCurrentBlogger(
-      query,
-      sessionInfo.userInfo,
-    );
-  }
+  // @Get('comments')
+  // @UseGuards(JwtBearerGuard)
+  // async getAllCommentsForBlogs(
+  //   @Query() query: QueryInputModel,
+  //   @CurrentUserIdFromBearerJWT()
+  //   sessionInfo: { userInfo: UserInfo; deviceId: string },
+  // ) {
+  //   return this.commentsQueryRepo.getAllCommentsForCurrentBlogger(
+  //     query,
+  //     sessionInfo.userInfo,
+  //   );
+  // }
 
   @Post()
   @UseGuards(JwtBearerGuard)
