@@ -24,6 +24,7 @@ export class QueryInputModel {
   @IsOptional()
   sortDirection: string;
 }
+
 export class QueryBanStatus {
   @IsOptional()
   banStatus: string;

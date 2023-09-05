@@ -131,8 +131,8 @@ export class BlogsQueryRepo {
   }
   async getSortedPostsBlog(
     blogId: string,
-    pageNumber: number,
-    pageSize: number,
+    pageNumber?: number,
+    pageSize?: number,
     sortBy?: string,
     sortDirection?: string,
     userId?: string,
