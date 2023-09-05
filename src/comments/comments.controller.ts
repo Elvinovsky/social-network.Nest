@@ -20,8 +20,8 @@ import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
-import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
 import { UserInfo } from '../users/user.models';
+import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 
 @Controller('/comments')
 export class CommentsController {
@@ -51,7 +51,7 @@ export class CommentsController {
   async updateComment(
     @Param('id', ObjectIdPipe) id: string,
     @Body() inputModel: CommentInputModel,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userId: string; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
@@ -80,7 +80,7 @@ export class CommentsController {
   @UseGuards(JwtBearerGuard)
   async deleteComment(
     @Param('id', ObjectIdPipe) id: string,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userId: string; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
@@ -106,7 +106,7 @@ export class CommentsController {
   async updateLikeStatusComment(
     @Param('id', ObjectIdPipe) id: string,
     @Body() inputModel: LikeStatus,
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     // Получаем комментарий по id
