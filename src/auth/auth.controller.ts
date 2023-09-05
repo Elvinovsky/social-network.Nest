@@ -24,12 +24,7 @@ import {
 } from './auth.models';
 import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
-import {
-  UserCreateDTO,
-  UserInfo,
-  UserInputModel,
-  UserViewDTO,
-} from '../users/user.models';
+import { UserInfo, UserInputModel, UserViewDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
 import { refreshCookieOptions } from '../common/helpers';
@@ -41,8 +36,9 @@ import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserRegistrationCommand } from './application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
-import { CurrentUserIdFromBearerJWT } from './decorators/current-userId-jwt';
 import requestIp from 'request-ip';
+import { CurrentSessionInfoFromRefreshJWT } from './decorators/current-session-info-from-cookie-jwt';
+import { CurrentSessionInfoFromAccessJWT } from './decorators/current-session-info-jwt';
 
 @Controller('auth')
 export class AuthController {
@@ -94,23 +90,25 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
     //ищем юзера в БД по коду подтверждения
-    const foundUser = await this.usersService.findUserByConfirmCode(
-      codeModel.code,
-    );
+    // const foundUser = await this.usersService.findUserByConfirmCode(
+    //   codeModel.code,
+    // );
 
     //если юзер не найден или код подтвержен  возвращаем 400 ошибку.
-    if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException([
-        {
-          field: 'code',
-          message: 'user not found or code already confirmed',
-        },
-      ]);
-    }
+    // if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
+    //   throw new BadRequestException([
+    //     {
+    //       field: 'code',
+    //       message: 'user not found or code already confirmed',
+    //     },
+    //   ]);
+    // }
 
     //подтвержаем эл/почту юзера.
     await this.authService.confirmationEmail(codeModel.code);
@@ -122,18 +120,18 @@ export class AuthController {
   @Throttle(5, 10)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
-    const foundUser: UserCreateDTO | null =
-      await this.usersService.findUserByEmail(emailModel.email);
+    // const foundUser: UserCreateDTO | null =
+    //   await this.usersService.findUserByEmail(emailModel.email);
 
     // если юзер не найден или его почта уже подтвержена выдаем ошибку 400 ошибку
-    if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException([
-        {
-          field: 'email',
-          message: 'invalid email',
-        },
-      ]);
-    }
+    // if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
+    //   throw new BadRequestException([
+    //     {
+    //       field: 'email',
+    //       message: 'invalid email',
+    //     },
+    //   ]);
+    // }
 
     //обновляем код и отправляем по электронной почте
     const isSendCode = await this.authService.sendUpdateConfirmCodeByEmail(
@@ -145,6 +143,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @UseGuards(LocalAuthGuard)
   async login(
     @CurrentUserIdLocal() user: UserViewDTO,
@@ -176,15 +176,20 @@ export class AuthController {
 
   @Post('refresh-token')
   @UseGuards(JwtRefreshGuard)
-  async createRefToken(@Req() req, @Response() res) {
+  async createRefToken(
+    @CurrentSessionInfoFromRefreshJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
+    @Response() res,
+  ) {
+    debugger;
     // Создание нового access token и refreshToken.
     const newAccessToken = await this.authService.createJWTAccessToken(
-      req.userInfo,
-      req.deviceId,
+      sessionInfo.deviceId,
+      sessionInfo.userInfo,
     );
     const newRefreshToken = await this.authService.createJWTRefreshToken(
-      req.userInfo,
-      req.deviceId,
+      sessionInfo.userInfo,
+      sessionInfo.deviceId,
     );
 
     // Получение нового времени создания токена.
@@ -195,7 +200,7 @@ export class AuthController {
     // Обновление времени создания в сессии устройства.
     await this.devicesService.updateIATByDeviceSession(
       newIssuedAt,
-      req.issuedAt,
+      sessionInfo.issuedAt,
     );
 
     // Отправка нового refreshToken в куках и access token в ответе.
@@ -207,9 +212,13 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtRefreshGuard)
-  async logout(@Req() req, @Res() res) {
+  async logout(
+    @CurrentSessionInfoFromRefreshJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
+    @Res() res,
+  ) {
     // Удаление записи о сессии устройства.
-    await this.devicesService.logoutByIAT(req.issuedAt);
+    await this.devicesService.logoutByIAT(sessionInfo.issuedAt);
 
     // Удаление refreshToken из куков и отправка успешного статуса.
     return res.clearCookie('refreshToken').sendStatus(204);
@@ -253,7 +262,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtBearerGuard)
   async getMe(
-    @CurrentUserIdFromBearerJWT()
+    @CurrentSessionInfoFromAccessJWT()
     sessionInfo: {
       userInfo: UserInfo;
       deviceId: string;
