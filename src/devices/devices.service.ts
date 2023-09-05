@@ -77,6 +77,6 @@ export class DevicesService {
   }
 
   async findSessionByDeviceId(devicesId: string) {
-    return this.devicesRepository.findDeviceIdAmongSession(devicesId);
+    return this.devicesRepository.findDeviceIdAmongSessions(devicesId);
   }
 }
