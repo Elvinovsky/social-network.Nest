@@ -24,6 +24,7 @@ import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
 import { UserInfo } from '../users/user.models';
 import { BlogsService } from './application/blogs.service';
+import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -33,7 +34,7 @@ export class BlogsController {
   ) {}
 
   @Post()
-  @UseGuards(JwtBearerGuard)
+  @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createBlog(
     @Body() inputModel: BlogInputModel,
