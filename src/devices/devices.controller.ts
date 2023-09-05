@@ -5,12 +5,13 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { JwtRefreshGuard } from '../auth/guards/jwt-refresh.guard';
+import { CurrentSessionInfoFromRefreshJWT } from '../auth/decorators/current-session-info-from-cookie-jwt';
+import { UserInfo } from '../users/user.models';
 
 @Controller('security')
 export class DevicesController {
@@ -19,9 +20,13 @@ export class DevicesController {
   // Обработка запроса на получение устройств пользователя
   @Get('devices')
   @UseGuards(JwtRefreshGuard)
-  async getDevices(@Req() req, @Res() res) {
+  async getDevices(
+    @CurrentSessionInfoFromRefreshJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
+    @Res() res,
+  ) {
     // Получаем id пользователя из JwtRefreshGuard
-    const userId = req.userId.toString();
+    const userId = sessionInfo.userInfo.userId;
 
     // Ищем устройства пользователя
     const devicesSessionsByUser =
@@ -33,11 +38,15 @@ export class DevicesController {
 
   @Delete('devices')
   @UseGuards(JwtRefreshGuard)
-  async deleteDevices(@Req() req, @Res() res) {
-    const userId = req.userId.toString(); // Получаем id пользователя из запроса
+  async deleteDevices(
+    @CurrentSessionInfoFromRefreshJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
+    @Res() res,
+  ) {
+    const userId = sessionInfo.userInfo.userId; // Получаем id пользователя из запроса
 
     await this.devicesService.logoutDevicesSessionsForUser(
-      req.issuedAt,
+      sessionInfo.issuedAt,
       userId,
     ); // Выход из всех устройств пользователя кроме текущей
 
@@ -49,10 +58,11 @@ export class DevicesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteDeviceById(
     @Param('deviceId') id: string,
-    @Req() req,
+    @CurrentSessionInfoFromRefreshJWT()
+    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
     @Res() res,
   ) {
-    const userId = req.userId.toString(); // Получаем id пользователя из запроса
+    const userId = sessionInfo.userInfo.userId; // Получаем id пользователя из запроса
 
     // Выход из конкретного устройства пользователя
     const logoutDeviceSession =
