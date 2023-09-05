@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-export const CurrentUserIdFromBearerJWT = createParamDecorator(
+export const CurrentSessionInfoFromAccessJWT = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
 
@@ -15,6 +15,7 @@ export const CurrentUserIdFromBearerJWT = createParamDecorator(
     if (!sessionInfo.deviceId) {
       throw new UnauthorizedException();
     }
+
     return sessionInfo;
   },
 );
