@@ -35,6 +35,16 @@ export class Blog {
     blog.blogOwnerInfo = blogOwnerInfo;
     return blog;
   }
+  static createBlogSA(inputModel: BlogInputModel): BlogCreateDTO {
+    const blog: Blog = new Blog();
+    blog.name = inputModel.name;
+    blog.description = inputModel.description;
+    blog.websiteUrl = inputModel.websiteUrl;
+    blog.addedAt = new Date().toISOString();
+    blog.isMembership = false;
+    blog.blogOwnerInfo = { userId: 'userId', userLogin: 'SA' };
+    return blog;
+  }
   //todo
   unbindOwner(blog: BlogDocument) {
     if (blog.blogOwnerInfo.userId) {

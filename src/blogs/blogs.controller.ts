@@ -20,11 +20,7 @@ import { BlogInputModel, BlogViewDTO } from './blog.models';
 import { PostViewDTO } from '../posts/post.models';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
-import { CurrentUserIdFromBearerJWT } from '../auth/decorators/current-userId-jwt';
-import { UserInfo } from '../users/user.models';
 import { BlogsService } from './application/blogs.service';
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('blogs')
@@ -37,14 +33,9 @@ export class BlogsController {
   @Post()
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(
-    @Body() inputModel: BlogInputModel,
-    @CurrentUserIdFromBearerJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string },
-  ) {
-    const result: BlogViewDTO = await this.blogsService.createBlog(
+  async createBlog(@Body() inputModel: BlogInputModel) {
+    const result: BlogViewDTO = await this.blogsService.createBlogSA(
       inputModel,
-      sessionInfo.userInfo,
     );
     return result;
   }
