@@ -24,7 +24,12 @@ import {
 } from './auth.models';
 import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
-import { UserInfo, UserInputModel, UserViewDTO } from '../users/user.models';
+import {
+  UserCreateDTO,
+  UserInfo,
+  UserInputModel,
+  UserViewDTO,
+} from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
 import { refreshCookieOptions } from '../common/helpers';
@@ -95,21 +100,30 @@ export class AuthController {
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
-    //ищем юзера в БД по коду подтверждения
-    // const foundUser = await this.usersService.findUserByConfirmCode(
-    //   codeModel.code,
-    // );
+    // ищем юзера в БД по коду подтверждения
+    const foundUser = await this.usersService.findUserByConfirmCode(
+      codeModel.code,
+    );
 
-    //если юзер не найден или код подтвержен  возвращаем 400 ошибку.
-    // if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-    //   throw new BadRequestException([
-    //     {
-    //       field: 'code',
-    //       message: 'user not found or code already confirmed',
-    //     },
-    //   ]);
-    // }
+    //если код подтвержен  возвращаем 400 ошибку.
+    if (foundUser?.emailConfirmation.isConfirmed) {
+      throw new BadRequestException([
+        {
+          field: 'code',
+          message: 'user not found or code already confirmed',
+        },
+      ]);
+    }
 
+    //если код подтверждения протух 400 ошибку.
+    if (!foundUser?.canBeConfirmed) {
+      throw new BadRequestException([
+        {
+          field: 'code',
+          message: 'code has expired',
+        },
+      ]);
+    }
     //подтвержаем эл/почту юзера.
     await this.authService.confirmationEmail(codeModel.code);
   }
@@ -120,18 +134,18 @@ export class AuthController {
   @Throttle(5, 10)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
-    // const foundUser: UserCreateDTO | null =
-    //   await this.usersService.findUserByEmail(emailModel.email);
+    const foundUser: UserCreateDTO | null =
+      await this.usersService.findUserByEmail(emailModel.email);
 
-    // если юзер не найден или его почта уже подтвержена выдаем ошибку 400 ошибку
-    // if (!foundUser || foundUser.emailConfirmation.isConfirmed) {
-    //   throw new BadRequestException([
-    //     {
-    //       field: 'email',
-    //       message: 'invalid email',
-    //     },
-    //   ]);
-    // }
+    // если почта уже подтвержена выдаем ошибку 400 ошибку
+    if (foundUser?.emailConfirmation.isConfirmed) {
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email already confirmed',
+        },
+      ]);
+    }
 
     //обновляем код и отправляем по электронной почте
     const isSendCode = await this.authService.sendUpdateConfirmCodeByEmail(
