@@ -54,9 +54,10 @@ export class User {
 
   canBeConfirmed(expirationDate: Date) {
     if (expirationDate < new Date()) {
-      throw new Error('bad value');
+      return false;
     }
-    this.emailConfirmation.expirationDate = expirationDate;
+    this.emailConfirmation.expirationDate = 'not required';
+    return true;
   }
 }
 
