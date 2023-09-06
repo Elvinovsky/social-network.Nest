@@ -13,7 +13,6 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { WsThrottlerGuard } from './guards/throttler-behind-proxy';
 import { OptionalBearerGuard } from './guards/optional-bearer.guard';
 import { CodeExpireCheck } from './auth.models';
 import { UserRegistrationUseCase } from './application/use-cases/user-registration-use-case.';
@@ -39,7 +38,6 @@ const useCases = [UserRegistrationUseCase];
     ...useCases,
     CodeExpireCheck,
     OptionalBearerGuard,
-    WsThrottlerGuard,
     AuthService,
     BasicStrategy,
     BasicAuthGuard,
