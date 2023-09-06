@@ -76,14 +76,14 @@ export class BlogsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(
-    @Query() query: QueryInputModel & SearchNameTerm,
+    @Query() query?: QueryInputModel & SearchNameTerm,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
     return await this.blogsQueryRepo.getSortedBlogs(
-      query.searchNameTerm,
-      query.pageNumber,
-      query.pageSize,
-      query.sortBy,
-      query.sortDirection,
+      query?.searchNameTerm,
+      query?.pageNumber,
+      query?.pageSize,
+      query?.sortBy,
+      query?.sortDirection,
     );
   }
 
@@ -104,15 +104,15 @@ export class BlogsController {
   @UseGuards(OptionalBearerGuard)
   async getPostsByBlog(
     @Param('blogId') blogId: string,
-    @Query() query: QueryInputModel,
+    @Query() query?: QueryInputModel,
     @CurrentUserIdOptional() userId?: string,
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
       blogId,
-      query.pageNumber,
-      query.pageSize,
-      query.sortBy,
-      query.sortDirection,
+      query?.pageNumber,
+      query?.pageSize,
+      query?.sortBy,
+      query?.sortDirection,
       userId,
     );
 
