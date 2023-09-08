@@ -20,50 +20,68 @@ export class JwtBearerGuard implements CanActivate {
     private jwtService: JwtService,
     private configService: ConfigService<ConfigType>,
   ) {}
+
+  /**
+   *   1.Проверка наличия токена в заголовках запроса.
+   *   2.Верификация и декодирование JWT-токена.
+   *   3.Проверка, не заблокирован ли пользователь.
+   *   4.Проверка активности сессии на устройстве.
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const accessToken = this.extractTokenFromHeaders(request);
 
     if (!accessToken) {
+      // Если токен отсутствует в заголовках запроса, выбрасываем исключение UnauthorizedException.
       throw new UnauthorizedException();
     } else {
-      const payload = (await this.jwtService
+      // Пытаемся верифицировать и декодировать JWT-токен.
+      const decodedToken = (await this.jwtService
         .verifyAsync(accessToken, {
           secret: this.configService.get('auth.SECRET_ACCESS_KEY', {
             infer: true,
           }),
         })
         .catch(() => {
+          // Если верификация не удалась (например, токен истек или неверный секретный ключ), выбрасываем исключение UnauthorizedException.
           throw new UnauthorizedException();
         })) as {
         userInfo: UserInfo;
         deviceId: string;
       };
-      if (!payload) {
+
+      if (!decodedToken) {
+        // Если декодированный пейлоад отсутствует, выбрасываем исключение UnauthorizedException.
         throw new UnauthorizedException();
       }
 
-      const isBanned = await this.usersService.findUser(
-        payload.userInfo.userId,
+      // Проверяем, заблокирован ли пользователь.
+      const isUserBanned = await this.usersService.findUser(
+        decodedToken.userInfo.userId,
       );
 
+      // Проверяем, активна ли сессия на устройстве.
       const sessionActivateCheck =
-        await this.devicesService.findSessionByDeviceId(payload.deviceId);
+        await this.devicesService.findSessionByDeviceId(decodedToken.deviceId);
 
-      if (isBanned?.banInfo.isBanned || !sessionActivateCheck) {
+      if (isUserBanned?.banInfo.isBanned || !sessionActivateCheck) {
+        // Если пользователь заблокирован или сессия на устройстве не активна, выбрасываем исключение UnauthorizedException.
         throw new UnauthorizedException();
       }
 
+      // Если все проверки пройдены успешно, устанавливаем в объекте запроса пользовательские данные для дальнейшего использования в контроллерах.
       request.user = {
-        userInfo: payload.userInfo,
-        deviceId: payload.deviceId,
+        userInfo: decodedToken.userInfo,
+        deviceId: decodedToken.deviceId,
       };
     }
 
     return true;
   }
+
+  // Вспомогательная функция для извлечения JWT-токена из заголовков запроса.
   private extractTokenFromHeaders(request: Request) {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : null;
+    const [tokenType, token] = request.headers.authorization?.split(' ') ?? [];
+    return tokenType === 'Bearer' ? token : null;
   }
 }
