@@ -39,6 +39,8 @@ export class BloggerBlogsController {
     private postsService: PostsService,
     private commentsQueryRepo: CommentsQueryRepo,
   ) {}
+
+  // Получение всех комментариев для блогов текущего пользователя
   @Get('comments')
   @UseGuards(JwtBearerGuard)
   async getAllCommentsForBlogs(
@@ -52,6 +54,7 @@ export class BloggerBlogsController {
     );
   }
 
+  // Создание нового блога текущего пользователя
   @Post()
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.CREATED)
@@ -67,6 +70,7 @@ export class BloggerBlogsController {
     return result;
   }
 
+  // Получение отсортированных блогов текущего пользователя
   @Get()
   @UseGuards(JwtBearerGuard)
   async getBlogs(
@@ -84,6 +88,7 @@ export class BloggerBlogsController {
     );
   }
 
+  // Обновление блога текущего пользователя
   @Put(':blogId')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -108,6 +113,7 @@ export class BloggerBlogsController {
     }
   }
 
+  // Удаление блога текущего пользователя
   @Delete(':blogId')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -130,6 +136,7 @@ export class BloggerBlogsController {
     }
   }
 
+  // Создание нового поста в блоге текущего пользователя
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
@@ -157,7 +164,8 @@ export class BloggerBlogsController {
     return result;
   }
 
-  @Get(':blogId/posts/:postId')
+  // Получение постов в блоге текущего пользователя
+  @Get(':blogId/posts')
   @UseGuards(JwtBearerGuard)
   async getPostsByBlog(
     @Param('blogId') blogId: string,
@@ -180,6 +188,7 @@ export class BloggerBlogsController {
     return getPostsByBlogId;
   }
 
+  // Обновление поста в блоге текущего пользователя
   @Put(':blogId/posts/:postId')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -205,6 +214,7 @@ export class BloggerBlogsController {
     }
   }
 
+  // Удаление поста в блоге текущего пользователя
   @UseGuards(JwtBearerGuard)
   @Delete(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
