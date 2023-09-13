@@ -25,6 +25,7 @@ export class User {
 
   @Prop({ type: EmailConfirmationModel, required: true })
   emailConfirmation: EmailConfirmationModel;
+
   @Prop({ type: BanInfo, required: true })
   banInfo: BanInfo;
 
