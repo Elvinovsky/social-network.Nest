@@ -37,20 +37,9 @@ import { getConfiguration } from './configuration/getConfiguration';
 import { BloggerBlogsController } from './api/blogger/blogger-blogs.controller';
 import { SendSMTPAdapter } from './email/send-smtp-adapter';
 import { SaBlogsController } from './api/sa/sa-blogs.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5433,
-      username: 'postgres',
-      password: 'sa',
-      database: 'social-network',
-      autoLoadEntities: false,
-      synchronize: false,
-    }),
     configModule,
     UsersModule,
     AuthModule,
