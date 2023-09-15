@@ -14,17 +14,19 @@ import { User } from '../users.schema';
 import { DevicesService } from '../../devices/devices.service';
 import { LikesService } from '../../likes/likes.service';
 import { CommentsService } from '../../comments/comments.service';
+import { UsersPostgresRepository } from '../infrastructure/postgres/users-postgres.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly usersPostgresRepository: UsersPostgresRepository,
     private devicesService: DevicesService,
     private likesService: LikesService,
     private commentsService: CommentsService,
   ) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
-    return this.usersRepository.findUser(userId);
+    return this.usersPostgresRepository.findUser(userId);
   }
   async getUserSA(userId: string): Promise<UserViewDTO | null> {
     return this.usersRepository.getUser(userId);
@@ -33,9 +35,9 @@ export class UsersService {
     inputModel: UserInputModel,
     hash: string,
   ): Promise<UserViewDTO> {
-    const newUser: UserCreateDTO = User.Create(inputModel, hash);
+    const newUser: UserCreateDTO = User.CreateSA(inputModel, hash);
 
-    return await this.usersRepository.createUserSA(newUser);
+    return await this.usersPostgresRepository.createUser(newUser);
   }
 
   async createUserRegistration(
@@ -53,14 +55,18 @@ export class UsersService {
     );
 
     //отправляем ДТО в репозиторий
-    return this.usersRepository.createUser(newUser);
+    return this.usersPostgresRepository.createUser(newUser);
   }
 
-  async updateUser(userId: string, inputModel: UserInputModel) {
-    return this.usersRepository.updateUser(userId, inputModel);
+  async changeEmailUser(userId: string, email: string) {
+    return this.usersPostgresRepository.updateEmail(userId, email);
+  }
+
+  async changeLoginUser(userId: string, login: string) {
+    return this.usersPostgresRepository.updateLogin(userId, login);
   }
   async deleteUserById(id: string): Promise<Document | null> {
-    return this.usersRepository.deleteUserById(id);
+    return this.usersPostgresRepository.deleteUserById(id);
   }
   async deleteUserByEmail(email: string): Promise<boolean> {
     return this.usersRepository.deleteUserByEmail(email);
@@ -69,7 +75,7 @@ export class UsersService {
     return await bcrypt.hash(password, 7);
   }
 
-  async _isUserExists(
+  async _isUserAlreadyExists(
     inputModel: RegistrationInputModel,
   ): Promise<true | ResultsAuthForErrors> {
     const userEmail = await this.usersRepository.findUserByEmail(
@@ -91,15 +97,15 @@ export class UsersService {
   async findUserByEmail(email: string) {
     return this.usersRepository.findUserByEmail(email);
   }
-  async findUserByLogin(email: string) {
-    return this.usersRepository.findUserByLogin(email);
+  async findUserByLogin(login: string) {
+    return this.usersRepository.findUserByLogin(login);
   }
   async findUserByConfirmCode(code: string) {
     return this.usersRepository.findUserByCode(code);
   }
 
   async findByLoginOrEmail(loginOrEmail: string) {
-    return this.usersRepository.findUserLoginOrEmail(loginOrEmail);
+    return this.usersPostgresRepository.findUserLoginOrEmail(loginOrEmail);
   }
   async confirmationEmail(code: string) {
     return this.usersRepository.confirmEmail(code);
