@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 import {
   BanInfo,
   EmailConfirmationModel,
@@ -11,6 +12,9 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
+  @Prop({ required: true })
+  id: string;
+
   @Prop({ required: true })
   login: string;
 
@@ -32,17 +36,19 @@ export class User {
   static Create(
     inputModel: UserInputModel,
     hash: string,
-    code?: string,
-    expireDate?: Date,
+    code: string,
+    expireDate: Date,
   ): UserCreateDTO {
     const user: User = new User();
+
+    user.id = uuidv4();
     user.login = inputModel.login;
     user.passwordHash = hash;
     user.email = inputModel.email;
     user.addedAt = new Date().toISOString();
     user.emailConfirmation = {
-      confirmationCode: code || 'not required',
-      expirationDate: expireDate || 'not required',
+      confirmationCode: code,
+      expirationDate: expireDate,
       isConfirmed: true,
     };
     user.banInfo = {
@@ -52,12 +58,31 @@ export class User {
     };
     return user;
   }
+  static CreateSA(inputModel: UserInputModel, hash: string): UserCreateDTO {
+    const user: User = new User();
 
+    user.id = uuidv4();
+    user.login = inputModel.login;
+    user.passwordHash = hash;
+    user.email = inputModel.email;
+    user.addedAt = new Date().toISOString();
+    user.emailConfirmation = {
+      confirmationCode: null,
+      expirationDate: null,
+      isConfirmed: true,
+    };
+    user.banInfo = {
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+    };
+    return user;
+  }
   canBeConfirmed(expirationDate: Date) {
     if (expirationDate < new Date()) {
       return false;
     }
-    this.emailConfirmation.expirationDate = 'not required';
+    this.emailConfirmation.expirationDate = null;
     return true;
   }
 }
