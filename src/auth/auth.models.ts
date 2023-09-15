@@ -9,7 +9,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { AuthService } from './application/auth.service';
 
 export class RegistrationInputModel {
@@ -44,6 +44,16 @@ export class EmailInputModel {
    *     Email of already registered but not confirmed user
    */
 }
+
+export class LoginUpdateInputModel {
+  @Optional()
+  @Length(3, 10)
+  @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
+  /**
+   * maxLength: 10, minLength: 3, pattern: c
+   */
+}
 export class LoginInputModel {
   @IsNotEmpty()
   loginOrEmail: string;
@@ -59,7 +69,7 @@ export class CodeExpireCheck implements ValidatorConstraintInterface {
     const currentUser = await this.authService.findUserByConfirmCode(code);
     if (
       !currentUser ||
-      currentUser.emailConfirmation.expirationDate < new Date()
+      currentUser.emailConfirmation.expirationDate! < new Date()
     ) {
       return false;
     }
