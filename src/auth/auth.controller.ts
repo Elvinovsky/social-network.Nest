@@ -10,7 +10,6 @@ import {
   Post,
   PreconditionFailedException,
   Put,
-  Req,
   Request,
   Res,
   Response,
@@ -18,18 +17,14 @@ import {
 } from '@nestjs/common';
 import {
   EmailInputModel,
+  LoginUpdateInputModel,
   NewPasswordRecoveryInputModel,
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
 } from './auth.models';
 import { AuthService } from './application/auth.service';
 import { UsersService } from '../users/aplication/users.service';
-import {
-  UserCreateDTO,
-  UserInfo,
-  UserInputModel,
-  UserViewDTO,
-} from '../users/user.models';
+import { UserCreateDTO, UserInfo, UserViewDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
 import { refreshCookieOptions } from '../common/helpers';
@@ -62,7 +57,7 @@ export class AuthController {
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
-      await this.usersService._isUserExists(inputModel);
+      await this.usersService._isUserAlreadyExists(inputModel);
 
     // если находим совпадения по емайлу возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.email) {
@@ -292,15 +287,25 @@ export class AuthController {
     throw new InternalServerErrorException(); // Ошибка: что то пошло не так.
   }
 
-  @Put('email-or-login-recovery')
-  @UseGuards(JwtRefreshGuard)
-  async updateUser(@Req() req, @Body() inputModel: UserInputModel) {
+  // todo send email confirm code
+  @Put('email-recovery')
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateUser(
+    @CurrentSessionInfoFromAccessJWT()
+    sessionInfo: {
+      userInfo: UserInfo;
+      deviceId: string;
+    },
+    @Body() inputModel: EmailInputModel,
+  ) {
     //ищем юзера в БД по эл/почте
-    const isUserExists: true | ResultsAuthForErrors =
-      await this.usersService._isUserExists(inputModel);
+    const isEmailFree = await this.usersService.findUserByEmail(
+      inputModel.email,
+    );
 
     // если находим возвращаем в ответе ошибку.
-    if (isUserExists === ResultsAuthForErrors.email) {
+    if (isEmailFree) {
       throw new BadRequestException([
         {
           field: 'email',
@@ -309,8 +314,30 @@ export class AuthController {
       ]);
     }
 
+    return this.usersService.changeEmailUser(
+      sessionInfo.userInfo.userId,
+      inputModel.email,
+    );
+  }
+
+  @Put('login-recovery')
+  @UseGuards(JwtBearerGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateLogin(
+    @CurrentSessionInfoFromAccessJWT()
+    sessionInfo: {
+      userInfo: UserInfo;
+      deviceId: string;
+    },
+    @Body() inputModel: LoginUpdateInputModel,
+  ) {
+    //ищем юзера в БД по эл/почте
+    const isLoginFree = await this.usersService.findUserByLogin(
+      inputModel.login,
+    );
+
     // если находим возвращаем в ответе ошибку.
-    if (isUserExists === ResultsAuthForErrors.login) {
+    if (isLoginFree) {
       throw new BadRequestException([
         {
           field: 'login',
@@ -318,6 +345,9 @@ export class AuthController {
         },
       ]);
     }
-    return this.usersService.updateUser(req.userId, inputModel);
+    return this.usersService.changeLoginUser(
+      sessionInfo.userInfo.userId,
+      inputModel.login,
+    );
   }
 }
