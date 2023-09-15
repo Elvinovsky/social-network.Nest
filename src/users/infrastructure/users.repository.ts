@@ -84,15 +84,15 @@ export class UsersRepository {
 
   /**
    * Обновление данных пользователя на основе UserInputModel.
-   * @param user Объект пользователя для обновления.
+   * @param userId Айди пользователя для обновления.
    * @param inputModel Новые данные пользователя.
    * @returns Объект Model, представляющий результат операции обновления.
    * @Throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
    */
-  async updateUser(user, inputModel: UserInputModel) {
+  async updateUser(userId: string, inputModel: UserInputModel) {
     try {
       return this.userModel.updateOne(
-        { _id: user.id },
+        { _id: objectIdHelper(userId) },
         {
           $set: {
             login: inputModel.login,
