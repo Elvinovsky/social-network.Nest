@@ -17,6 +17,7 @@ import { CommentsService } from '../comments/comments.service';
 import { CommentsRepository } from '../comments/comments.repository';
 import { CommentMapper } from '../comments/helpers/comment.mapping';
 import { UsersPostgresRepository } from './infrastructure/postgres/users-postgres.repository';
+import { UsersPostgresQueryRepository } from './infrastructure/postgres/users-postgres-query.repository';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
@@ -33,6 +34,7 @@ const useCases = [UserRegistrationToAdminUseCase];
   providers: [
     ...useCases,
     UsersPostgresRepository,
+    UsersPostgresQueryRepository,
     LikesService,
     LikesRepository,
 
