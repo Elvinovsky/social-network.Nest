@@ -7,26 +7,23 @@ import {
   UserInputModel,
   UserViewDTO,
 } from '../user.models';
-import bcrypt from 'bcrypt';
 import { RegistrationInputModel } from '../../auth/auth.models';
 import { ResultsAuthForErrors } from '../../auth/auth.constants';
 import { User } from '../users.schema';
 import { DevicesService } from '../../devices/devices.service';
 import { LikesService } from '../../likes/likes.service';
 import { CommentsService } from '../../comments/comments.service';
-import { UsersPostgresRepository } from '../infrastructure/postgres/users-postgres.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly usersPostgresRepository: UsersPostgresRepository,
     private devicesService: DevicesService,
     private likesService: LikesService,
     private commentsService: CommentsService,
   ) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
-    return this.usersPostgresRepository.findUser(userId);
+    return this.usersRepository.findUser(userId);
   }
   async getUserSA(userId: string): Promise<UserViewDTO | null> {
     return this.usersRepository.getUser(userId);
@@ -37,7 +34,7 @@ export class UsersService {
   ): Promise<UserViewDTO> {
     const newUser: UserCreateDTO = User.CreateSA(inputModel, hash);
 
-    return await this.usersPostgresRepository.createUser(newUser);
+    return await this.usersRepository.createUser(newUser);
   }
 
   async createUserRegistration(
@@ -55,24 +52,19 @@ export class UsersService {
     );
 
     //отправляем ДТО в репозиторий
-    return this.usersPostgresRepository.createUser(newUser);
+    return this.usersRepository.createUser(newUser);
   }
 
   async changeEmailUser(userId: string, email: string) {
-    return this.usersPostgresRepository.updateEmail(userId, email);
+    return this.usersRepository.updateEmail(userId, email);
   }
 
   async changeLoginUser(userId: string, login: string) {
-    return this.usersPostgresRepository.updateLogin(userId, login);
+    return this.usersRepository.updateLogin(userId, login);
   }
+
   async deleteUserById(id: string): Promise<Document | null> {
-    return this.usersPostgresRepository.deleteUserById(id);
-  }
-  async deleteUserByEmail(email: string): Promise<boolean> {
-    return this.usersRepository.deleteUserByEmail(email);
-  }
-  async _generateHash(password: string): Promise<string> {
-    return await bcrypt.hash(password, 7);
+    return this.usersRepository.deleteUserById(id);
   }
 
   async _isUserAlreadyExists(
@@ -105,7 +97,7 @@ export class UsersService {
   }
 
   async findByLoginOrEmail(loginOrEmail: string) {
-    return this.usersPostgresRepository.findUserLoginOrEmail(loginOrEmail);
+    return this.usersRepository.findUserLoginOrEmail(loginOrEmail);
   }
   async confirmationEmail(code: string) {
     return this.usersRepository.confirmEmail(code);
@@ -118,7 +110,9 @@ export class UsersService {
   }
 
   async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
-    const badBoy = await this.usersRepository.getBadBoy(userId);
+    const badBoy: SAUserViewDTO | null = await this.usersRepository.findUser(
+      userId,
+    );
 
     if (!badBoy) {
       return null;
