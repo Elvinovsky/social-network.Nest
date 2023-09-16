@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DevicesRepository } from './devices.repository';
+import { DevicesRepository } from './infrastructure/mongo/devices.repository';
 import { SessionCreateDTO } from './device.models';
 import { Device } from './device.schemas';
 import { UserInfo } from '../users/user.models';

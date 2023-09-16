@@ -12,7 +12,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './aplication/users.service';
+import { UsersService } from './application/users.service';
 import {
   QueryInputModel,
   SearchEmailTerm,
@@ -22,7 +22,7 @@ import { UsersQueryRepository } from './infrastructure/users.query.repo';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { UserInputModel } from './user.models';
 import { ResultsAuthForErrors } from '../auth/auth.constants';
-import { UserRegistrationToAdminCommand } from './aplication/use-cases/user-registration-to-admin-use-case';
+import { UserRegistrationToAdminCommand } from './application/use-cases/user-registration-to-admin-use-case';
 import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('users')
@@ -59,7 +59,7 @@ export class UsersController {
   async createUser(@Body() inputModel: UserInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
-      await this.usersService._isUserExists(inputModel);
+      await this.usersService._isUserAlreadyExists(inputModel);
 
     // если находим совпадения по емайлу возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.email) {

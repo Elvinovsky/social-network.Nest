@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, DeviceDocument, DeviceModel } from './device.schemas';
-import { DeviceViewDTO, SessionCreateDTO } from './device.models';
-import { devicesMapper } from './device.helpers';
+import { Device, DeviceModel } from '../../device.schemas';
+import { DeviceViewDTO, SessionCreateDTO } from '../../device.models';
+import { devicesMapper } from '../../device.helpers';
 @Injectable()
 export class DevicesRepository {
   constructor(@InjectModel(Device.name) private deviceModel: DeviceModel) {}
@@ -13,10 +12,11 @@ export class DevicesRepository {
     });
     return !!deviceSession;
   }
-  async findDeviceIdAmongSessions(
-    deviceId: string,
-  ): Promise<DeviceDocument | null> {
-    return this.deviceModel.findOne({ deviceId: deviceId }).exec();
+  async findDeviceIdAmongSessions(deviceId: string): Promise<boolean> {
+    const session = await this.deviceModel
+      .findOne({ deviceId: deviceId })
+      .exec();
+    return !!session;
   }
 
   // Метод для поиска всех устройств сессии по идентификатору пользователя
@@ -31,25 +31,21 @@ export class DevicesRepository {
     }
     return devicesMapper(devicesSessions); // Применяем функцию маппинга и возвращаем массив устройств.
   }
-  async addDeviceSession(
-    deviceSession: SessionCreateDTO,
-  ): Promise<mongoose.Document> {
-    return this.deviceModel.create(deviceSession);
+  async addDeviceSession(deviceSession: SessionCreateDTO): Promise<void> {
+    await this.deviceModel.create(deviceSession);
   }
   async updateDeviceSession(
     newIssuedAt: number,
     issuedAt: number,
-  ): Promise<boolean> {
-    const updateActiveDAte = new Date().toISOString();
+  ): Promise<void> {
+    const updateActiveDate = new Date();
     const result = await this.deviceModel.updateOne(
       { issuedAt: issuedAt },
-      { $set: { issuedAt: newIssuedAt, lastActiveDate: updateActiveDAte } },
+      { $set: { issuedAt: newIssuedAt, lastActiveDate: updateActiveDate } },
     );
-    return result.matchedCount === 1;
   }
-  async deleteDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
+  async deleteDeviceSessionByIAT(issuedAt: number): Promise<void> {
     const result = await this.deviceModel.deleteOne({ issuedAt: issuedAt });
-    return result.deletedCount === 1;
   }
   async deleteDeviceSessionSpecified(
     deviceId: string,
@@ -68,13 +64,12 @@ export class DevicesRepository {
   async deleteDevicesSessionsExceptCurrent(
     issuedAt: number,
     userId: string,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const result = await this.deviceModel.deleteMany({
       'userInfo.userId': userId,
       issuedAt: { $ne: issuedAt }, // исключаем документы с определенным значением issuedAt
       status: { $nin: ['closed', 'expired'] }, // исключаем документы со статусами 'closed' и 'expired'
     });
-    return result.deletedCount === 1;
   }
   async deleteAllDevicesAdminOrder(userId: string): Promise<number> {
     const result = await this.deviceModel

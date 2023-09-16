@@ -16,9 +16,9 @@ import {
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { BanUserInputModel, UserInputModel } from '../../users/user.models';
 import { ResultsAuthForErrors } from '../../auth/auth.constants';
-import { UserRegistrationToAdminCommand } from '../../users/aplication/use-cases/user-registration-to-admin-use-case';
+import { UserRegistrationToAdminCommand } from '../../users/application/use-cases/user-registration-to-admin-use-case';
 import { CommandBus } from '@nestjs/cqrs';
-import { UsersService } from '../../users/aplication/users.service';
+import { UsersService } from '../../users/application/users.service';
 import {
   QueryBanStatus,
   QueryInputModel,
@@ -40,7 +40,7 @@ export class SaUsersController {
   async createUser(@Body() inputModel: UserInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
-      await this.usersService._isUserExists(inputModel);
+      await this.usersService._isUserAlreadyExists(inputModel);
 
     // если находим совпадения по емайлу возвращаем в ответе ошибку.
     if (isUserExists === ResultsAuthForErrors.email) {

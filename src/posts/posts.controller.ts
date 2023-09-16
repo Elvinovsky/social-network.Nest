@@ -28,7 +28,7 @@ import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
-import { UsersService } from '../users/aplication/users.service';
+import { UsersService } from '../users/application/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
 import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 import { UserInfo } from '../users/user.models';

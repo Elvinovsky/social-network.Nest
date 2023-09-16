@@ -51,17 +51,6 @@ export class UsersRepository {
     }
   }
 
-  async getBadBoy(userId: string): Promise<UserDocument | null> {
-    try {
-      if (!objectIdHelper(userId)) return null;
-
-      return this.userModel.findById(objectIdHelper(userId));
-    } catch (e) {
-      console.log('error usersRepository', e);
-      throw new InternalServerErrorException();
-    }
-  }
-
   /**
    * Создание нового пользователя на основе данных из UserCreateDTO.
    * @param inputModel Данные для создания пользователя.
@@ -73,37 +62,6 @@ export class UsersRepository {
     await user.save();
 
     return userMapping(user);
-  }
-
-  async createUserSA(inputModel: UserCreateDTO): Promise<UserViewDTO> {
-    const user: UserDocument = new this.userModel(inputModel);
-    await user.save();
-
-    return userMapping(user);
-  }
-
-  /**
-   * Обновление данных пользователя на основе UserInputModel.
-   * @param userId Айди пользователя для обновления.
-   * @param inputModel Новые данные пользователя.
-   * @returns Объект Model, представляющий результат операции обновления.
-   * @Throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
-   */
-  async updateUser(userId: string, inputModel: UserInputModel) {
-    try {
-      return this.userModel.updateOne(
-        { _id: objectIdHelper(userId) },
-        {
-          $set: {
-            login: inputModel.login,
-            email: inputModel.email,
-          },
-        },
-      );
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
-    }
   }
 
   /**
@@ -244,7 +202,7 @@ export class UsersRepository {
    */
   async updateConfirmationCodeByEmail(email: string, newCode: string) {
     try {
-      const isUpdate = await this.userModel
+      const isUpdated = await this.userModel
         .updateOne(
           {
             email: email,
@@ -252,34 +210,7 @@ export class UsersRepository {
           { $set: { 'emailConfirmation.confirmationCode': newCode } },
         )
         .exec();
-      return isUpdate.matchedCount === 1;
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  /**
-   * Поиск пользователя по логину и адресу электронной почты.
-   * @param login Логин пользователя.
-   * @param email Адрес электронной почты пользователя.
-   * @returns Объект UserDocument, представляющий пользователя, или null, если пользователь не найден.
-   * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
-   */
-  async findUserByLoginAndEmail(login: string, email: string) {
-    try {
-      // Ищем пользователя в базе данных по логину или адресу электронной почты
-      const user = await this.userModel
-        .findOne({ $or: [{ login: login }, { email: email }] })
-        .exec();
-
-      // Если пользователь не найден, возвращаем null
-      if (!user) {
-        return null;
-      }
-
-      // Возвращаем найденного пользователя
-      return user;
+      return isUpdated.matchedCount === 1;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -340,10 +271,42 @@ export class UsersRepository {
           },
         },
       );
-      return updateResult.matchedCount;
+      return updateResult.matchedCount === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');
+    }
+  }
+
+  async updateEmail(userId: string, email: string) {
+    try {
+      const updateResult = await this.userModel.updateOne(
+        { id: userId },
+        {
+          $set: {
+            email: email,
+          },
+        },
+      );
+      return updateResult.matchedCount === 1;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+  async updateLogin(userId: string, login: string) {
+    try {
+      return this.userModel.updateOne(
+        { id: userId },
+        {
+          $set: {
+            login: login,
+          },
+        },
+      );
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
   }
 }

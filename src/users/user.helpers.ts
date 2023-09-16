@@ -15,7 +15,7 @@ export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
 
 export const userMapping = (user: UserDocument): UserViewDTO => {
   return {
-    id: user._id.toString(),
+    id: user.id,
     login: user.login,
     email: user.email,
     createdAt: user.addedAt,

@@ -23,6 +23,7 @@ export class UserInputModel {
 }
 
 export class UserCreateDTO {
+  id: string;
   login: string;
   passwordHash: string;
   email: string;
@@ -31,12 +32,9 @@ export class UserCreateDTO {
   banInfo: BanInfo;
 }
 
-export type UserMethodType = {
-  canBeConfirmed: () => boolean;
-};
 export class EmailConfirmationModel {
-  confirmationCode: string;
-  expirationDate: Date | string;
+  confirmationCode: string | null;
+  expirationDate: Date | null;
   isConfirmed: boolean;
 }
 

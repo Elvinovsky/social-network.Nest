@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { DevicesService } from '../../devices/devices.service';
-import { UsersService } from '../../users/aplication/users.service';
+import { UsersService } from '../../users/application/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../configuration/getConfiguration';

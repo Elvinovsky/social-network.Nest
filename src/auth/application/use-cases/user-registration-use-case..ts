@@ -1,4 +1,4 @@
-import { UsersService } from '../../../users/aplication/users.service';
+import { UsersService } from '../../../users/application/users.service';
 import { EmailSenderService } from '../../../email/email.service';
 import { RegistrationInputModel } from '../../auth.models';
 import { v4 as uuidv4 } from 'uuid';
