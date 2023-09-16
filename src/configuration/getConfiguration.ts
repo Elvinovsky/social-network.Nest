@@ -11,10 +11,21 @@ export const getConfiguration = () => ({
     REFRESH_TOKEN_EXPIRATION_TIME:
       process.env.REFRESH_TOKEN_EXPIRATION_TIME ?? '20h',
   },
-  db: {
+  repo_type: process.env.REPO_TYPE,
+  mongoDBOptions: {
     DB_NAME: process.env.DB_NAME,
     MONGO_URI:
       process.env.MONGO_URL ?? `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`,
+  },
+  sqlOptions: {
+    type: 'postgres',
+    host: 'localhost',
+    port: 5433,
+    username: 'postgres',
+    password: 'sa',
+    database: 'social-network',
+    autoLoadEntities: false,
+    synchronize: false,
   },
 });
 
