@@ -24,7 +24,7 @@ export type SessionCreateDTO = {
   issuedAt: number;
   ip: string | null;
   title: string | null;
-  lastActiveDate: string;
+  lastActiveDate: Date;
   expirationDate: Date;
 };
 

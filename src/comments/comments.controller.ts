@@ -15,7 +15,7 @@ import { CommentsService } from './comments.service';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { CommentInputModel } from './comment.models';
-import { UsersService } from '../users/aplication/users.service';
+import { UsersService } from '../users/application/users.service';
 import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';

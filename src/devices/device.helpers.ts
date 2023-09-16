@@ -6,9 +6,9 @@ export const devicesMapper = (
 ): DeviceViewDTO[] => {
   return array.map((el) => {
     return {
-      ip: el.ip ? el.ip : 'ip',
-      title: el.title ? el.title : 'Device Name',
-      lastActiveDate: el.lastActiveDate,
+      ip: el.ip,
+      title: el.title,
+      lastActiveDate: el.lastActiveDate.toISOString(),
       deviceId: el.deviceId,
     };
   });

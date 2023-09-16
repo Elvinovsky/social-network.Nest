@@ -20,7 +20,7 @@ export class Device {
   @Prop({ required: true })
   title: string;
   @Prop({ required: true })
-  lastActiveDate: string;
+  lastActiveDate: Date;
   @Prop({ required: true })
   expirationDate: Date;
 
@@ -38,7 +38,7 @@ export class Device {
     newSession.issuedAt = issuedAt;
     newSession.ip = ip ?? 'ip';
     newSession.title = deviceName ?? 'deviceName';
-    newSession.lastActiveDate = new Date().toISOString();
+    newSession.lastActiveDate = new Date();
     newSession.expirationDate = add(new Date(), {
       seconds: 20,
       //minutes:20

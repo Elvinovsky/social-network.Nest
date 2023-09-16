@@ -23,7 +23,7 @@ import {
   RegistrationInputModel,
 } from './auth.models';
 import { AuthService } from './application/auth.service';
-import { UsersService } from '../users/aplication/users.service';
+import { UsersService } from '../users/application/users.service';
 import { UserCreateDTO, UserInfo, UserViewDTO } from '../users/user.models';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUserIdLocal } from './decorators/current-user-id-local.decorator';
@@ -111,7 +111,10 @@ export class AuthController {
     }
 
     //если код подтверждения протух 400 ошибку.
-    if (!foundUser?.canBeConfirmed) {
+    if (
+      !foundUser ||
+      foundUser.emailConfirmation.expirationDate! < new Date()
+    ) {
       throw new BadRequestException([
         {
           field: 'code',

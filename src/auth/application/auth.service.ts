@@ -1,12 +1,11 @@
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { UsersService } from '../../users/aplication/users.service';
+import { UsersService } from '../../users/application/users.service';
 import bcrypt from 'bcrypt';
 import { NewPasswordRecoveryInputModel } from '../auth.models';
-import { SAUserViewDTO, UserInfo } from '../../users/user.models';
+import { UserInfo } from '../../users/user.models';
 import { EmailSenderService } from '../../email/email.service';
 import { JwtService } from '@nestjs/jwt';
-import { userMappingSA } from '../../users/user.helpers';
 import { DevicesService } from '../../devices/devices.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigType } from '../../configuration/getConfiguration';
@@ -82,10 +81,7 @@ export class AuthService {
 
     return true;
   }
-  async checkCredentials(
-    loginOrEmail: string,
-    password: string,
-  ): Promise<SAUserViewDTO | null> {
+  async checkCredentials(loginOrEmail: string, password: string) {
     //ищем юзера в БД по логину или эл/почте
     const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
 
@@ -102,7 +98,7 @@ export class AuthService {
 
     // если сверка прошла успешна возвращаем SAUserViewDto в ином случае null.
     if (isHashesEquals) {
-      return userMappingSA(user);
+      return user;
     } else {
       return null;
     }
