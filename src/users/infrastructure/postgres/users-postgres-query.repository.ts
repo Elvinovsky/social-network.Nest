@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { PaginatorType } from '../../../pagination/pagination.models';
-import { UserViewDTO } from '../../user.models';
+import { MeViewModel, UserViewDTO } from '../../user.models';
 import {
   getDirection,
   getPageNumber,
@@ -13,9 +13,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
-export class UsersPostgresQueryRepository {
+export class UsersRawSQLQueryRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
-  async getSortedUsers(
+  async getSortedUsersForSA(
     searchEmailTerm?: string,
     searchLoginTerm?: string,
     pageNumber?: number,
@@ -73,6 +73,26 @@ export class UsersPostgresQueryRepository {
       pageSize: getPageSize(pageSize),
       totalCount: +calculateOfFiles[0].totalCount,
       items: usersMap,
+    };
+  }
+  async getUserInfo(id: string): Promise<MeViewModel | null> {
+    const user = await this.dataSource.query(
+      `
+    SELECT "email", "login", "id"
+    FROM "user"."accountData"
+    WHERE "id" = $1
+    `,
+      [id],
+    );
+
+    if (user[0].length < 1) {
+      return null;
+    }
+
+    return {
+      email: user[0].email,
+      login: user[0].login,
+      userId: user[0].id,
     };
   }
 }
