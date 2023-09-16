@@ -37,25 +37,19 @@ import { getConfiguration } from './configuration/getConfiguration';
 import { BloggerBlogsController } from './api/blogger/blogger-blogs.controller';
 import { SendSMTPAdapter } from './email/send-smtp-adapter';
 import { SaBlogsController } from './api/sa/sa-blogs.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5433,
-      username: 'postgres',
-      password: 'sa',
-      database: 'social-network',
-      autoLoadEntities: false,
-      synchronize: false,
-    }),
     configModule,
     UsersModule,
     AuthModule,
     DevicesModule,
-    MongooseModule.forRoot(getConfiguration().db.MONGO_URI),
+    TypeOrmModule.forRoot(
+      getConfiguration().sqlOptions as TypeOrmModuleOptions,
+    ),
+    MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
@@ -77,7 +71,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [
     BlogIdExistenceCheck,
     AppService,
-    DeleteDbRepository,
+    {
+      provide: DeleteDbRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? DeleteDbRepository
+          : DeleteDbSQLRepository,
+    },
 
     EmailSenderService,
     SendSMTPAdapter,
