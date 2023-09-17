@@ -25,7 +25,7 @@ export class User {
   email: string;
 
   @Prop({ required: true })
-  addedAt: string;
+  addedAt: Date;
 
   @Prop({ type: EmailConfirmationModel, required: true })
   emailConfirmation: EmailConfirmationModel;
@@ -45,11 +45,11 @@ export class User {
     user.login = inputModel.login;
     user.passwordHash = hash;
     user.email = inputModel.email;
-    user.addedAt = new Date().toISOString();
+    user.addedAt = new Date();
     user.emailConfirmation = {
       confirmationCode: code,
       expirationDate: expireDate,
-      isConfirmed: true,
+      isConfirmed: false,
     };
     user.banInfo = {
       isBanned: false,
@@ -65,7 +65,7 @@ export class User {
     user.login = inputModel.login;
     user.passwordHash = hash;
     user.email = inputModel.email;
-    user.addedAt = new Date().toISOString();
+    user.addedAt = new Date();
     user.emailConfirmation = {
       confirmationCode: null,
       expirationDate: null,
