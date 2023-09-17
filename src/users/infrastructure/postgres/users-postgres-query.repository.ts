@@ -16,6 +16,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 export class UsersRawSQLQueryRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getSortedUsersForSA(
+    banStatus: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
     pageNumber?: number,
@@ -23,7 +24,6 @@ export class UsersRawSQLQueryRepository {
     sortBy?: string,
     sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
-    debugger;
     const getEmailTerm = (searchEmailTerm?: string): string => {
       return searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
     };
@@ -34,9 +34,11 @@ export class UsersRawSQLQueryRepository {
     const queryString = `
         SELECT u."id", u."login", u."email", u."addedAt" as "createdAt"
         FROM "user"."accountData" u
-        WHERE u."login" LIKE $1 and u."email" LIKE $2
-        ORDER BY "${getSortBy(sortBy)}" ${getDirection(sortDirection)}
-        OFFSET $3 LIMIT $4`;
+        WHERE u."login" ilike $1 or u."email" ilike $2
+        ORDER BY "${getSortBy(sortBy)}" ${
+      getDirection(sortDirection) === 1 ? 'Asc' : 'Desc'
+    }
+      OFFSET $3 LIMIT $4`;
 
     const users = await this.dataSource.query(queryString, [
       getLoginTerm(searchLoginTerm),
@@ -50,25 +52,24 @@ export class UsersRawSQLQueryRepository {
         id: el.id,
         login: el.login,
         email: el.email,
-        createdAt: el.createdAt,
+        createdAt: el.createdAt.toISOString(),
       };
     });
 
     const calculateOfFiles = await this.dataSource.query(
       `
-     SELECT COUNT(u.*) as "totalCount"
+     SELECT COUNT(*) as "totalCount"
+        FROM ( SELECT u."id", u."login", u."email", u."addedAt" as "createdAt"
         FROM "user"."accountData" u
-        WHERE u."login" LIKE $1 and u."email" LIKE $2
-        OFFSET $3 LIMIT $4`,
-      [
-        getLoginTerm(searchLoginTerm),
-        getEmailTerm(searchEmailTerm),
-        getSkip(getPageNumber(pageNumber), getPageSize(pageSize)),
-        getPageSize(pageSize),
-      ],
+        WHERE u."login" ilike $1 or u."email" ilike $2)
+        `,
+      [getLoginTerm(searchLoginTerm), getEmailTerm(searchEmailTerm)],
     );
     return {
-      pagesCount: pagesCountOfBlogs(+calculateOfFiles[0].totalCount, pageSize),
+      pagesCount: pagesCountOfBlogs(
+        +calculateOfFiles[0].totalCount,
+        getPageSize(pageSize),
+      ),
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: +calculateOfFiles[0].totalCount,
