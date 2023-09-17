@@ -8,7 +8,6 @@ export class DevicesRawSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async findDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
-    debugger;
     const deviceSession = await this.dataSource.query(
       `
     SELECT d.*
@@ -30,7 +29,7 @@ export class DevicesRawSqlRepository {
   }
 
   // Метод для поиска всех устройств сессии по идентификатору пользователя
-  async findDevicesSessionsByUserId(
+  async getDevicesSessionsByUserId(
     userId: string,
   ): Promise<DeviceViewDTO[] | null> {
     const devicesSessions = await this.dataSource.query(
@@ -47,6 +46,7 @@ export class DevicesRawSqlRepository {
 
     return devicesSessions.map((el) => {
       return {
+        id: el.id,
         ip: el.ip,
         title: el.title,
         lastActiveDate: el.lastActiveDate.toISOString(),
