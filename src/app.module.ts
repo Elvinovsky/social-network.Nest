@@ -48,7 +48,7 @@ import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.rep
     DevicesModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: '127.0.0.1',
       port: 5433,
       username: 'postgres',
       password: 'sa',
