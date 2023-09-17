@@ -37,15 +37,17 @@ export class DevicesRepository {
   async updateDeviceSession(
     newIssuedAt: number,
     issuedAt: number,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const updateActiveDate = new Date();
     const result = await this.deviceModel.updateOne(
       { issuedAt: issuedAt },
       { $set: { issuedAt: newIssuedAt, lastActiveDate: updateActiveDate } },
     );
+    return result.matchedCount === 1;
   }
-  async deleteDeviceSessionByIAT(issuedAt: number): Promise<void> {
+  async deleteDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
     const result = await this.deviceModel.deleteOne({ issuedAt: issuedAt });
+    return result.deletedCount === 1;
   }
   async deleteDeviceSessionSpecified(
     deviceId: string,
@@ -64,12 +66,13 @@ export class DevicesRepository {
   async deleteDevicesSessionsExceptCurrent(
     issuedAt: number,
     userId: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const result = await this.deviceModel.deleteMany({
       'userInfo.userId': userId,
       issuedAt: { $ne: issuedAt }, // исключаем документы с определенным значением issuedAt
       status: { $nin: ['closed', 'expired'] }, // исключаем документы со статусами 'closed' и 'expired'
     });
+    return result.deletedCount > 1;
   }
   async deleteAllDevicesAdminOrder(userId: string): Promise<number> {
     const result = await this.deviceModel

@@ -6,7 +6,6 @@ import {
   BanUserInputModel,
   SAUserViewDTO,
   UserCreateDTO,
-  UserInputModel,
   UserViewDTO,
 } from '../user.models';
 import { userMapping, userMappingSA } from '../user.helpers';
@@ -250,7 +249,7 @@ export class UsersRepository {
           },
         },
       );
-      return updateResult.matchedCount;
+      return updateResult.matchedCount === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');

@@ -74,7 +74,7 @@ export class UsersRawSQLRepository {
         id: user[0].id,
         login: user[0].login,
         email: user[0].email,
-        createdAt: user[0].addedAt,
+        createdAt: user[0].addedAt.toISOString(),
       };
     } catch (e) {
       console.log('error usersRepository', e);
@@ -100,7 +100,7 @@ export class UsersRawSQLRepository {
       id: user[0].id,
       login: user[0].login,
       email: user[0].email,
-      createdAt: user[0].addedAt,
+      createdAt: user[0].addedAt.toISOString(),
       banInfo: {
         isBanned: user[0].isBanned,
         banDate: user[0].banDate,
@@ -112,12 +112,14 @@ export class UsersRawSQLRepository {
   async findUserByEmail(email: string): Promise<UserCreateDTO | null> {
     const user = await this.dataSource.query(
       `
-            SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", e."isConfirmed", e."expirationDate", e."confirmationCode", b."isBanned", b."banDate", b."banReason"
+            SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", 
+                   e."isConfirmed", e."expirationDate", e."confirmationCode", 
+                   b."isBanned", b."banDate", b."banReason"
             FROM "user"."accountData" u
             LEFT JOIN "user"."emailConfirmation" e
             ON u."id" = e."userId" 
             LEFT JOIN "user"."banInfo" b
-            ON u."id" = e."userId" 
+            ON u."id" = b."userId" 
             WHERE u."email" = $1
             `,
       [email],
@@ -150,7 +152,7 @@ export class UsersRawSQLRepository {
             LEFT JOIN "user"."emailConfirmation" e
             ON u."id" = e."userId" 
             LEFT JOIN "user"."banInfo" b
-            ON u."id" = e."userId" 
+            ON u."id" = b."userId" 
             WHERE u."login" = $1
             `,
       [login],
@@ -220,7 +222,7 @@ export class UsersRawSQLRepository {
         id: inputModel.id,
         login: inputModel.login,
         email: inputModel.email,
-        createdAt: inputModel.addedAt,
+        createdAt: inputModel.addedAt.toISOString(),
       };
     } catch (e) {
       console.log(e);
@@ -261,13 +263,15 @@ export class UsersRawSQLRepository {
 
   async deleteUserById(userId: string): Promise<Document | null> {
     try {
-      return this.dataSource.query(
+      const result = await this.dataSource.query(
         `
       DELETE FROM "user"."accountData"
         WHERE "id" = $1;
       `,
         [userId],
       );
+      if (result[1] !== 1) return null;
+      return result;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -288,9 +292,7 @@ export class UsersRawSQLRepository {
       [code],
     );
     // Если пользователь не найден, возвращаем null
-    if (!user) {
-      return null;
-    }
+    if (user.length < 1) return null;
 
     // Возвращаем найденного пользователя
     return {
@@ -353,7 +355,7 @@ export class UsersRawSQLRepository {
     `,
       [email, newCode],
     );
-    return update[0].update === 1;
+    return update[1] === 1;
   }
 
   async updatePasswordForUser(hash: string, code: string) {
@@ -372,7 +374,7 @@ export class UsersRawSQLRepository {
         [hash, code],
       );
 
-      return result[0].result === 1;
+      return result[1] === 1;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -393,7 +395,7 @@ export class UsersRawSQLRepository {
                 `,
         [inputModel.isBanned, inputModel.banReason, userId],
       );
-      return updateResult[0].update === 1;
+      return updateResult[1] === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');
@@ -415,6 +417,7 @@ export class UsersRawSQLRepository {
                 `,
         [inputModel.isBanned, userId],
       );
+      return updateResult[1] === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');

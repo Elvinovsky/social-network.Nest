@@ -8,11 +8,12 @@ export class DevicesRawSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async findDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
+    debugger;
     const deviceSession = await this.dataSource.query(
       `
-    SELECT "issuedAt"
-    FROM "devices"."sessions"
-    WHERE "issuedAt" = $1`,
+    SELECT d.*
+    FROM "devices"."sessions" d
+    WHERE d."issuedAt" = $1`,
       [issuedAt],
     );
     return deviceSession.length === 1;
@@ -74,7 +75,7 @@ export class DevicesRawSqlRepository {
   async updateDeviceSession(
     newIssuedAt: number,
     issuedAt: number,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const updateActiveDate = new Date();
     const result = await this.dataSource.query(
       `
@@ -84,14 +85,17 @@ export class DevicesRawSqlRepository {
      `,
       [newIssuedAt, issuedAt, updateActiveDate],
     );
+    console.log(result);
+    return result[1] === 1;
   }
-  async deleteDeviceSessionByIAT(issuedAt: number): Promise<void> {
+  async deleteDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
     const result = await this.dataSource.query(
       `
     DELETE FROM "devices"."sessions"
     WHERE "issuedAt" = $1`,
       [issuedAt],
     );
+    return result[1] === 1;
   }
   async deleteDeviceSessionSpecified(
     deviceId: string,
@@ -103,14 +107,14 @@ export class DevicesRawSqlRepository {
      WHERE "id" = $1 and "userId" = $2`,
       [deviceId, userId],
     );
-    return result[0].length === 1;
+    return result[1] === 1;
   }
 
   // Метод для удаления всех сессий устройств пользователя, кроме определенной по времени создания (issuedAt)
   async deleteDevicesSessionsExceptCurrent(
     issuedAt: number,
     userId: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const result = await this.dataSource.query(
       `
     DELETE FROM "devices"."sessions"
@@ -118,6 +122,7 @@ export class DevicesRawSqlRepository {
     `,
       [issuedAt, userId],
     );
+    return result[1] >= 1;
   }
   async deleteAllDevicesAdminOrder(userId: string): Promise<number> {
     const result = await this.dataSource.query(
@@ -126,6 +131,6 @@ export class DevicesRawSqlRepository {
     WHERE "userId" = $1`,
       [userId],
     );
-    return result[0].length;
+    return result[1];
   }
 }

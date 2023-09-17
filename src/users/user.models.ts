@@ -27,7 +27,7 @@ export class UserCreateDTO {
   login: string;
   passwordHash: string;
   email: string;
-  addedAt: string;
+  addedAt: Date;
   emailConfirmation: EmailConfirmationModel;
   banInfo: BanInfo;
 }

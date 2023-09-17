@@ -7,7 +7,7 @@ export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
       id: el._id.toString(),
       login: el.login,
       email: el.email,
-      createdAt: el.addedAt,
+      createdAt: el.addedAt.toISOString(),
       banInfo: el.banInfo,
     };
   });
@@ -18,7 +18,7 @@ export const userMapping = (user: UserDocument): UserViewDTO => {
     id: user.id,
     login: user.login,
     email: user.email,
-    createdAt: user.addedAt,
+    createdAt: user.addedAt.toISOString(),
   };
 };
 
@@ -28,7 +28,7 @@ export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
       id: el._id.toString(),
       login: el.login,
       email: el.email,
-      createdAt: el.addedAt,
+      createdAt: el.addedAt.toISOString(),
     };
   });
 };
@@ -38,7 +38,7 @@ export const userMappingSA = (user: UserDocument): SAUserViewDTO => {
     id: user._id.toString(),
     login: user.login,
     email: user.email,
-    createdAt: user.addedAt,
+    createdAt: user.addedAt.toISOString(),
     banInfo: user.banInfo,
   };
 };

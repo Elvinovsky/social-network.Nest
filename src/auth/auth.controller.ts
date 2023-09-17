@@ -52,8 +52,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -100,21 +100,15 @@ export class AuthController {
       codeModel.code,
     );
 
-    //если код подтвержен  возвращаем 400 ошибку.
-    if (foundUser?.emailConfirmation.isConfirmed) {
-      throw new BadRequestException([
-        {
-          field: 'code',
-          message: 'user not found or code already confirmed',
-        },
-      ]);
+    if (!foundUser) {
+      throw new BadRequestException({
+        field: 'code',
+        message: 'code not exists',
+      });
     }
 
     //если код подтверждения протух 400 ошибку.
-    if (
-      !foundUser ||
-      foundUser.emailConfirmation.expirationDate! < new Date()
-    ) {
+    if (foundUser.emailConfirmation.expirationDate! < new Date()) {
       throw new BadRequestException([
         {
           field: 'code',
@@ -135,8 +129,17 @@ export class AuthController {
     const foundUser: UserCreateDTO | null =
       await this.usersService.findUserByEmail(emailModel.email);
 
+    if (foundUser === null) {
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email not exists',
+        },
+      ]);
+    }
+
     // если почта уже подтвержена выдаем ошибку 400 ошибку
-    if (foundUser?.emailConfirmation.isConfirmed) {
+    if (foundUser.emailConfirmation.isConfirmed) {
       throw new BadRequestException([
         {
           field: 'email',
@@ -162,7 +165,7 @@ export class AuthController {
     @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,
     @Request() req,
-    @Response() res,
+    @Response({ passthrough: true }) res,
   ) {
     const ipAddress = requestIp.getClientIp(req);
     const userInfo: UserInfo = {
@@ -193,7 +196,6 @@ export class AuthController {
     sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
     @Response() res,
   ) {
-    debugger;
     // Создание нового access token и refreshToken.
     const newAccessToken = await this.authService.createJWTAccessToken(
       sessionInfo.deviceId,

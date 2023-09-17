@@ -24,7 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
       id: user.id,
       login: user.login,
       email: user.email,
-      createdAt: user.addedAt,
+      createdAt: user.addedAt.toISOString(),
     } as UserViewDTO;
   }
 }

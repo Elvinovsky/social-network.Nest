@@ -42,6 +42,7 @@ export class UsersQueryRepository {
       };
     }
     const calculateOfFiles = await this.userModel.countDocuments(filter);
+
     const foundUsers: UserDocument[] = await this.userModel
       .find(filter)
       .sort({
