@@ -15,14 +15,15 @@ export class DevicesRawSqlRepository {
     WHERE d."issuedAt" = $1`,
       [issuedAt],
     );
+    console.log('SessionByIAT', deviceSession);
     return deviceSession.length === 1;
   }
   async findDeviceIdAmongSessions(deviceId: string): Promise<boolean> {
     const deviceSession = await this.dataSource.query(
       `
-    SELECT "id"
-    FROM "devices"."sessions"
-    WHERE "id" = $1`,
+    SELECT d."id"
+    FROM "devices"."sessions" d
+    WHERE d."id" = $1`,
       [deviceId],
     );
     return deviceSession.length === 1;
@@ -46,11 +47,10 @@ export class DevicesRawSqlRepository {
 
     return devicesSessions.map((el) => {
       return {
-        id: el.id,
+        deviceId: el.id,
         ip: el.ip,
         title: el.title,
         lastActiveDate: el.lastActiveDate.toISOString(),
-        deviceId: el.deviceId,
       };
     }); //  возвращаем массив устройств.
   }

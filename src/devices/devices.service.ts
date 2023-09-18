@@ -6,8 +6,9 @@ import { UserInfo } from '../users/user.models';
 @Injectable()
 export class DevicesService {
   constructor(protected devicesRepository: DevicesRepository) {}
-  async findDevicesSessionsByUserId(userId: string) {
-    return this.devicesRepository.findDevicesSessionsByUserId(userId);
+
+  async getDevicesSessionsByUserId(userId: string) {
+    return this.devicesRepository.getDevicesSessionsByUserId(userId);
   }
 
   async createDeviceSession(
@@ -58,6 +59,7 @@ export class DevicesService {
         issuedAt,
         userId,
       );
+    console.log('logoutSessions', result);
     return result;
   }
 
