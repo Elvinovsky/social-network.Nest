@@ -20,7 +20,7 @@ export class DevicesRepository {
   }
 
   // Метод для поиска всех устройств сессии по идентификатору пользователя
-  async findDevicesSessionsByUserId(
+  async getDevicesSessionsByUserId(
     userId: string,
   ): Promise<DeviceViewDTO[] | null> {
     const devicesSessions = await this.deviceModel.find({

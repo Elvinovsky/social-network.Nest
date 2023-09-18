@@ -15,13 +15,13 @@ export class SendSMTPAdapter {
         },
       });
 
-      await transporter.verify((r, e) => {
-        console.log(e);
-      });
+      await transporter.verify();
 
-      transporter.sendMail(mailOptions, (r, e) => {
+      transporter.sendMail(
+        mailOptions /*(r, e) => {
         console.log(e);
-      });
+      }*/,
+      );
 
       return true;
     } catch (err) {

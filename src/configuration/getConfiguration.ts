@@ -7,9 +7,9 @@ export const getConfiguration = () => ({
     SECRET_ACCESS_KEY: process.env.ACCESS_JWT_SECRET_KEY ?? 'r=key',
     SECRET_REFRESH_KEY: process.env.REFRESH_JWT_SECRET_KEY ?? 'l=key',
     ACCESS_TOKEN_EXPIRATION_TIME:
-      process.env.ACCESS_TOKEN_EXPIRATION_TIME ?? '10h',
+      process.env.ACCESS_TOKEN_EXPIRATION_TIME ?? '10s',
     REFRESH_TOKEN_EXPIRATION_TIME:
-      process.env.REFRESH_TOKEN_EXPIRATION_TIME ?? '20h',
+      process.env.REFRESH_TOKEN_EXPIRATION_TIME ?? '20s',
   },
   repo_type: process.env.REPO_TYPE,
   mongoDBOptions: {

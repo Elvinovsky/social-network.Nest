@@ -37,14 +37,14 @@ export class JwtRefreshGuard implements CanActivate {
 
     const payload = this.verifyRefreshToken(refreshToken);
 
-    await this.verifyDeviceSession(payload.iat);
+    await this.verifyDeviceSession(payload.issuedAt);
     await this.verifyUser(payload.userInfo.userId);
 
     // Если все проверки пройдены, то добавляем информацию о пользователе в запрос
     request.user = {
       userInfo: payload.userInfo,
       deviceId: payload.deviceId,
-      issuedAt: payload.iat,
+      issuedAt: payload.issuedAt,
     };
 
     return true;
@@ -73,14 +73,14 @@ export class JwtRefreshGuard implements CanActivate {
   private verifyRefreshToken(refreshToken: string): {
     userInfo: UserInfo;
     deviceId: string;
-    iat: number;
+    issuedAt: number;
   } {
     try {
       return this.jwtService.verify(refreshToken, {
         secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
           infer: true,
         }),
-      }) as { userInfo: UserInfo; deviceId: string; iat: number };
+      }) as { userInfo: UserInfo; deviceId: string; issuedAt: number };
     } catch {
       throw new UnauthorizedException();
     }
@@ -92,9 +92,9 @@ export class JwtRefreshGuard implements CanActivate {
    * @param iat Время выдачи токена
    * @throws UnauthorizedException, если сессия устройства не найдена
    */
-  private async verifyDeviceSession(iat: number): Promise<void> {
+  private async verifyDeviceSession(issuedAt: number): Promise<void> {
     const checkDeviceSession = await this.devicesService.findDeviceSessionByIAT(
-      iat,
+      issuedAt,
     );
     if (!checkDeviceSession) {
       throw new UnauthorizedException();

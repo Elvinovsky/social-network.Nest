@@ -7,7 +7,7 @@ import {
 export const CurrentSessionInfoFromRefreshJWT = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
-
+    console.log(request.user);
     const sessionInfo = request.user;
     if (!sessionInfo.userInfo) {
       throw new UnauthorizedException();

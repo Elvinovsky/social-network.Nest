@@ -32,6 +32,7 @@ export class Device {
     deviceName: string,
   ): SessionCreateDTO {
     const newSession: Device = new Device();
+    console.log('СЕССИЯ --->', issuedAt);
 
     newSession.userInfo = userInfo;
     newSession.deviceId = deviceId;

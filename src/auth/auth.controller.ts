@@ -52,8 +52,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  // @UseGuards(ThrottlerGuard)
-  // @Throttle(5, 10)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -158,14 +158,13 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(ThrottlerGuard)
   @Throttle(5, 10)
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(ThrottlerGuard, LocalAuthGuard)
   async login(
     @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,
     @Request() req,
-    @Response({ passthrough: true }) res,
+    @Response() res,
   ) {
     const ipAddress = requestIp.getClientIp(req);
     const userInfo: UserInfo = {

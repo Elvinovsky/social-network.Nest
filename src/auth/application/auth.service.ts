@@ -112,6 +112,7 @@ export class AuthService {
   async login(userInfo: UserInfo, deviceName: string, ip: string) {
     try {
       const deviceId = uuidv4();
+
       const createJWTAccessToken = await this.createJWTAccessToken(
         deviceId,
         userInfo,
@@ -141,10 +142,12 @@ export class AuthService {
     }
   }
   async createJWTAccessToken(deviceId: string, userInfo: UserInfo) {
+    const updateIssuedAt = new Date().getTime();
+
     const accessToken = this.jwtService.sign(
       {
         userInfo: userInfo,
-
+        issuedAt: updateIssuedAt,
         deviceId: deviceId,
       },
       {
@@ -165,10 +168,13 @@ export class AuthService {
     userInfo: UserInfo,
     deviceId: string,
   ): Promise<string> {
+    const updateIssuedAt = new Date().getTime();
+
     return this.jwtService.sign(
       {
         userInfo: userInfo,
         deviceId: deviceId,
+        issuedAt: updateIssuedAt,
       },
       {
         expiresIn: this.configService.get(
@@ -218,8 +224,8 @@ export class AuthService {
     try {
       const decoded = this.jwtService.decode(token, {
         complete: true,
-      }) as { payload: { iat: number } };
-      return decoded.payload.iat;
+      }) as { payload: { issuedAt: number } };
+      return decoded.payload.issuedAt;
     } catch (error) {
       console.log('error getIATByRefreshToken', error);
       throw new PreconditionFailedException();

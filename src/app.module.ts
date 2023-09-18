@@ -46,16 +46,9 @@ import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.rep
     UsersModule,
     AuthModule,
     DevicesModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: '127.0.0.1',
-      port: 5433,
-      username: 'postgres',
-      password: 'sa',
-      database: 'social-network',
-      autoLoadEntities: false,
-      synchronize: false,
-    }),
+    TypeOrmModule.forRoot(
+      getConfiguration().sqlOptions as TypeOrmModuleOptions,
+    ),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
