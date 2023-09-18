@@ -1,11 +1,12 @@
 import {
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { DevicesService } from './devices.service';
@@ -22,26 +23,33 @@ export class DevicesController {
   @UseGuards(JwtRefreshGuard)
   async getDevices(
     @CurrentSessionInfoFromRefreshJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
-    @Res() res,
+    sessionInfo: {
+      userInfo: UserInfo;
+      deviceId: string;
+      issuedAt: number;
+    },
   ) {
     // Получаем id пользователя из JwtRefreshGuard
     const userId = sessionInfo.userInfo.userId;
-
+    console.log(userId);
     // Ищем устройства пользователя
     const devicesSessionsByUser =
-      await this.devicesService.findDevicesSessionsByUserId(userId);
+      await this.devicesService.getDevicesSessionsByUserId(userId);
+    console.log(userId);
 
-    // Отправляем список устройств
-    res.send(devicesSessionsByUser);
+    return devicesSessionsByUser;
   }
 
   @Delete('devices')
   @UseGuards(JwtRefreshGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteDevices(
     @CurrentSessionInfoFromRefreshJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
-    @Res() res,
+    sessionInfo: {
+      userInfo: UserInfo;
+      deviceId: string;
+      issuedAt: number;
+    },
   ) {
     const userId = sessionInfo.userInfo.userId; // Получаем id пользователя из запроса
 
@@ -49,9 +57,6 @@ export class DevicesController {
       sessionInfo.issuedAt,
       userId,
     ); // Выход из всех устройств пользователя кроме текущей
-
-    res.sendStatus(204); // Успешный статус: OK, без содержимого
-    return;
   }
   @Delete('devices/:deviceId')
   @UseGuards(JwtRefreshGuard)
@@ -60,7 +65,6 @@ export class DevicesController {
     @Param('deviceId') id: string,
     @CurrentSessionInfoFromRefreshJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string; issuedAt: number },
-    @Res() res,
   ) {
     const userId = sessionInfo.userInfo.userId; // Получаем id пользователя из запроса
 
@@ -70,14 +74,10 @@ export class DevicesController {
 
     // Обработка различных сценариев удаления устройства
     if (logoutDeviceSession === null) {
-      res.sendStatus(404); // Ошибка: Не найдено.
-      return;
+      throw new NotFoundException();
     }
     if (!logoutDeviceSession) {
-      res.sendStatus(403); // Ошибка: Запрещено (отказано в доступе).
-      return;
+      throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
-    res.sendStatus(204); // Успешный статус: OK, без содержимого.
-    return;
   }
 }
