@@ -35,8 +35,8 @@ export class SaUsersController {
     private commandBus: CommandBus,
   ) {}
 
-  @UseGuards(BasicAuthGuard)
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createUser(@Body() inputModel: UserInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =

@@ -1,14 +1,10 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
-  Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -18,60 +14,14 @@ import {
   SearchNameTerm,
 } from '../pagination/pagination.models';
 import { BlogsQueryRepo } from './infrastructure/repositories/blogs.query.repo';
-import { BlogInputModel, BlogViewDTO } from './blog.models';
-import { BlogPostInputModel, PostViewDTO } from '../posts/post.models';
+import { BlogViewDTO } from './blog.models';
+import { PostViewDTO } from '../posts/post.models';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { BlogsService } from './application/blogs.service';
-import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
-import { PostsService } from '../posts/posts.service';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(
-    private readonly blogsQueryRepo: BlogsQueryRepo,
-    private blogsService: BlogsService,
-    private postsService: PostsService,
-  ) {}
-
-  @Post()
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: BlogInputModel) {
-    const result: BlogViewDTO = await this.blogsService.createBlogSA(
-      inputModel,
-    );
-    return result;
-  }
-
-  @Put(':blogId')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(
-    @Param('blogId', ObjectIdPipe) blogId: string,
-    @Body() inputModel: BlogInputModel,
-  ) {
-    const result: boolean | null | number = await this.blogsService.updateBlog(
-      blogId,
-      inputModel,
-    );
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
-  }
-
-  @Delete(':blogId')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('blogId', ObjectIdPipe) blogId: string) {
-    const result = await this.blogsService.deleteBlog(blogId);
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
-  }
+  constructor(private readonly blogsQueryRepo: BlogsQueryRepo) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -120,22 +70,5 @@ export class BlogsController {
       throw new NotFoundException();
     }
     return getPostsByBlogId;
-  }
-
-  @Post(':blogId/posts')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createPost(
-    @Param('blogId', ObjectIdPipe) blogId: string,
-    @Body() inputModel: BlogPostInputModel,
-  ) {
-    const result: boolean | PostViewDTO | null =
-      await this.postsService.createPostByBLog(blogId, inputModel);
-
-    if (result === null) {
-      throw new NotFoundException();
-    }
-
-    return result;
   }
 }

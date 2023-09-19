@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { PostsQueryRepo } from './posts.query.repo';
+import { PostsQueryRepo } from './infrastructure/mongo/posts.query.repo';
 import {
   QueryInputModel,
   SearchTitleTerm,
@@ -30,7 +30,6 @@ import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/application/users.service';
 import { CommentsQueryRepo } from '../comments/comments.query.repository';
-import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 
@@ -104,7 +103,7 @@ export class PostsController {
   @UseGuards(OptionalBearerGuard)
   async getCommentsByPostId(
     @Query() query: QueryInputModel & SearchTitleTerm,
-    @Param('postId', ObjectIdPipe) postId: string,
+    @Param('postId') postId: string,
     @CurrentUserIdOptional() userId?: string,
   ) {
     const getCommentsByPostId =
@@ -127,7 +126,7 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtBearerGuard)
   async createCommentByPost(
-    @Param('postId', ObjectIdPipe) postId: string,
+    @Param('postId') postId: string,
     @Body() inputModel: CommentInputModel,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
@@ -156,27 +155,10 @@ export class PostsController {
     return result;
   }
 
-  @Put(':postId')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(
-    @Param('postId', ObjectIdPipe) postId: string,
-    @Body() inputModel: PostInputModel,
-  ) {
-    const result: boolean | null = await this.postsService.updatePostSA(
-      postId,
-      inputModel,
-    );
-
-    if (result === null) {
-      throw new NotFoundException('Not Found');
-    }
-  }
-
   @Delete(':postId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('postId', ObjectIdPipe) postId: string) {
+  async deletePost(@Param('postId') postId: string) {
     const result: Document | null | boolean =
       await this.postsService.deletePost(postId);
 

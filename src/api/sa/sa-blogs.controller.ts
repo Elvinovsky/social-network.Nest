@@ -1,23 +1,31 @@
 import {
   BadRequestException,
+  Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
+  Post,
   Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import {
+  PaginatorType,
   QueryInputModel,
   SearchNameTerm,
 } from '../../pagination/pagination.models';
 import { BlogsQueryRepo } from '../../blogs/infrastructure/repositories/blogs.query.repo';
-import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 import { UsersService } from '../../users/application/users.service';
 import { BlogsService } from '../../blogs/application/blogs.service';
+import { BlogInputModel, BlogViewDTO } from '../../blogs/blog.models';
+import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
+import { PostsService } from '../../posts/posts.service';
 
 @Controller('sa/blogs')
 export class SaBlogsController {
@@ -25,6 +33,7 @@ export class SaBlogsController {
     private blogsQueryRepo: BlogsQueryRepo,
     private blogsService: BlogsService,
     private usersService: UsersService,
+    private postsService: PostsService,
   ) {}
 
   @Get()
@@ -39,13 +48,125 @@ export class SaBlogsController {
     );
   }
 
+  @Post()
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async createBlog(@Body() inputModel: BlogInputModel) {
+    const result: BlogViewDTO = await this.blogsService.createBlogSA(
+      inputModel,
+    );
+    return result;
+  }
+
+  @Put(':blogId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(
+    @Param('blogId') blogId: string,
+    @Body() inputModel: BlogInputModel,
+  ) {
+    const result: boolean | null | number = await this.blogsService.updateBlog(
+      blogId,
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+  }
+  @Delete(':blogId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(@Param('blogId') blogId: string) {
+    const result = await this.blogsService.deleteBlogSA(blogId);
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+  }
+
+  // Получение постов в блоге текущего пользователя
+  @Get(':blogId/posts')
+  @UseGuards(BasicAuthGuard)
+  async getPostsByBlog(
+    @Param('blogId') blogId: string,
+    @Query() query: QueryInputModel,
+  ): Promise<PaginatorType<PostViewDTO[]>> {
+    const getPostsByBlogId = await this.blogsQueryRepo.getSortedPostsBlog(
+      blogId,
+      query.pageNumber,
+      query.pageSize,
+      query.sortBy,
+      query.sortDirection,
+    );
+
+    if (!getPostsByBlogId) {
+      throw new NotFoundException();
+    }
+    return getPostsByBlogId;
+  }
+  @Post(':blogId/posts')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async createPost(
+    @Param('blogId') blogId: string,
+    @Body() inputModel: BlogPostInputModel,
+  ) {
+    const result: boolean | PostViewDTO | null =
+      await this.postsService.createPostByBLog(blogId, inputModel);
+
+    if (result === null) {
+      throw new NotFoundException();
+    }
+
+    return result;
+  }
+
+  @Put(':blogId/posts/:postId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() inputModel: BlogPostInputModel,
+  ) {
+    const result: boolean | null = await this.postsService.updatePostSA(
+      postId,
+      blogId,
+      inputModel,
+    );
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+    if (result === false) {
+      throw new ForbiddenException();
+    }
+  }
+
+  @Delete(':blogId/posts/:postId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ) {
+    const result: Document | null | boolean =
+      await this.postsService.deletePostSA(postId, blogId);
+
+    if (result === null) {
+      throw new NotFoundException('Not Found');
+    }
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
+  }
+
   @Put(':id/bind-with-user/:userId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async bindWithUser(
-    @Param('id', ObjectIdPipe) id: string,
-    @Param('userId') userId: string,
-  ) {
+  async bindWithUser(@Param('id') id: string, @Param('userId') userId: string) {
     const foundBlog = await this.blogsService.findById(id);
 
     if (!foundBlog) {
@@ -55,7 +176,7 @@ export class SaBlogsController {
           message: 'Blog with given id does not exist',
         },
       ]);
-    } else if (foundBlog.blogOwnerInfo.userId) {
+    } else if (foundBlog.blogOwnerInfo?.userId) {
       throw new BadRequestException([
         {
           field: 'blogId',
