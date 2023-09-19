@@ -17,8 +17,8 @@ import { BlogsRepository } from './blogs/infrastructure/repositories/blogs.repos
 import { DeleteDBController } from './db-clear.testing/delete.db.controller';
 import { DeleteDbRepository } from './db-clear.testing/delete.db.repository';
 import { PostsService } from './posts/posts.service';
-import { PostsRepository } from './posts/posts.repository';
-import { PostsQueryRepo } from './posts/posts.query.repo';
+import { PostsRepository } from './posts/infrastructure/mongo/posts.repository';
+import { PostsQueryRepo } from './posts/infrastructure/mongo/posts.query.repo';
 import { PostsController } from './posts/posts.controller';
 import { Like, LikeSchema } from './likes/like.schemas';
 import { Comment, CommentSchema } from './comments/comment.schemas';
@@ -39,6 +39,7 @@ import { SendSMTPAdapter } from './email/send-smtp-adapter';
 import { SaBlogsController } from './api/sa/sa-blogs.controller';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.repository';
+import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.repository';
 
 @Module({
   imports: [
@@ -87,9 +88,15 @@ import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.rep
     BlogsService,
 
     PostsService,
-    PostsRepository,
     PostsQueryRepo,
     PostMapper,
+    {
+      provide: PostsRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? PostsRepository
+          : PostsRawSqlRepository,
+    },
 
     CommentsService,
     CommentsRepository,
