@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostsRepository } from './posts.repository';
+import { PostsRepository } from './infrastructure/mongo/posts.repository';
 import {
   BlogPostInputModel,
   PostCreateDTO,
@@ -42,7 +42,7 @@ export class PostsService {
     }
     const newPost = Post.create(inputModel, foundBlog.name, blogId);
 
-    return this.postsRepository.createPostBlog(newPost);
+    return this.postsRepository.createPost(newPost);
   }
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
@@ -86,24 +86,25 @@ export class PostsService {
     //   return false;
     // }
 
-    return this.postsRepository.updatePostById(postId, inputModel);
+    return this.postsRepository.updatePostById(postId, blogId, inputModel);
   }
 
   async updatePostSA(
     postId: string,
-    inputModel: PostInputModel,
+    blogId: string,
+    inputModel: BlogPostInputModel,
   ): Promise<boolean | null> {
     const foundPost = await this.findPostById(postId);
+    const foundBlog = await this.blogService.findById(blogId);
 
-    if (!foundPost) {
+    if (!foundPost || !foundBlog) {
       return null;
     }
+    if (foundBlog.blogOwnerInfo?.userId) {
+      return false;
+    }
 
-    // if (foundPost?.blogId !== blogId) {
-    //   return false;
-    // }
-
-    return this.postsRepository.updatePostById(postId, inputModel);
+    return this.postsRepository.updatePostById(postId, blogId, inputModel);
   }
 
   async deletePost(
@@ -131,6 +132,23 @@ export class PostsService {
     // if (foundPost?.blogId !== blogId) {
     //   return false;
     // }
+    return this.postsRepository.deletePost(postId);
+  }
+
+  async deletePostSA(
+    postId: string,
+    blogId: string,
+  ): Promise<Document | null | boolean> {
+    const foundPost = await this.findPostById(postId);
+    const foundBlog = await this.blogService.findById(blogId);
+
+    if (!foundPost || !foundBlog) {
+      return null;
+    }
+    if (foundBlog.blogOwnerInfo?.userId) {
+      return false;
+    }
+
     return this.postsRepository.deletePost(postId);
   }
 }

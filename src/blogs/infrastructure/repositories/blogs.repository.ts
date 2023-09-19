@@ -3,7 +3,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
 import { blogMapping } from '../../blog.helpers';
-import { objectIdHelper } from '../../../common/helpers';
 import { UserInfo } from '../../../users/user.models';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
@@ -15,9 +14,7 @@ export class BlogsRepository {
   // Возвращает BlogDocument или null, если блог не найден
   async findBlogById(id: string): Promise<BlogDocument | null> {
     try {
-      if (!objectIdHelper(id)) return null;
-
-      return await this.blogModel.findById(objectIdHelper(id)).exec();
+      return await this.blogModel.findOne({ id: id }).exec();
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
       throw new InternalServerErrorException();
@@ -47,7 +44,7 @@ export class BlogsRepository {
     try {
       const result = await this.blogModel
         .updateOne(
-          { _id: objectIdHelper(id) },
+          { id: id },
           {
             $set: {
               name: inputModel.name,
@@ -66,9 +63,12 @@ export class BlogsRepository {
 
   // Удаляет блог с заданным ID
   // Возвращает удаленный документ или null, если блог не найден
-  async deleteBlogById(id: string): Promise<Document | null> {
+  async deleteBlogById(id: string): Promise<boolean | null> {
     try {
-      return await this.blogModel.findByIdAndDelete(objectIdHelper(id));
+      return await this.blogModel
+        .deleteOne({ id: id })
+        .then((result) => Promise.resolve(result.deletedCount === 1))
+        .catch((error) => Promise.reject(error));
     } catch (e) {
       console.log(e, 'error deleteBlogById');
       throw new InternalServerErrorException();
@@ -78,11 +78,9 @@ export class BlogsRepository {
   async updateBlogOwnerInfo(userInfo: UserInfo, id: string) {
     try {
       return await this.blogModel
-        .findByIdAndUpdate(
-          { _id: objectIdHelper(id) },
-          { $set: { blogOwnerInfo: userInfo } },
-        )
-        .exec();
+        .updateOne({ id: id }, { $set: { blogOwnerInfo: userInfo } })
+        .then((result) => Promise.resolve(result.matchedCount === 1))
+        .catch((error) => Promise.reject(error));
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();

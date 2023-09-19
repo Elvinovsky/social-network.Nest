@@ -24,15 +24,16 @@ export class BlogInputModel {
 }
 
 export type BlogCreateDTO = {
+  id: string;
   name: string;
   description: string;
   websiteUrl: string;
-  addedAt: string;
+  addedAt: Date;
   /**
    * True if user has not expired membership subscription to blog
    */
   isMembership: boolean;
-  blogOwnerInfo: UserInfo;
+  blogOwnerInfo: UserInfo | null;
 };
 
 export type BlogViewDTO = {

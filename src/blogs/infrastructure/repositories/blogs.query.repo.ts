@@ -29,10 +29,8 @@ export class BlogsQueryRepo {
 
   async getBlogById(id: string): Promise<BlogViewDTO | null> {
     try {
-      if (!objectIdHelper(id)) return null;
-
       const foundBlog: BlogDocument | null = await this.blogModel
-        .findById(objectIdHelper(id))
+        .findOne({ id: id })
         .exec();
       if (!foundBlog) {
         return null;

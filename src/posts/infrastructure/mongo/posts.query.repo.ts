@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument, PostModel } from './post.schemas';
-import { PaginatorType } from '../pagination/pagination.models';
-import { PostViewDTO } from './post.models';
+import { Post, PostDocument, PostModel } from '../../post.schemas';
+import { PaginatorType } from '../../../pagination/pagination.models';
+import { PostCreateDTO, PostViewDTO } from '../../post.models';
 import {
   getDirection,
   getPageNumber,
@@ -11,10 +11,10 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../common/constants';
-import { PostMapper } from './post.helpers';
-import { objectIdHelper } from '../common/helpers';
+} from '../../../pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../../common/constants';
+import { PostMapper } from '../../post.helpers';
+import { objectIdHelper } from '../../../common/helpers';
 
 @Injectable()
 export class PostsQueryRepo {
@@ -60,13 +60,14 @@ export class PostsQueryRepo {
     userId?: string,
   ): Promise<PostViewDTO | null> {
     try {
-      const post: PostDocument | null = await this.postModel
+      const post: PostCreateDTO | null = await this.postModel
         .findById(objectIdHelper(postId))
-        .lean()
-        .exec();
+        .lean();
+
       if (!post) {
         return null;
       }
+
       return this.postMapper.mapPost(post, userId);
     } catch (e) {
       console.log(e, 'error getPostById method');

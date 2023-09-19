@@ -43,18 +43,24 @@ export class BlogsService {
 
   async deleteBlog(
     id: string,
-    userInfo?: UserInfo,
+    userInfo: UserInfo,
   ): Promise<Document | null | boolean> {
-    if (userInfo) {
-      const validateResult: BlogDocument | null | boolean =
-        await this._isOwnerFoundBlog(id, userInfo.userId);
-      if (!validateResult) {
-        return validateResult;
-      }
+    const validateResult: BlogDocument | null | boolean =
+      await this._isOwnerFoundBlog(id, userInfo.userId);
+    if (!validateResult) {
+      return validateResult;
     }
+
     return this.blogsRepository.deleteBlogById(id);
   }
 
+  async deleteBlogSA(id: string): Promise<Document | null | boolean> {
+    const validateResult: BlogDocument | null | boolean = await this.findById(
+      id,
+    );
+
+    return this.blogsRepository.deleteBlogById(id);
+  }
   async _isOwnerFoundBlog(id: string, userId: string) {
     // поиск блога в базе данных.
     const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
@@ -65,7 +71,7 @@ export class BlogsService {
     }
 
     // проверка принадлежности блога автору
-    if (blog.blogOwnerInfo.userId !== userId) {
+    if (blog.blogOwnerInfo?.userId !== userId) {
       return false;
     }
 
