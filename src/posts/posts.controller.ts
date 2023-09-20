@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { PostsQueryRepo } from './infrastructure/mongo/posts.query.repo';
+import { PostsQueryRepository } from './infrastructure/mongo/posts-query-repository.service';
 import {
   QueryInputModel,
   SearchTitleTerm,
@@ -37,7 +37,7 @@ import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-sess
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
-    private readonly postsQueryRepo: PostsQueryRepo,
+    private readonly postsQueryRepo: PostsQueryRepository,
     private readonly likesService: LikesService,
     private readonly commentsService: CommentsService,
     private readonly usersService: UsersService,
@@ -47,16 +47,17 @@ export class PostsController {
   @Get()
   @UseGuards(OptionalBearerGuard)
   async getPosts(
-    @Query() query: QueryInputModel & SearchTitleTerm,
+    @Query() query: QueryInputModel,
+    @Query() queryTitle: SearchTitleTerm,
     @CurrentUserIdOptional() userId?: string,
   ) {
     return await this.postsQueryRepo.getSortedPosts(
-      query.searchTitleTerm,
-      Number(query.pageNumber),
-      Number(query.pageSize),
+      query.pageNumber,
+      query.pageSize,
       query.sortBy,
       query.sortDirection,
       userId,
+      queryTitle.searchTitleTerm,
     );
   }
 

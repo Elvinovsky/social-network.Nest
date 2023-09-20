@@ -64,7 +64,13 @@ export class PostsRawSqlRepository {
       SET  "title" = $3, "shortDescription" = $4, "content"=$5
       WHERE "id" = $1 and "blogId" = $2;
       `,
-        [inputModel.title, inputModel.shortDescription, inputModel.content],
+        [
+          postId,
+          blogId,
+          inputModel.title,
+          inputModel.shortDescription,
+          inputModel.content,
+        ],
       )
       .then((result) => result[1] === 1)
       .catch((error) => error);

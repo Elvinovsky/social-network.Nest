@@ -14,7 +14,6 @@ import {
   pagesCountOfBlogs,
 } from '../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../common/constants';
-import { objectIdHelper } from '../../common/helpers';
 import mongoose from 'mongoose';
 
 @Injectable()
@@ -61,13 +60,13 @@ export class UsersQueryRepository {
   }
 
   async getSortedUsersForSA(
-    banStatus?: string,
+    banStatus: string,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
       let filter: mongoose.FilterQuery<UserDocument> = {};
@@ -122,9 +121,7 @@ export class UsersQueryRepository {
   }
 
   async getUserInfo(id: string): Promise<MeViewModel | null> {
-    const user = await this.userModel
-      .findOne({ _id: objectIdHelper(id) })
-      .exec();
+    const user = await this.userModel.findOne({ id: id }).exec();
     if (!user) {
       return null;
     }

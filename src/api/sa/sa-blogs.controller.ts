@@ -38,13 +38,17 @@ export class SaBlogsController {
 
   @Get()
   @UseGuards(BasicAuthGuard)
-  async getBlogs(@Query() query: QueryInputModel & SearchNameTerm) {
+  async getBlogs(
+    @Query() query: QueryInputModel,
+    @Query() search: SearchNameTerm,
+  ) {
+    console.log(query);
     return this.blogsQueryRepo.getSortedBlogsForSA(
-      query.searchNameTerm,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
+      search.searchNameTerm,
     );
   }
 
@@ -65,13 +69,14 @@ export class SaBlogsController {
     @Param('blogId') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const result: boolean | null | number = await this.blogsService.updateBlog(
-      blogId,
-      inputModel,
-    );
+    const result: boolean | null | number =
+      await this.blogsService.updateBlogSA(blogId, inputModel);
 
     if (result === null) {
       throw new NotFoundException();
+    }
+    if (result === false) {
+      throw new ForbiddenException();
     }
   }
   @Delete(':blogId')

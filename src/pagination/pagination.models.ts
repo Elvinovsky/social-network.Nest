@@ -5,7 +5,6 @@ import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_SortBy,
-  SortDirection,
 } from '../common/constants';
 
 export type PaginatorType<T> = {
@@ -21,23 +20,21 @@ export class QueryInputModel {
   @Transform(({ value }) =>
     Number(value) > 0 ? Number(value) : DEFAULT_PAGE_NUMBER,
   )
-  pageNumber: number;
+  pageNumber = 1;
 
   @IsOptional()
   @Transform(({ value }) =>
     Number(value) > 0 ? Number(value) : DEFAULT_PAGE_SIZE,
   )
-  pageSize: number;
+  pageSize = 10;
 
   @IsOptional()
   @Transform(({ value }) => (value ? value : DEFAULT_PAGE_SortBy))
-  sortBy: string;
+  sortBy: string = DEFAULT_PAGE_SortBy;
 
   @IsOptional()
-  @Transform(({ value }) =>
-    value === 'asc' ? SortDirection.Asc : SortDirection.Desc,
-  )
-  sortDirection: string;
+  @Transform(({ value }) => (value === 'asc' ? 'asc' : 'desc'))
+  sortDirection = 'desc';
 }
 
 export class QueryBanStatus {
@@ -45,7 +42,7 @@ export class QueryBanStatus {
   @Transform(({ value }) =>
     value === BanStatus.Banned ? BanStatus.Banned : BanStatus.NotBanned,
   )
-  banStatus: string;
+  banStatus: BanStatus.NotBanned;
 }
 
 export class SearchNameTerm {

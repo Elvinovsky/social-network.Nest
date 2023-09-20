@@ -7,9 +7,9 @@ import {
   PostViewDTO,
 } from './post.models';
 import { BlogsService } from '../blogs/application/blogs.service';
-import { BlogDocument } from '../blogs/blog.schemas';
 import { UserInfo } from '../users/user.models';
 import { Post } from './post.schemas';
+import { BlogCreateDTO } from '../blogs/blog.models';
 
 @Injectable()
 export class PostsService {
@@ -27,14 +27,14 @@ export class PostsService {
     userInfo?: UserInfo,
   ): Promise<PostViewDTO | null | boolean> {
     if (userInfo) {
-      const validateResult: BlogDocument | null | boolean =
+      const validateResult: BlogCreateDTO | null | boolean =
         await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
       if (!validateResult) {
         return validateResult;
       }
     }
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
+    const foundBlog: BlogCreateDTO | null = await this.blogService.findById(
       blogId,
     );
     if (!foundBlog) {
@@ -47,7 +47,7 @@ export class PostsService {
 
   async createPost(inputModel: PostInputModel): Promise<PostViewDTO | null> {
     // валидация избыточна так как проверям блог на существование через pipe
-    const foundBlog: BlogDocument | null = await this.blogService.findById(
+    const foundBlog: BlogCreateDTO | null = await this.blogService.findById(
       inputModel.blogId,
     );
     if (!foundBlog) {
@@ -69,7 +69,7 @@ export class PostsService {
     userInfo: UserInfo,
     inputModel: BlogPostInputModel,
   ): Promise<boolean | null> {
-    const validateResult: boolean | BlogDocument | null =
+    const validateResult: boolean | BlogCreateDTO | null =
       await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
     if (!validateResult) {
@@ -114,7 +114,7 @@ export class PostsService {
   ): Promise<Document | null | boolean> {
     if (userInfo && blogId) {
       // поиск блога и его принадлежности пользователю
-      const validateResult: boolean | BlogDocument | null =
+      const validateResult: boolean | BlogCreateDTO | null =
         await this.blogService._isOwnerFoundBlog(blogId, userInfo.userId);
 
       if (!validateResult) {

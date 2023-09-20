@@ -17,19 +17,18 @@ export class UsersRawSQLQueryRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getSortedUsersForSA(
     banStatus: string,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
-    const getEmailTerm = (searchEmailTerm?: string): string => {
-      return searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
-    };
-    const getLoginTerm = (searchLoginTerm?: string): string => {
-      return searchLoginTerm ? `%${searchLoginTerm}%` : `%%`;
-    };
+    const getEmailTerm = (searchEmailTerm?: string): string =>
+      searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
+
+    const getLoginTerm = (searchLoginTerm?: string): string =>
+      searchLoginTerm ? `%${searchLoginTerm}%` : `%%`;
 
     const queryString = `
         SELECT u."id", u."login", u."email", u."addedAt" as "createdAt"

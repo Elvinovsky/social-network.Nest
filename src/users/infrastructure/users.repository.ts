@@ -9,16 +9,13 @@ import {
   UserViewDTO,
 } from '../user.models';
 import { userMapping, userMappingSA } from '../user.helpers';
-import { objectIdHelper } from '../../common/helpers';
 
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
     try {
-      if (!objectIdHelper(userId)) return null;
-
-      const user = await this.userModel.findById(objectIdHelper(userId));
+      const user = await this.userModel.findOne({ id: userId });
       if (!user) {
         return null;
       }
@@ -37,9 +34,7 @@ export class UsersRepository {
    */
   async getUser(userId: string): Promise<UserViewDTO | null> {
     try {
-      if (!objectIdHelper(userId)) return null;
-
-      const user = await this.userModel.findById(objectIdHelper(userId));
+      const user = await this.userModel.findOne({ id: userId });
       if (!user) {
         return null;
       }
@@ -71,25 +66,7 @@ export class UsersRepository {
    */
   async deleteUserById(userId: string): Promise<Document | null> {
     try {
-      return this.userModel.findByIdAndDelete(objectIdHelper(userId));
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  /**
-   * Удаление пользователя по адресу электронной почты.
-   * @param email Адрес электронной почты пользователя.
-   * @returns true, если удаление успешно, в противном случае false.
-   * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
-   */
-  async deleteUserByEmail(email: string) {
-    try {
-      const deleteResult = await this.userModel
-        .deleteOne({ email: email })
-        .exec();
-      return deleteResult.deletedCount === 1;
+      return this.userModel.findByIdAndDelete({ id: userId });
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -148,12 +125,14 @@ export class UsersRepository {
    * @returns Объект UserDocument, представляющий пользователя, или null, если пользователь не найден.
    * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
    */
-  async findUserLoginOrEmail(loginOrEmail: string) {
+  async findUserLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserCreateDTO | null> {
     try {
       // Ищем пользователя в базе данных по логину или адресу электронной почты
       const user = await this.userModel
         .findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
-        .exec();
+        .lean();
 
       // Если пользователь не найден, возвращаем null
       if (!user) {
@@ -161,7 +140,7 @@ export class UsersRepository {
       }
 
       // Возвращаем найденного пользователя
-      return user;
+      return user as UserCreateDTO;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -239,7 +218,7 @@ export class UsersRepository {
     try {
       const updateResult = await this.userModel.updateOne(
         {
-          _id: objectIdHelper(userId),
+          id: userId,
         },
         {
           $set: {
@@ -260,7 +239,7 @@ export class UsersRepository {
     try {
       const updateResult = await this.userModel.updateOne(
         {
-          _id: objectIdHelper(userId),
+          id: userId,
         },
         {
           $set: {

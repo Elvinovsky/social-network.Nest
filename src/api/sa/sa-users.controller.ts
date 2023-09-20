@@ -72,16 +72,19 @@ export class SaUsersController {
   @UseGuards(BasicAuthGuard)
   async getUsers(
     @Query()
-    query: QueryInputModel & SearchEmailTerm & SearchLoginTerm & QueryBanStatus,
+    query: QueryInputModel,
+    @Query() queryEmail: SearchEmailTerm,
+    @Query() queryLogin: SearchLoginTerm,
+    @Query() queryBanStatus: QueryBanStatus,
   ) {
     return this.usersQueryRepo.getSortedUsersForSA(
-      query.banStatus,
-      query.searchEmailTerm,
-      query.searchLoginTerm,
+      queryBanStatus.banStatus,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
+      queryEmail.searchEmailTerm,
+      queryLogin.searchLoginTerm,
     );
   }
   @Put(':id/ban')

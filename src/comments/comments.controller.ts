@@ -19,7 +19,6 @@ import { UsersService } from '../users/application/users.service';
 import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
-import { ObjectIdPipe } from '../common/pipes/object-id.pipe';
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 
@@ -34,7 +33,7 @@ export class CommentsController {
   @Get(':id')
   @UseGuards(OptionalBearerGuard)
   async getComment(
-    @Param('id', ObjectIdPipe) id: string,
+    @Param('id') id: string,
     @CurrentUserIdOptional() userId?: string,
   ) {
     const comment = await this.commentService.getComment(id, userId);
@@ -49,7 +48,7 @@ export class CommentsController {
   @Put(':id')
   @UseGuards(JwtBearerGuard)
   async updateComment(
-    @Param('id', ObjectIdPipe) id: string,
+    @Param('id') id: string,
     @Body() inputModel: CommentInputModel,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userId: string; deviceId: string },
@@ -79,7 +78,7 @@ export class CommentsController {
   @Delete(':id')
   @UseGuards(JwtBearerGuard)
   async deleteComment(
-    @Param('id', ObjectIdPipe) id: string,
+    @Param('id') id: string,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userId: string; deviceId: string },
   ) {
@@ -104,7 +103,7 @@ export class CommentsController {
   @Put(':id/like-status')
   @UseGuards(JwtBearerGuard)
   async updateLikeStatusComment(
-    @Param('id', ObjectIdPipe) id: string,
+    @Param('id') id: string,
     @Body() inputModel: LikeStatus,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },

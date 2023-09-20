@@ -14,22 +14,21 @@ import {
 } from '../../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../common/constants';
 import { PostMapper } from '../../post.helpers';
-import { objectIdHelper } from '../../../common/helpers';
 
 @Injectable()
-export class PostsQueryRepo {
+export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: PostModel,
     private postMapper: PostMapper,
   ) {}
 
   async getSortedPosts(
-    searchTitleTerm: string | undefined,
     pageNumber?: number,
     pageSize?: number,
     sortBy?: string,
     sortDirection?: string,
     userId?: string,
+    searchTitleTerm?: string,
   ): Promise<PaginatorType<PostViewDTO[]>> {
     const filter: mongoose.FilterQuery<PostDocument> = {};
     if (searchTitleTerm) {
@@ -61,7 +60,7 @@ export class PostsQueryRepo {
   ): Promise<PostViewDTO | null> {
     try {
       const post: PostCreateDTO | null = await this.postModel
-        .findById(objectIdHelper(postId))
+        .findOne({ id: postId })
         .lean();
 
       if (!post) {
