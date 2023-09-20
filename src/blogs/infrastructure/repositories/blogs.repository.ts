@@ -1,7 +1,7 @@
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../../blog.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModel } from '../../blog.schemas';
+import { Blog, BlogModel } from '../../blog.schemas';
 import { blogMapping } from '../../blog.helpers';
 import { UserInfo } from '../../../users/user.models';
 
@@ -12,9 +12,9 @@ export class BlogsRepository {
 
   // Находит блог по заданному ID
   // Возвращает BlogDocument или null, если блог не найден
-  async findBlogById(id: string): Promise<BlogDocument | null> {
+  async findBlogById(id: string): Promise<BlogCreateDTO | null> {
     try {
-      return await this.blogModel.findOne({ id: id }).exec();
+      return await this.blogModel.findOne({ id: id }).lean();
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
       throw new InternalServerErrorException();
@@ -28,7 +28,7 @@ export class BlogsRepository {
       const createdBlog = await new this.blogModel(blog);
       await createdBlog.save();
 
-      return blogMapping(createdBlog);
+      return blogMapping(blog);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -62,8 +62,8 @@ export class BlogsRepository {
   }
 
   // Удаляет блог с заданным ID
-  // Возвращает удаленный документ или null, если блог не найден
-  async deleteBlogById(id: string): Promise<boolean | null> {
+  // Возвращает true, false если блог не найден
+  async deleteBlogById(id: string): Promise<boolean> {
     try {
       return await this.blogModel
         .deleteOne({ id: id })
@@ -75,7 +75,7 @@ export class BlogsRepository {
     }
   }
 
-  async updateBlogOwnerInfo(userInfo: UserInfo, id: string) {
+  async updateBlogOwnerInfo(userInfo: UserInfo, id: string): Promise<boolean> {
     try {
       return await this.blogModel
         .updateOne({ id: id }, { $set: { blogOwnerInfo: userInfo } })

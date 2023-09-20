@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../blog.models';
 import { BlogsRepository } from '../infrastructure/repositories/blogs.repository';
-import { Blog, BlogDocument } from '../blog.schemas';
+import { Blog } from '../blog.schemas';
 import { UserInfo } from '../../users/user.models';
 
 //input: BlogInputModel, output: BlogViewDTO, BlogDocument
@@ -9,7 +9,7 @@ import { UserInfo } from '../../users/user.models';
 @Injectable()
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
-  async findById(id: string): Promise<BlogDocument | null> {
+  async findById(id: string): Promise<BlogCreateDTO | null> {
     return this.blogsRepository.findBlogById(id);
   }
   async createBlogSA(inputModel: BlogInputModel): Promise<BlogViewDTO> {
@@ -31,7 +31,7 @@ export class BlogsService {
     userInfo?: UserInfo,
   ): Promise<boolean | null | number> {
     if (userInfo) {
-      const validateResult: BlogDocument | null | boolean =
+      const validateResult: BlogCreateDTO | null | boolean =
         await this._isOwnerFoundBlog(id, userInfo.userId);
       if (!validateResult) {
         return validateResult;
@@ -41,12 +41,29 @@ export class BlogsService {
     return this.blogsRepository.updateBlogById(id, inputModel);
   }
 
+  async updateBlogSA(
+    id: string,
+    inputModel: BlogInputModel,
+  ): Promise<boolean | null | number> {
+    const validateResult: BlogCreateDTO | null = await this.findById(id);
+    if (!validateResult) {
+      return null;
+    }
+
+    if (validateResult.blogOwnerInfo?.userId) {
+      return false;
+    }
+
+    return this.blogsRepository.updateBlogById(id, inputModel);
+  }
+
   async deleteBlog(
     id: string,
     userInfo: UserInfo,
   ): Promise<Document | null | boolean> {
-    const validateResult: BlogDocument | null | boolean =
+    const validateResult: BlogCreateDTO | null | boolean =
       await this._isOwnerFoundBlog(id, userInfo.userId);
+
     if (!validateResult) {
       return validateResult;
     }
@@ -55,15 +72,16 @@ export class BlogsService {
   }
 
   async deleteBlogSA(id: string): Promise<Document | null | boolean> {
-    const validateResult: BlogDocument | null | boolean = await this.findById(
-      id,
-    );
+    const validateResult: BlogCreateDTO | null = await this.findById(id);
+    if (!validateResult) {
+      return null;
+    }
 
     return this.blogsRepository.deleteBlogById(id);
   }
   async _isOwnerFoundBlog(id: string, userId: string) {
     // поиск блога в базе данных.
-    const blog: BlogDocument | null = await this.blogsRepository.findBlogById(
+    const blog: BlogCreateDTO | null = await this.blogsRepository.findBlogById(
       id,
     );
     if (!blog) {

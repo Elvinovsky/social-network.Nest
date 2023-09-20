@@ -23,7 +23,6 @@ import { BlogInputModel, BlogViewDTO } from '../../blogs/blog.models';
 import { JwtBearerGuard } from '../../auth/guards/jwt-bearer-auth.guard';
 import { BlogsService } from '../../blogs/application/blogs.service';
 import { DevicesService } from '../../devices/devices.service';
-import { ObjectIdPipe } from '../../common/pipes/object-id.pipe';
 import { PostsService } from '../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 import { UserInfo } from '../../users/user.models';
@@ -74,17 +73,18 @@ export class BloggerBlogsController {
   @Get()
   @UseGuards(JwtBearerGuard)
   async getBlogs(
-    @Query() query: QueryInputModel & SearchNameTerm,
+    @Query() query: QueryInputModel,
+    @Query() queryName: SearchNameTerm,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
       sessionInfo.userInfo,
-      query.searchNameTerm,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
+      queryName.searchNameTerm,
     );
   }
 
@@ -93,7 +93,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Param('blogId') blogId: string,
     @Body() inputModel: BlogInputModel,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
@@ -118,7 +118,7 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(
-    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Param('blogId') blogId: string,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
@@ -141,7 +141,7 @@ export class BloggerBlogsController {
   @Post(':blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPost(
-    @Param('blogId', ObjectIdPipe) blogId: string,
+    @Param('blogId') blogId: string,
     @Body() inputModel: BlogPostInputModel,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
@@ -193,8 +193,8 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Param('blogId', ObjectIdPipe) blogId: string,
-    @Param('postId', ObjectIdPipe) postId: string,
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
     @Body() inputModel: BlogPostInputModel,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
@@ -219,8 +219,8 @@ export class BloggerBlogsController {
   @Delete(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Param('blogId', ObjectIdPipe) blogId: string,
-    @Param('postId', ObjectIdPipe) postId: string,
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {

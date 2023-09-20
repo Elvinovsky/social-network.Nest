@@ -1,4 +1,4 @@
-import { BlogViewDTO, SABlogViewDTO } from './blog.models';
+import { BlogCreateDTO, BlogViewDTO, SABlogViewDTO } from './blog.models';
 import { BlogDocument } from './blog.schemas';
 
 export const blogsMapping = (array: Array<BlogDocument>): BlogViewDTO[] => {
@@ -13,7 +13,7 @@ export const blogsMapping = (array: Array<BlogDocument>): BlogViewDTO[] => {
     };
   });
 };
-export const blogMapping = (blog: BlogDocument): BlogViewDTO => {
+export const blogMapping = (blog: BlogCreateDTO): BlogViewDTO => {
   return {
     id: blog.id,
     name: blog.name,

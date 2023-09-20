@@ -14,7 +14,6 @@ import {
 } from '../../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../common/constants';
 import { blogMapping, blogsMapperSA, blogsMapping } from '../../blog.helpers';
-import { objectIdHelper } from '../../../common/helpers';
 import { PostViewDTO } from '../../../posts/post.models';
 import { Post, PostDocument, PostModel } from '../../../posts/post.schemas';
 import { PostMapper } from '../../../posts/post.helpers';
@@ -44,13 +43,12 @@ export class BlogsQueryRepo {
   }
 
   async getSortedBlogs(
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     searchNameTerm?: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
-    debugger;
     const filter: mongoose.FilterQuery<BlogDocument> = {};
     try {
       if (searchNameTerm) {
@@ -64,18 +62,17 @@ export class BlogsQueryRepo {
       const foundBlogs: BlogDocument[] = await this.blogModel
         .find(filter)
         .sort({
-          [getSortBy(sortBy)]: getDirection(sortDirection),
+          [sortBy]: getDirection(sortDirection),
           [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
         })
-        .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
-        .limit(getPageSize(pageSize))
-        .lean()
-        .exec();
+        .skip(getSkip(getPageNumber(pageNumber), pageSize))
+        .limit(pageSize)
+        .lean();
 
       return {
         pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
-        page: getPageNumber(pageNumber),
-        pageSize: getPageSize(pageSize),
+        page: pageNumber,
+        pageSize: pageSize,
         totalCount: calculateOfFiles,
         items: blogsMapping(foundBlogs),
       };
@@ -86,11 +83,11 @@ export class BlogsQueryRepo {
   }
   async getSortedBlogsForCurrentBlogger(
     userInfo: UserInfo,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     searchNameTerm?: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
     const filter: mongoose.FilterQuery<BlogDocument> = {
       'blogOwnerInfo.userId': userInfo.userId,
@@ -129,18 +126,14 @@ export class BlogsQueryRepo {
   }
   async getSortedPostsBlog(
     blogId: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     userId?: string,
   ): Promise<PaginatorType<PostViewDTO[]> | null> {
     try {
-      if (!objectIdHelper(blogId)) return null;
-
-      const blogIdForPosts = await this.blogModel.findById(
-        objectIdHelper(blogId),
-      );
+      const blogIdForPosts = await this.blogModel.findById({ id: blogId });
       if (!blogIdForPosts) {
         return null;
       }
@@ -172,11 +165,11 @@ export class BlogsQueryRepo {
   }
 
   async getSortedBlogsForSA(
-    searchNameTerm?: string,
     pageNumber?: number,
     pageSize?: number,
     sortBy?: string,
     sortDirection?: string,
+    searchNameTerm?: string,
   ): Promise<PaginatorType<SABlogViewDTO[]>> {
     const filter: mongoose.FilterQuery<BlogDocument> = {};
     try {
