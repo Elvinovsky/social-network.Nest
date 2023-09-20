@@ -18,7 +18,7 @@ import { DeleteDBController } from './db-clear.testing/delete.db.controller';
 import { DeleteDbRepository } from './db-clear.testing/delete.db.repository';
 import { PostsService } from './posts/posts.service';
 import { PostsRepository } from './posts/infrastructure/mongo/posts.repository';
-import { PostsQueryRepo } from './posts/infrastructure/mongo/posts.query.repo';
+import { PostsQueryRepository } from './posts/infrastructure/mongo/posts-query-repository.service';
 import { PostsController } from './posts/posts.controller';
 import { Like, LikeSchema } from './likes/like.schemas';
 import { Comment, CommentSchema } from './comments/comment.schemas';
@@ -40,6 +40,9 @@ import { SaBlogsController } from './api/sa/sa-blogs.controller';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.repository';
 import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.repository';
+import { PostsRawSqlQueryRepository } from './posts/infrastructure/sql/posts-raw-sql-query.repository';
+import { BlogsRawSqlRepository } from './blogs/infrastructure/repositories/sql/blogs-raw-sql.repository';
+import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/sql/blogs-query-raw-sql.repository';
 
 @Module({
   imports: [
@@ -82,13 +85,24 @@ import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.
 
     EmailSenderService,
     SendSMTPAdapter,
-
-    BlogsQueryRepo,
-    BlogsRepository,
+    {
+      provide: BlogsRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? BlogsRepository
+          : BlogsRawSqlRepository,
+    },
+    {
+      provide: BlogsQueryRepo,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? BlogsQueryRepo
+          : BlogsQueryRawSqlRepository,
+    },
     BlogsService,
 
     PostsService,
-    PostsQueryRepo,
+    PostsQueryRepository,
     PostMapper,
     {
       provide: PostsRepository,
@@ -97,7 +111,13 @@ import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.
           ? PostsRepository
           : PostsRawSqlRepository,
     },
-
+    {
+      provide: PostsQueryRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? PostsQueryRepository
+          : PostsRawSqlQueryRepository,
+    },
     CommentsService,
     CommentsRepository,
     CommentsQueryRepo,
