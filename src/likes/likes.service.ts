@@ -77,16 +77,12 @@ export class LikesService {
     return Promise.all(
       likesArr
         .sort(function (a, b) {
-          return a.createdAt < b.createdAt
-            ? -1
-            : a.createdAt > b.createdAt
-            ? 1
-            : 0;
+          return a.addedAt < b.addedAt ? -1 : a.addedAt > b.addedAt ? 1 : 0;
         })
         .reverse()
         .map(async (lastLikes) => {
           return {
-            addedAt: lastLikes.createdAt.toISOString(),
+            addedAt: lastLikes.addedAt.toISOString(),
             userId: lastLikes.userId,
             login: lastLikes.userLogin,
           };

@@ -32,13 +32,14 @@ export class LikesRepository {
     });
   }
   async getLikeInfo(userId: string, postOrCommentId: string) {
-    return this.likeModel
+    const likeInfo: LikeCreateDTO | null = await this.likeModel
       .findOne({
         userId: userId,
         postIdOrCommentId: postOrCommentId,
         isBanned: { $ne: true },
       })
-      .lean();
+      .exec();
+    return likeInfo;
   }
   async updateLikeInfo(
     userId: string,

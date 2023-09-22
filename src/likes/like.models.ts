@@ -24,6 +24,6 @@ export type LikeCreateDTO = {
   status: string;
   userId: string;
   userLogin: string;
-  postOrCommentId: string;
+  postIdOrCommentId: string;
   addedAt: Date;
 };
