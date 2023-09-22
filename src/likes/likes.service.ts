@@ -70,6 +70,7 @@ export class LikesService {
 
     return likeInfo ? likeInfo.status : Status.None;
   }
+
   async getLastLikes(id: string): Promise<LikeViewDTO[]> {
     const likesArr: LikeCreateDTO[] = await this.likesRepository.getLikes(id);
 

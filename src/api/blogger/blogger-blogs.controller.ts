@@ -27,7 +27,7 @@ import { PostsService } from '../../posts/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/post.models';
 import { UserInfo } from '../../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../../auth/decorators/current-session-info-jwt';
-import { CommentsQueryRepo } from '../../comments/comments.query.repository';
+import { CommentsQueryRepo } from '../../comments/infrastructure/repositories/mongo/comments.query.repository';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {

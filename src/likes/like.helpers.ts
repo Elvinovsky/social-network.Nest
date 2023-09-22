@@ -2,7 +2,7 @@
 // import { InjectModel } from '@nestjs/mongoose';
 // import { Like, LikeModel } from './like.schemas';
 // import { Status } from '../common/constant';
-// import { LikesRepository } from './likes.repository';
+// import { LikesRepository } from './likes.repositories';
 // @Injectable()
 // export class LikeAndDisCounter {
 //   constructor(

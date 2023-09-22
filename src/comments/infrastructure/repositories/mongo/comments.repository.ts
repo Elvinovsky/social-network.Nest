@@ -4,10 +4,13 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Comment, CommentDocument, CommentModel } from './comment.schemas';
-import { objectIdHelper } from '../common/helpers';
-import { CommentMapper } from './helpers/comment.mapping';
-import { CommentCreateDTO } from './comment.models';
+import {
+  Comment,
+  CommentDocument,
+  CommentModel,
+} from '../../../comment.schemas';
+import { CommentMapper } from '../../../helpers/comment.mapping';
+import { CommentCreateDTO, CommentViewDTO } from '../../../comment.models';
 
 @Injectable()
 export class CommentsRepository {
@@ -17,10 +20,8 @@ export class CommentsRepository {
   ) {}
   async getCommentById(commentId: string, userId: any) {
     try {
-      if (!objectIdHelper(commentId)) return null;
-
-      const result: CommentDocument | null = await this.commentModel.findOne({
-        _id: objectIdHelper(commentId),
+      const result: CommentCreateDTO | null = await this.commentModel.findOne({
+        id: commentId,
         'commentatorInfo.isBanned': { $ne: true },
       });
       if (!result) return null;
@@ -32,21 +33,7 @@ export class CommentsRepository {
     }
   }
 
-  async getCommentByPostId(postId: string) {
-    try {
-      if (!objectIdHelper(postId)) return null;
-
-      const result: CommentDocument | null = await this.commentModel.findOne({
-        postId: objectIdHelper(postId),
-      });
-      return result;
-    } catch (e) {
-      console.log(e, 'error getCommentByPostId');
-      throw new HttpException('server error', 500);
-    }
-  }
-
-  async addNewComment(newComment: CommentCreateDTO) {
+  async addNewComment(newComment: CommentCreateDTO): Promise<CommentViewDTO> {
     try {
       const comment: CommentDocument = new this.commentModel(newComment);
       await comment.save();
@@ -60,20 +47,18 @@ export class CommentsRepository {
 
   async updateCommentById(id: string, content: string): Promise<boolean> {
     const result = await this.commentModel.updateOne(
-      { _id: objectIdHelper(id) },
+      { id: id },
       { $set: { content } },
     );
     return result.matchedCount === 1;
   }
 
-  async findCommentById(id: string) {
+  async findCommentById(id: string): Promise<string | null> {
     try {
-      if (!objectIdHelper(id)) return null;
-
-      const result: CommentDocument | null = await this.commentModel.findById(
-        objectIdHelper(id),
-      );
-      return result;
+      const result: CommentCreateDTO | null = await this.commentModel.findOne({
+        id: id,
+      });
+      return result?.id ? result.id : null;
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);
@@ -81,22 +66,22 @@ export class CommentsRepository {
   }
 
   async deleteComment(id: string): Promise<boolean> {
-    const resultDeleted = await this.commentModel.deleteOne({
-      _id: objectIdHelper(id),
-    });
+    const resultDeleted = await this.commentModel.deleteOne({ id: id });
     return resultDeleted.deletedCount === 1;
   }
 
-  banComments(userId: string) {
-    return this.commentModel.updateMany(
+  async banCommentsUserId(userId: string): Promise<boolean> {
+    const bannedComments = await this.commentModel.updateMany(
       { 'commentatorInfo.userId': userId },
       { $set: { 'commentatorInfo.isBanned': true } },
     );
+    return bannedComments.matchedCount >= 1;
   }
-  unBanComments(userId: string) {
-    return this.commentModel.updateMany(
+  async unBanCommentsUserId(userId: string) {
+    const unBannedComments = await this.commentModel.updateMany(
       { 'commentatorInfo.userId': userId },
       { $set: { 'commentatorInfo.isBanned': false } },
     );
+    return unBannedComments.matchedCount >= 1;
   }
 }

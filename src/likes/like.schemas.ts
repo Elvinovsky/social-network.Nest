@@ -13,9 +13,9 @@ export class Like {
   @Prop({ required: true })
   userLogin: string;
   @Prop({ required: true })
-  postOrCommentId: string;
+  postIdOrCommentId: string;
   @Prop({ required: true })
-  createdAt: Date;
+  addedAt: Date;
   @Prop()
   isBanned: boolean;
 }

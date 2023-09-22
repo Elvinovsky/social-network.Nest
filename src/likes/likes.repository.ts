@@ -10,7 +10,7 @@ export class LikesRepository {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
   async countLikes(id: string) {
     const likes = await this.likeModel.countDocuments({
-      postOrCommentId: id,
+      postIdOrCommentId: id,
       status: Status.Like,
       isBanned: { $ne: true },
     });
@@ -18,7 +18,7 @@ export class LikesRepository {
   }
   async countDisLikes(id: string) {
     const disLikes = await this.likeModel.countDocuments({
-      postOrCommentId: id,
+      postIdOrCommentId: id,
       status: Status.Dislike,
       isBanned: { $ne: true },
     });
@@ -26,7 +26,7 @@ export class LikesRepository {
   }
   async getLikes(id: string): Promise<LikeCreateDTO[]> {
     return this.likeModel.find({
-      postOrCommentId: id,
+      postIdOrCommentId: id,
       status: Status.Like,
       isBanned: { $ne: true },
     });
@@ -35,10 +35,10 @@ export class LikesRepository {
     return this.likeModel
       .findOne({
         userId: userId,
-        postOrCommentId: postOrCommentId,
+        postIdOrCommentId: postOrCommentId,
         isBanned: { $ne: true },
       })
-      .exec();
+      .lean();
   }
   async updateLikeInfo(
     userId: string,
@@ -48,7 +48,7 @@ export class LikesRepository {
     const result = await this.likeModel.updateOne(
       {
         userId: userId,
-        postOrCommentId: postOrCommentId,
+        postIdOrCommentId: postOrCommentId,
       },
       { $set: { status: statusType } },
     );
@@ -63,8 +63,8 @@ export class LikesRepository {
       status: statusType,
       userId: userInfo.userId,
       userLogin: userInfo.userLogin,
-      postOrCommentId: postOrCommentId,
-      createdAt: new Date(),
+      postIdOrCommentId: postOrCommentId,
+      addedAt: new Date(),
       isBanned: false,
     });
 

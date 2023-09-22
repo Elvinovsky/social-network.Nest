@@ -25,5 +25,5 @@ export type LikeCreateDTO = {
   userId: string;
   userLogin: string;
   postOrCommentId: string;
-  createdAt: Date;
+  addedAt: Date;
 };

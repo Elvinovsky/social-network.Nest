@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CommentsRepository } from './comments.repository';
+import { CommentsRepository } from './infrastructure/repositories/mongo/comments.repository';
 import { CommentCreateDTO, CommentViewDTO } from './comment.models';
 import { Comment } from './comment.schemas';
 import { UserInfo } from '../users/user.models';
@@ -15,9 +15,6 @@ export class CommentsService {
     userId?: any,
   ): Promise<CommentViewDTO | null> {
     return await this.commentsRepository.getCommentById(commentId, userId);
-  }
-  async findCommentByPostId(postId: string) {
-    return this.commentsRepository.getCommentByPostId(postId);
   }
   async createComment(
     postId: string,
@@ -41,9 +38,9 @@ export class CommentsService {
   }
 
   async banComments(userId: string) {
-    return this.commentsRepository.banComments(userId);
+    return this.commentsRepository.banCommentsUserId(userId);
   }
   async unBanComments(userId: string) {
-    return this.commentsRepository.unBanComments(userId);
+    return this.commentsRepository.unBanCommentsUserId(userId);
   }
 }

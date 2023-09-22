@@ -33,7 +33,7 @@ import { DevicesService } from '../devices/devices.service';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { UsersQueryRepository } from '../users/infrastructure/users.query.repo';
 import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+//import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserRegistrationCommand } from './application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
 import requestIp from 'request-ip';
@@ -52,8 +52,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -90,8 +90,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -122,8 +122,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   async emailResending(@Body() emailModel: EmailInputModel) {
     // ищем юзера в БД по эл/почте.
     const foundUser: UserCreateDTO | null =
@@ -158,8 +158,8 @@ export class AuthController {
   }
 
   @Post('login')
-  @Throttle(5, 10)
-  @UseGuards(ThrottlerGuard, LocalAuthGuard)
+  // @Throttle(5, 10)
+  @UseGuards(/*ThrottlerGuard,*/ LocalAuthGuard)
   async login(
     @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,

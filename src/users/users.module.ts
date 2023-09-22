@@ -14,7 +14,7 @@ import { LikesRepository } from '../likes/likes.repository';
 import { Like, LikeSchema } from '../likes/like.schemas';
 import { Comment, CommentSchema } from '../comments/comment.schemas';
 import { CommentsService } from '../comments/comments.service';
-import { CommentsRepository } from '../comments/comments.repository';
+import { CommentsRepository } from '../comments/infrastructure/repositories/mongo/comments.repository';
 import { CommentMapper } from '../comments/helpers/comment.mapping';
 import { UsersRawSQLQueryRepository } from './infrastructure/sql/users-raw-sql-query.repository';
 import { UsersRawSQLRepository } from './infrastructure/sql/users-raw-sql.repository';

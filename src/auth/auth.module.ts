@@ -22,10 +22,10 @@ import { SendSMTPAdapter } from '../email/send-smtp-adapter';
 const useCases = [UserRegistrationUseCase];
 @Module({
   imports: [
-    ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
-    }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 1,
+    //   limit: 5,
+    // }),
     UsersModule,
     CqrsModule,
     forwardRef(() => DevicesModule),

@@ -83,14 +83,14 @@ export class CommentsController {
     sessionInfo: { userId: string; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
-    const comment = await this.commentService.findCommentById(id);
-    if (!comment) {
+    const commentId = await this.commentService.findCommentById(id);
+    if (!commentId) {
       throw new NotFoundException();
     }
 
     // Проверяем, является ли пользователь автором комментария
     const currentUser = await this.usersService.getUserSA(sessionInfo.userId);
-    if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
+    if (!currentUser || currentUser.id !== commentId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
 
