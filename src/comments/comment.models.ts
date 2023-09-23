@@ -12,10 +12,11 @@ export class CommentInputModel {
 }
 
 export type CommentCreateDTO = {
+  id: string;
   postId: string;
   content: string;
   commentatorInfo: CommentatorInfo;
-  addedAt: string;
+  addedAt: Date;
 };
 
 export type CommentViewDTO = {

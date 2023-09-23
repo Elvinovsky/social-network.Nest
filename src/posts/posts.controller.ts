@@ -29,7 +29,7 @@ import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optiona
 import { CommentInputModel } from '../comments/comment.models';
 import { CommentsService } from '../comments/comments.service';
 import { UsersService } from '../users/application/users.service';
-import { CommentsQueryRepo } from '../comments/comments.query.repository';
+import { CommentsQueryRepo } from '../comments/infrastructure/repositories/mongo/comments.query.repository';
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 
@@ -103,7 +103,7 @@ export class PostsController {
   @Get(':postId/comments')
   @UseGuards(OptionalBearerGuard)
   async getCommentsByPostId(
-    @Query() query: QueryInputModel & SearchTitleTerm,
+    @Query() query: QueryInputModel,
     @Param('postId') postId: string,
     @CurrentUserIdOptional() userId?: string,
   ) {

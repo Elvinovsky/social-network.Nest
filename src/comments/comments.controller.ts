@@ -21,6 +21,7 @@ import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
+import { ParamUUIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('/comments')
 export class CommentsController {
@@ -33,7 +34,7 @@ export class CommentsController {
   @Get(':id')
   @UseGuards(OptionalBearerGuard)
   async getComment(
-    @Param('id') id: string,
+    @Param('id', ParamUUIdPipe) id: string,
     @CurrentUserIdOptional() userId?: string,
   ) {
     const comment = await this.commentService.getComment(id, userId);

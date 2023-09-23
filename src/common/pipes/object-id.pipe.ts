@@ -1,5 +1,6 @@
 import { Injectable, PipeTransform } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ObjectIdPipe implements PipeTransform {
@@ -8,5 +9,15 @@ export class ObjectIdPipe implements PipeTransform {
       return value;
     }
     return false;
+  }
+}
+
+@Injectable()
+export class ParamUUIdPipe implements PipeTransform {
+  transform(value: string): string | null {
+    if (isUUID(value)) {
+      return value;
+    }
+    return null;
   }
 }

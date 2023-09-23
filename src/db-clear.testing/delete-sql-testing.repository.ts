@@ -7,6 +7,12 @@ export class DeleteDbSQLRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async deleteDB() {
     await this.dataSource.query(`
+    DELETE FROM "features"."likes"
+    `);
+    await this.dataSource.query(`
+    DELETE FROM "features"."comments"
+    `);
+    await this.dataSource.query(`
     DELETE FROM "features"."posts"
     `);
     await this.dataSource.query(`

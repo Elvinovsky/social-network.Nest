@@ -28,7 +28,7 @@ export class Blog {
   @Prop({ required: true, default: false })
   isMembership: boolean;
 
-  @Prop({ type: UserInfo, required: true })
+  @Prop({ type: UserInfo || null })
   blogOwnerInfo: UserInfo | null;
 
   static createBlog(

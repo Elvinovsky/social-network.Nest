@@ -21,7 +21,6 @@ import {
 } from '../../../../pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../common/constants';
 import { UserInfo } from '../../../../users/user.models';
-import { BlogsQueryRepo } from '../../../../blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogModel } from '../../../../blogs/blog.schemas';
 
 export class CommentsQueryRepo {
@@ -30,17 +29,16 @@ export class CommentsQueryRepo {
     @InjectModel(Post.name) private postModel: PostModel,
     @InjectModel(Blog.name) private blogModel: BlogModel,
     private readonly commentMapper: CommentMapper,
-    private readonly blogsQueryRepo: BlogsQueryRepo,
   ) {}
   async getCommentsByPostId(
     postId: string,
     pageNumber: number,
     pageSize: number,
-    sortBy?: string,
-    sortDirection?: string,
+    sortBy: string,
+    sortDirection: string,
     userId?: string,
   ): Promise<PaginatorType<CommentViewDTO[]> | null> {
-    const postIdForComment = await this.postModel.findById(postId);
+    const postIdForComment = await this.postModel.findOne({ id: postId });
     if (!postIdForComment) {
       return null;
     }

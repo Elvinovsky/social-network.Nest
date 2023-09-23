@@ -1,5 +1,4 @@
-import { CommentDocument } from '../comment.schemas';
-import { CommentViewDTO } from '../comment.models';
+import { CommentCreateDTO, CommentViewDTO } from '../comment.models';
 import { LikesService } from '../../likes/likes.service';
 import { Injectable } from '@nestjs/common';
 
@@ -7,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export class CommentMapper {
   constructor(private readonly likesService: LikesService) {}
   async comment(
-    comment: CommentDocument,
+    comment: CommentCreateDTO,
     currentUserId?: string,
   ): Promise<CommentViewDTO> {
     const status = await this.likesService.getLikeStatusCurrentUser(
@@ -31,11 +30,11 @@ export class CommentMapper {
         dislikesCount: countsLikeAndDis.disLikes,
         myStatus: status,
       },
-      createdAt: comment.addedAt,
+      createdAt: comment.addedAt.toISOString(),
     };
   }
   async comments(
-    array: Array<CommentDocument>,
+    array: Array<CommentCreateDTO>,
     userId?: string,
   ): Promise<CommentViewDTO[]> {
     return Promise.all(
@@ -50,7 +49,7 @@ export class CommentMapper {
         );
 
         return {
-          id: el._id.toString(),
+          id: el.id,
           content: el.content,
           commentatorInfo: {
             userId: el.commentatorInfo.userId,
@@ -61,7 +60,7 @@ export class CommentMapper {
             dislikesCount: countsLikeAndDis.disLikes,
             myStatus: status,
           },
-          createdAt: el.addedAt,
+          createdAt: el.addedAt.toISOString(),
         };
       }),
     );

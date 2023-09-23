@@ -37,13 +37,13 @@ export class UsersRawSQLQueryRepository {
         ORDER BY "${getSortBy(sortBy)}" ${
       getDirection(sortDirection) === 1 ? 'Asc' : 'Desc'
     }
-      OFFSET $3 LIMIT $4`;
+      OFFSET $3 LIMIT $4`; // todo добавить валидацию на офсет для ограничения пролистования записей .
 
     const users = await this.dataSource.query(queryString, [
       getLoginTerm(searchLoginTerm),
       getEmailTerm(searchEmailTerm),
-      getSkip(getPageNumber(pageNumber), getPageSize(pageSize)),
-      getPageSize(pageSize),
+      getSkip(pageNumber, pageSize),
+      pageSize,
     ]);
 
     const usersMap = await users.map((el) => {

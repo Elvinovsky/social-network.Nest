@@ -19,6 +19,7 @@ import { CommentMapper } from '../comments/helpers/comment.mapping';
 import { UsersRawSQLQueryRepository } from './infrastructure/sql/users-raw-sql-query.repository';
 import { UsersRawSQLRepository } from './infrastructure/sql/users-raw-sql.repository';
 import { getConfiguration } from '../configuration/getConfiguration';
+import { CommentsRawSqlRepository } from '../comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
@@ -52,7 +53,13 @@ const useCases = [UserRegistrationToAdminUseCase];
     LikesRepository,
 
     CommentsService,
-    CommentsRepository,
+    {
+      provide: CommentsRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? CommentsRepository
+          : CommentsRawSqlRepository,
+    },
     CommentMapper,
 
     UsersService,

@@ -36,14 +36,14 @@ export class OptionalBearerGuard implements CanActivate {
         }),
       })
       .catch(() => {
-        return true;
+        console.log('token invalid, but true');
       });
 
     if (!payload) {
       return true;
     }
 
-    request.userId = payload.userId;
+    request.userId = payload.userInfo.userId;
     return true;
   }
 

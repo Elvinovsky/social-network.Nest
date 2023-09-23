@@ -18,6 +18,7 @@ import { BlogViewDTO } from './blog.models';
 import { PostViewDTO } from '../posts/post.models';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
+import { ParamUUIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -41,7 +42,9 @@ export class BlogsController {
 
   @Get(':blogId')
   @HttpCode(HttpStatus.OK)
-  async getBlog(@Param('blogId') blogId: string): Promise<BlogViewDTO> {
+  async getBlog(
+    @Param('blogId', ParamUUIdPipe) blogId: string,
+  ): Promise<BlogViewDTO> {
     const blog: BlogViewDTO | null = await this.blogsQueryRepo.getBlogById(
       blogId,
     );
