@@ -1,14 +1,14 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { LikeCreateDTO } from './like.models';
-import { Like, LikeModel } from './like.schemas';
-import { Status } from '../common/constants';
-import { UserInfo } from '../users/user.models';
+import { LikeCreateDTO } from '../../like.models';
+import { Like, LikeModel } from '../../like.schemas';
+import { Status } from '../../../common/constants';
+import { UserInfo } from '../../../users/user.models';
 
 @Injectable()
 export class LikesRepository {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
-  async countLikes(id: string) {
+  async countLikes(id: string): Promise<number> {
     const likes = await this.likeModel.countDocuments({
       postIdOrCommentId: id,
       status: Status.Like,
@@ -16,7 +16,7 @@ export class LikesRepository {
     });
     return likes;
   }
-  async countDisLikes(id: string) {
+  async countDisLikes(id: string): Promise<number> {
     const disLikes = await this.likeModel.countDocuments({
       postIdOrCommentId: id,
       status: Status.Dislike,
@@ -31,7 +31,10 @@ export class LikesRepository {
       isBanned: { $ne: true },
     });
   }
-  async getLikeInfo(userId: string, postOrCommentId: string) {
+  async getLikeInfo(
+    userId: string,
+    postOrCommentId: string,
+  ): Promise<LikeCreateDTO | null> {
     const likeInfo: LikeCreateDTO | null = await this.likeModel
       .findOne({
         userId: userId,
@@ -59,7 +62,7 @@ export class LikesRepository {
     userInfo: UserInfo,
     postOrCommentId: string,
     statusType: string,
-  ) {
+  ): Promise<boolean> {
     const newLikeInfo = new this.likeModel({
       status: statusType,
       userId: userInfo.userId,
@@ -72,21 +75,21 @@ export class LikesRepository {
     await newLikeInfo.save();
     return !!newLikeInfo;
   }
-  async banLikes(userId: string) {
-    return this.likeModel.updateMany(
+  async banLikes(userId: string): Promise<boolean> {
+    return !!(await this.likeModel.updateMany(
       { userId: userId },
       {
         $set: {
           isBanned: true,
         },
       },
-    );
+    ));
   }
 
-  unBanLikes(userId: string) {
-    return this.likeModel.updateMany(
+  async unBanLikes(userId: string): Promise<boolean> {
+    return !!(await this.likeModel.updateMany(
       { userId: userId },
       { $set: { isBanned: false } },
-    );
+    ));
   }
 }

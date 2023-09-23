@@ -9,7 +9,7 @@ import { BlogsController } from './blogs/blogs.controller';
 import { BlogsQueryRepo } from './blogs/infrastructure/repositories/blogs.query.repo';
 import { Blog, BlogSchema } from './blogs/blog.schemas';
 import { LikesService } from './likes/likes.service';
-import { LikesRepository } from './likes/likes.repository';
+import { LikesRepository } from './likes/infrastructure/mongo/likes.repository';
 import { PostMapper } from './posts/post.helpers';
 import { Post, PostSchema } from './posts/post.schemas';
 import { BlogsService } from './blogs/application/blogs.service';

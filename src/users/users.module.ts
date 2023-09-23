@@ -10,7 +10,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { SaUsersController } from '../api/sa/sa-users.controller';
 import { DevicesModule } from '../devices/devices.module';
 import { LikesService } from '../likes/likes.service';
-import { LikesRepository } from '../likes/likes.repository';
+import { LikesRepository } from '../likes/infrastructure/mongo/likes.repository';
 import { Like, LikeSchema } from '../likes/like.schemas';
 import { Comment, CommentSchema } from '../comments/comment.schemas';
 import { CommentsService } from '../comments/comments.service';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LikesRepository } from './likes.repository';
+import { LikesRepository } from './infrastructure/mongo/likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from './like.models';
 import { Status } from '../common/constants';
 import { UserInfo } from '../users/user.models';
