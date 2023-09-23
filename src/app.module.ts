@@ -23,14 +23,14 @@ import { PostsController } from './posts/posts.controller';
 import { Like, LikeSchema } from './likes/like.schemas';
 import { Comment, CommentSchema } from './comments/comment.schemas';
 import { CommentsService } from './comments/comments.service';
-import { CommentsRepository } from './comments/comments.repository';
+import { CommentsRepository } from './comments/infrastructure/repositories/mongo/comments.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentMapper } from './comments/helpers/comment.mapping';
 import { EmailSenderService } from './email/email.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { Device, DeviceSchema } from './devices/device.schemas';
-import { CommentsQueryRepo } from './comments/comments.query.repository';
+import { CommentsQueryRepo } from './comments/infrastructure/repositories/mongo/comments.query.repository';
 import { DevicesModule } from './devices/devices.module';
 import { BlogIdExistenceCheck } from './posts/post.models';
 import { getConfiguration } from './configuration/getConfiguration';
@@ -43,6 +43,8 @@ import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.
 import { PostsRawSqlQueryRepository } from './posts/infrastructure/sql/posts-raw-sql-query.repository';
 import { BlogsRawSqlRepository } from './blogs/infrastructure/repositories/sql/blogs-raw-sql.repository';
 import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/sql/blogs-query-raw-sql.repository';
+import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
+import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 
 @Module({
   imports: [
@@ -120,7 +122,20 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
     },
     CommentsService,
     CommentsRepository,
-    CommentsQueryRepo,
+    {
+      provide: CommentsRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? CommentsRepository
+          : CommentsRawSqlRepository,
+    },
+    {
+      provide: CommentsQueryRepo,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? CommentsQueryRepo
+          : CommentsQueryRawSqlRepository,
+    },
     CommentMapper,
 
     LikesService,
