@@ -45,6 +45,7 @@ import { BlogsRawSqlRepository } from './blogs/infrastructure/repositories/sql/b
 import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/sql/blogs-query-raw-sql.repository';
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
+import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.repository';
 
 @Module({
   imports: [
@@ -139,7 +140,13 @@ import { CommentsQueryRawSqlRepository } from './comments/infrastructure/reposit
     CommentMapper,
 
     LikesService,
-    LikesRepository,
+    {
+      provide: LikesRepository,
+      useClass:
+        getConfiguration().repo_type === 'Mongo'
+          ? LikesRepository
+          : LikesRawSqlRepository,
+    },
   ],
 })
 export class AppModule {}
