@@ -5,6 +5,17 @@ import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/settings/app-settings';
 import { BlogViewDTO } from '../src/blogs/blog.models';
 
+export const blogViewModel: BlogViewDTO = {
+  id: expect.stringMatching(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+  ),
+  name: 'elvinovsky blog',
+  description: 'blog of elvinovsky',
+  websiteUrl: 'https://elvinovsky.ru',
+  createdAt: expect.any(String),
+  isMembership: false,
+};
+
 describe('BLOGS', () => {
   let app: INestApplication;
   let httpServer: any;
@@ -34,17 +45,6 @@ describe('BLOGS', () => {
       items: [],
     });
   });
-
-  const blogViewModel: BlogViewDTO = {
-    id: expect.stringMatching(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-    ),
-    name: 'elvinovsky blog',
-    description: 'blog of elvinovsky',
-    websiteUrl: 'https://elvinovsky.ru',
-    createdAt: expect.any(String),
-    isMembership: false,
-  };
 
   it('CREATE BLOG FOR SA, should return 201 and BlogViewModel', async () => {
     const createdBlog = await request(httpServer)
