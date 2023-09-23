@@ -46,6 +46,7 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.repository';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -149,4 +150,6 @@ import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
