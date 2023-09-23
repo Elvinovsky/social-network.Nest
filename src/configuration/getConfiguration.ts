@@ -24,8 +24,9 @@ export const getConfiguration = () => ({
     username: 'postgres',
     password: 'sa',
     database: 'social-network',
-    autoLoadEntities: false,
-    synchronize: false,
+    entities: [],
+    autoLoadEntities: true,
+    synchronize: true,
   },
 });
 
