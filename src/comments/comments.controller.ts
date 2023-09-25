@@ -15,7 +15,6 @@ import { CommentsService } from './comments.service';
 import { OptionalBearerGuard } from '../auth/guards/optional-bearer.guard';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer-auth.guard';
 import { CommentInputModel } from './comment.models';
-import { UsersService } from '../users/application/users.service';
 import { LikeStatus } from '../likes/like.models';
 import { LikesService } from '../likes/likes.service';
 import { CurrentUserIdOptional } from '../auth/decorators/current-userId-optional.decorator';
@@ -27,7 +26,6 @@ import { ParamUUIdPipe } from '../common/pipes/object-id.pipe';
 export class CommentsController {
   constructor(
     private commentService: CommentsService,
-    private usersService: UsersService,
     private likesService: LikesService,
   ) {}
 
@@ -52,7 +50,7 @@ export class CommentsController {
     @Param('id') id: string,
     @Body() inputModel: CommentInputModel,
     @CurrentSessionInfoFromAccessJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
     const comment = await this.commentService.getComment(id);
@@ -62,8 +60,7 @@ export class CommentsController {
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.findUser(sessionInfo.userId);
-    if (!currentUser || currentUser.id !== comment.commentatorInfo.userId) {
+    if (sessionInfo.userInfo.userId !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
 
@@ -79,19 +76,18 @@ export class CommentsController {
   @Delete(':id')
   @UseGuards(JwtBearerGuard)
   async deleteComment(
-    @Param('id') id: string,
+    @Param('id', ParamUUIdPipe) id: string,
     @CurrentSessionInfoFromAccessJWT()
-    sessionInfo: { userId: string; deviceId: string },
+    sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
     // Проверяем, существует ли комментарий с указанным id
-    const commentId = await this.commentService.findCommentById(id);
-    if (!commentId) {
+    const comment = await this.commentService.findCommentById(id);
+    if (!comment) {
       throw new NotFoundException();
     }
 
     // Проверяем, является ли пользователь автором комментария
-    const currentUser = await this.usersService.getUserSA(sessionInfo.userId);
-    if (!currentUser || currentUser.id !== commentId) {
+    if (sessionInfo.userInfo.userId !== comment.commentatorInfo.userId) {
       throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
 
@@ -113,6 +109,11 @@ export class CommentsController {
     const comment = await this.commentService.findCommentById(id);
     if (!comment) {
       throw new NotFoundException();
+    }
+
+    // Проверяем, является ли пользователь автором комментария
+    if (sessionInfo.userInfo.userId !== comment.commentatorInfo.userId) {
+      throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
     }
 
     // Создаем или обновляем лайк для комментария

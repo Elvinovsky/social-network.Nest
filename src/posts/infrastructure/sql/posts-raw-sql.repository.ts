@@ -47,7 +47,7 @@ export class PostsRawSqlRepository {
           inputModel.addedAt,
         ],
       )
-      .catch((error) => Promise.reject(error));
+      .catch((error) => Promise.reject(console.log(error)));
 
     return this.postMapper.mapPost(inputModel);
   }

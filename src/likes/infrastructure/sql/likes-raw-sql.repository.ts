@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LikeCreateDTO } from '../../like.models';
+import { LikeCreateDTO, LikeViewDTO } from '../../like.models';
 import { Status } from '../../../common/constants';
 import { UserInfo } from '../../../users/user.models';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -15,10 +15,10 @@ export class LikesRawSqlRepository {
       FROM 
             "features"."likes"
       WHERE "postIdOrCommentId" = $1 
-             and "status" =  ${Status.Like}
-             "isBanned" = false
+             and "status" =  $2
+             and "isBanned" = false
     `,
-      [id],
+      [id, Status.Like],
     );
     return +likes[0].total;
   }
@@ -29,10 +29,10 @@ export class LikesRawSqlRepository {
       FROM 
             "features"."likes"
       WHERE "postIdOrCommentId" = $1 
-             and "status" =  ${Status.Dislike}
-             "isBanned" = false
+             and "status" =  $2
+             and "isBanned" = false
     `,
-      [id],
+      [id, Status.Dislike],
     );
     return +disLikes[0].total;
   }
@@ -49,10 +49,10 @@ export class LikesRawSqlRepository {
             u."id" = l."userId"
       WHERE 
             "postIdOrCommentId" = $1 
-            and "status" =  ${Status.Like}
+            and "status" =  $2
             and "isBanned" = false
     `,
-      [id],
+      [id, Status.Like],
     );
   }
 
@@ -73,10 +73,10 @@ export class LikesRawSqlRepository {
       WHERE 
             l."userId" = $1
             and l."postIdOrCommentId" = $2 
-            and l."status" =  ${Status.Like}
+            and l."status" = $3
             and l."isBanned" = false
     `,
-      [userId, postOrCommentId],
+      [userId, postOrCommentId, Status.Like],
     );
 
     if (likeInfo.length < 1) return null;
@@ -87,6 +87,7 @@ export class LikesRawSqlRepository {
       userLogin: likeInfo[0].userLogin,
       postIdOrCommentId: likeInfo[0].postIdOrCommentId,
       addedAt: likeInfo[0].addedAt,
+      isBanned: likeInfo[0].isBanned,
     };
   }
 
@@ -109,18 +110,20 @@ export class LikesRawSqlRepository {
     );
     return result.matchedCount === 1;
   }
-  async addLikeInfo(
-    userInfo: UserInfo,
-    postOrCommentId: string,
-    statusType: string,
-  ): Promise<boolean> {
+  async addLikeInfo(inputModel: LikeCreateDTO): Promise<boolean> {
     const newLikeInfo = await this.dataSource.query(
       `
         INSERT INTO features.likes(
                 "status", "userId", "postIdOrCommentId", "addedAt", "isBanned")
-        VALUES ($1, $2, $3, $4, ${new Date()}, false);
+        VALUES ($1, $2, $3, $4, $5);
     `,
-      [statusType, userInfo.userId, postOrCommentId],
+      [
+        inputModel.status,
+        inputModel.userId,
+        inputModel.postIdOrCommentId,
+        inputModel.addedAt,
+        inputModel.isBanned,
+      ],
     );
     return newLikeInfo.length === 0;
   }

@@ -82,12 +82,45 @@ export class PostsRawSqlQueryRepository {
     try {
       const post = await this.dataSource.query(
         `
-       SELECT p."id", p."title", p."shortDescription",  p."content", p."blogId", p."blogName", p."addedAt"
-       FROM "features"."posts" p 
-       WHERE "id" = $1
+       SELECT 
+                p."id", 
+                p."title", 
+                p."shortDescription",  
+                p."content", 
+                p."blogId", 
+                p."blogName", 
+                p."addedAt" as "createdAt",
+                SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
+                SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
+                MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
+       LEFT JOIN 
+                "features"."likes" l
+       ON
+                l."postIdOrCommentId" = p."id"
+                and l."isBanned" = false
+       FROM 
+                "features"."posts" p 
+       WHERE 
+                "id" = $1
+       GROUP BY
+                p."id",
+                p."title", 
+                p."shortDescription",  
+                p."content",
+                p."blogId", 
+                p."blogName", 
+                p."addedAt";
       `,
-        [postId],
+        [postId, userId],
       );
+
+      const newestLikes = await this.dataSource.query(`
+          SELECT 
+                    "userId", "userLogin", "addedAt"
+          FROM 
+                    "features"."likes"
+          ORDER
+      `);
 
       if (post.length < 1) {
         return null;

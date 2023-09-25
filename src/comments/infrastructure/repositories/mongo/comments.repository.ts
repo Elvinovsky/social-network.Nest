@@ -53,12 +53,20 @@ export class CommentsRepository {
     return result.matchedCount === 1;
   }
 
-  async findCommentById(id: string): Promise<string | null> {
+  async findCommentById(id: string): Promise<CommentCreateDTO | null> {
     try {
       const result: CommentCreateDTO | null = await this.commentModel.findOne({
         id: id,
       });
-      return result?.id ? result.id : null;
+      if (!result) return null;
+
+      return {
+        id: result.id,
+        postId: result.postId,
+        content: result.content,
+        commentatorInfo: result.commentatorInfo,
+        addedAt: result.addedAt,
+      };
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);

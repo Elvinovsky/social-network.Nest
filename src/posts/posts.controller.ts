@@ -32,6 +32,7 @@ import { UsersService } from '../users/application/users.service';
 import { CommentsQueryRepo } from '../comments/infrastructure/repositories/mongo/comments.query.repository';
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
+import { ParamUUIdPipe } from '../common/pipes/object-id.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -40,7 +41,6 @@ export class PostsController {
     private readonly postsQueryRepo: PostsQueryRepository,
     private readonly likesService: LikesService,
     private readonly commentsService: CommentsService,
-    private readonly usersService: UsersService,
     private readonly commentsQueryRepo: CommentsQueryRepo,
   ) {}
 
@@ -85,7 +85,7 @@ export class PostsController {
   async updateLikeStatusPost(
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
-    @Param('postId') postId: string,
+    @Param('postId', ParamUUIdPipe) postId: string,
     @Body() inputModel: LikeStatus,
   ) {
     const post = await this.postsService.findPostById(postId);

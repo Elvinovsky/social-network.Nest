@@ -44,7 +44,7 @@ export class CommentsQueryRawSqlRepository {
             u."login" as "userLogin",
             c."addedAt" AS "createdAt",
             SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
-            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "disLikesCount",
+            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
             MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
       FROM 
             "features"."comments" c
@@ -67,7 +67,7 @@ export class CommentsQueryRawSqlRepository {
             u."login",
             c."addedAt"
       ORDER BY 
-            c."${sortBy}" ${sortDirection === 'asc' ? 'asc' : 'desc'}
+            c."${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
       OFFSET $3 
       LIMIT $4`; // todo добавить валидацию на офсет для ограничения пролистования записей .
 
@@ -89,8 +89,8 @@ export class CommentsQueryRawSqlRepository {
           userLogin: el.userLogin,
         },
         likesInfo: {
-          likesCount: el.likesCount,
-          dislikesCount: el.dislikesCount,
+          likesCount: +el.likesCount,
+          dislikesCount: +el.dislikesCount,
           myStatus: el.myStatus ? el.myStatus : 'None',
         },
         createdAt: el.createdAt.toISOString(),

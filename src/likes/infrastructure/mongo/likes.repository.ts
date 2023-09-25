@@ -58,19 +58,8 @@ export class LikesRepository {
     );
     return result.matchedCount === 1;
   }
-  async addLikeInfo(
-    userInfo: UserInfo,
-    postOrCommentId: string,
-    statusType: string,
-  ): Promise<boolean> {
-    const newLikeInfo = new this.likeModel({
-      status: statusType,
-      userId: userInfo.userId,
-      userLogin: userInfo.userLogin,
-      postIdOrCommentId: postOrCommentId,
-      addedAt: new Date(),
-      isBanned: false,
-    });
+  async addLikeInfo(inputModel: LikeCreateDTO): Promise<boolean> {
+    const newLikeInfo = new this.likeModel(inputModel);
 
     await newLikeInfo.save();
     return !!newLikeInfo;

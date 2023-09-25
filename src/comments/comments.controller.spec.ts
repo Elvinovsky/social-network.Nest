@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, Request } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../app.module';
 import { appSettings } from '../settings/app-settings';
@@ -7,6 +7,7 @@ import { blogViewModel } from '../../test/blogs.e2e-spec';
 import { BlogViewDTO } from '../blogs/blog.models';
 import { PostViewDTO } from '../posts/post.models';
 import { UserViewDTO } from '../users/user.models';
+import { CommentCreateDTO } from './comment.models';
 
 describe('COMMENTS', () => {
   let app: INestApplication;
@@ -14,6 +15,8 @@ describe('COMMENTS', () => {
   let createdBlogView: BlogViewDTO;
   let createdPostView: PostViewDTO;
   let createdUserView: UserViewDTO;
+  let createdCommentView: CommentCreateDTO;
+  let accessToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -60,6 +63,15 @@ describe('COMMENTS', () => {
       })
       .expect(HttpStatus.CREATED);
 
+    const loginGetTokens = await request(httpServer)
+      .post('/auth/login')
+      .send({
+        loginOrEmail: 'elvinovsky',
+        password: '123qwer',
+      })
+      .expect(HttpStatus.OK);
+
+    accessToken = loginGetTokens.body.accessToken;
     createdBlogView = createdBlog.body;
     createdPostView = createdPost.body;
     createdUserView = createdUser.body;
@@ -87,17 +99,9 @@ describe('COMMENTS', () => {
   });
 
   it('CREATE COMMENT, should return CommentViewDto, 201 status', async () => {
-    const loginGetTokens = await request(httpServer)
-      .post('/auth/login')
-      .send({
-        loginOrEmail: 'elvinovsky',
-        password: '123qwer',
-      })
-      .expect(HttpStatus.OK);
-
     const createdComment = await request(httpServer)
       .post(`/posts/${createdPostView.id}/comments`)
-      .auth(loginGetTokens.body.accessToken, { type: 'bearer' })
+      .auth(accessToken, { type: 'bearer' })
       .send({
         content:
           'In order to create a comment, ' +
@@ -107,6 +111,8 @@ describe('COMMENTS', () => {
           'create a post for this blog.',
       })
       .expect(HttpStatus.CREATED);
+
+    createdCommentView = createdComment.body;
 
     expect(createdComment.body).toEqual({
       id: expect.stringMatching(
@@ -127,7 +133,7 @@ describe('COMMENTS', () => {
     });
   });
 
-  it('GET COMMENTS, should return pagination view for comments ', async () => {
+  it('GET COMMENTS, should return pagination view for created comment ', async () => {
     const getCommentsNoAuth = await request(httpServer)
       .get(`/posts/${createdPostView.id}/comments`)
       .expect(HttpStatus.OK);
@@ -149,12 +155,50 @@ describe('COMMENTS', () => {
             userLogin: 'elvinovsky',
           },
           likesInfo: {
-            likesCount: '0',
-            myStatus: 'None',
+            likesCount: expect.any(Number),
+            dislikesCount: expect.any(Number),
+            myStatus: expect.stringMatching(/^Like$|^Dislike$|^None$/),
           },
           createdAt: expect.any(String),
         },
       ],
     });
   });
+
+  it('UPDATE COMMENT, should return 204', async () => {
+    await request(httpServer)
+      .put(`/comments/${createdCommentView.id}`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({
+        content:
+          'In order to create a comment, ' +
+          'you need to create a user, ' +
+          'log in to the system, ' +
+          'create a blog,' +
+          ' create a post for this blog,' +
+          ' create comment for this post.',
+      });
+    const getUpdatedComment = await request(httpServer)
+      .get(`/comments/${createdCommentView.id}`)
+      .expect(HttpStatus.OK);
+
+    expect(getUpdatedComment.body.content).toEqual(
+      'In order to create a comment, ' +
+        'you need to create a user, ' +
+        'log in to the system, ' +
+        'create a blog,' +
+        ' create a post for this blog,' +
+        ' create comment for this post.',
+    );
+  });
+
+  // it('DELETE COMMENT, should return 404', async () => {
+  //   await request(httpServer)
+  //     .delete(`/comments/${createdCommentView.id}`)
+  //     .auth(accessToken, { type: 'bearer' });
+  //
+  //   await request(httpServer)
+  //     .get(`/comments/${createdCommentView.id}`)
+  //     .expect(HttpStatus.NOT_FOUND);
+  // });
 });

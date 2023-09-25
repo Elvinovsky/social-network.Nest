@@ -23,9 +23,9 @@ export class CommentsRawSqlRepository {
             c."content" as "content",
             c."userId" as "userId",
             u."login" as "userLogin",
-            c."addedAt" AS "createdAt",
+            c."addedAt" as "createdAt",
             SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
-            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "disLikesCount",
+            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
             MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
       FROM 
             "features"."comments" c
@@ -36,7 +36,6 @@ export class CommentsRawSqlRepository {
       LEFT JOIN 
             "features"."likes" l
       ON
-            l."userId" = u."id"
             and l."postIdOrCommentId" = c."id"
             and l."isBanned" = false
       WHERE 
@@ -62,8 +61,8 @@ export class CommentsRawSqlRepository {
           userLogin: result[0].userLogin,
         },
         likesInfo: {
-          likesCount: result[0].likesCount,
-          dislikesCount: result[0].dislikesCount,
+          likesCount: +result[0].likesCount,
+          dislikesCount: +result[0].dislikesCount,
           myStatus: result[0].myStatus ? result[0].myStatus : 'None',
         },
         createdAt: result[0].createdAt,
@@ -117,12 +116,15 @@ export class CommentsRawSqlRepository {
     return result[1] === 1;
   }
 
-  async findCommentById(commentId: string): Promise<boolean> {
+  async findCommentById(
+    commentId: string,
+  ): Promise<CommentCreateDTO | boolean> {
     try {
       const result = await this.dataSource.query(
         `
-        SELECT COUNT(*)
-        FROM
+       SELECT 
+                "id", "postId", "content", "userId", "addedAt", "isBanned"
+       FROM 
                 "features"."comments"
         WHERE 
                 "id" = $1;
@@ -130,7 +132,19 @@ export class CommentsRawSqlRepository {
       `,
         [commentId],
       );
-      return result.length === 1;
+      if (result.length < 1 || result[0].isBanned) return false;
+
+      return {
+        id: result[0].id,
+        content: result[0].content,
+        postId: result[0].postId,
+        commentatorInfo: {
+          userId: result[0].userId,
+          userLogin: result[0].userLogin,
+          isBanned: result[0].isBanned,
+        },
+        addedAt: result[0].addedAt,
+      };
     } catch (e) {
       console.log(e, 'error getCommentById');
       throw new HttpException('server error', 500);
@@ -138,17 +152,22 @@ export class CommentsRawSqlRepository {
   }
 
   async deleteComment(commentId: string): Promise<boolean> {
-    const resultDeleted = await this.dataSource.query(
-      `
+    try {
+      const resultDeleted = await this.dataSource.query(
+        `
         DELETE FROM 
                     "features"."comments"
         WHERE
                     "id" = $1
         
     `,
-      [commentId],
-    );
-    return resultDeleted[1] === 1;
+        [commentId],
+      );
+      return resultDeleted[1] === 1;
+    } catch (e) {
+      console.log(e, 'error deleteComment');
+      throw new HttpException('server error', 500);
+    }
   }
 
   async banCommentsUserId(userId: string): Promise<boolean> {

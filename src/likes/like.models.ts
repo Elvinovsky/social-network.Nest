@@ -26,4 +26,5 @@ export type LikeCreateDTO = {
   userLogin: string;
   postIdOrCommentId: string;
   addedAt: Date;
+  isBanned: boolean;
 };
