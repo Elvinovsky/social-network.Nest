@@ -88,6 +88,7 @@ import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.
 
     EmailSenderService,
     SendSMTPAdapter,
+    LikesRawSqlRepository,
     {
       provide: BlogsRepository,
       useClass:

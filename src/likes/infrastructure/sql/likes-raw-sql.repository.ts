@@ -1,13 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { LikeCreateDTO, LikeViewDTO } from '../../like.models';
+import { LikeCreateDTO } from '../../like.models';
 import { Status } from '../../../common/constants';
-import { UserInfo } from '../../../users/user.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class LikesRawSqlRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
+  async newestLikes(postId: string) {
+    const newestLikes = await this.dataSource.query(
+      `
+          SELECT 
+                    l."userId", u."login", l."addedAt"
+          FROM 
+                    "features"."likes" l
+          LEFT JOIN 
+                    "user"."accountData" u
+          ON 
+                    u."id" = l."userId"
+          WHERE 
+                    l."postIdOrCommentId" = $1 
+                    and "status" = $2
+          ORDER BY 
+                    l."addedAt" Desc
+          LIMIT 3
+      `,
+      [postId, Status.Like],
+    );
+    return newestLikes.length < 1 ? [] : newestLikes;
+  }
+  async currentStatus(commentId: string, userId?: string): Promise<string> {
+    const myStatus = await this.dataSource.query(
+      `
+      SELECT "status"
+      FROM "features"."likes"
+      WHERE "postIdOrCommentId" = $1 and "userId" = $2 
+      `,
+      [commentId, userId],
+    );
+    return (await myStatus.length) < 1 ? 'None' : myStatus[0].status;
+  }
+
   async countLikes(id: string): Promise<number> {
     const likes = await this.dataSource.query(
       `
@@ -73,10 +106,9 @@ export class LikesRawSqlRepository {
       WHERE 
             l."userId" = $1
             and l."postIdOrCommentId" = $2 
-            and l."status" = $3
             and l."isBanned" = false
     `,
-      [userId, postOrCommentId, Status.Like],
+      [userId, postOrCommentId],
     );
 
     if (likeInfo.length < 1) return null;
@@ -89,6 +121,17 @@ export class LikesRawSqlRepository {
       addedAt: likeInfo[0].addedAt,
       isBanned: likeInfo[0].isBanned,
     };
+  }
+  async deleteLikeInfo(userId: string, postOrCommentId: string) {
+    const deleteResult = await this.dataSource.query(
+      `
+    DELETE FROM  "features"."likes"
+    WHERE   
+                "postIdOrCommentId" = $2
+                and "userId" = $1
+    `,
+      [userId, postOrCommentId],
+    );
   }
 
   async updateLikeInfo(

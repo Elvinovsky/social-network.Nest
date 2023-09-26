@@ -111,11 +111,6 @@ export class CommentsController {
       throw new NotFoundException();
     }
 
-    // Проверяем, является ли пользователь автором комментария
-    if (sessionInfo.userInfo.userId !== comment.commentatorInfo.userId) {
-      throw new ForbiddenException(); // Ошибка: Запрещено (отказано в доступе).
-    }
-
     // Создаем или обновляем лайк для комментария
     const result = await this.likesService.createOrUpdateLike(
       id,

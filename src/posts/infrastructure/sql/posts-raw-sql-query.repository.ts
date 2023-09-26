@@ -7,10 +7,14 @@ import {
 } from '../../../pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { LikesRawSqlRepository } from '../../../likes/infrastructure/sql/likes-raw-sql.repository';
 
 @Injectable()
 export class PostsRawSqlQueryRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    private likesRawSqlRepository: LikesRawSqlRepository,
+  ) {}
 
   async getSortedPosts(
     pageNumber: number,
@@ -24,12 +28,37 @@ export class PostsRawSqlQueryRepository {
       searchTitleTerm ? `%${searchTitleTerm}%` : `%%`;
 
     const queryData = `
-    SELECT 
-        p."id", p."title", p."shortDescription",  p."content", p."blogId", p."blogName", p."addedAt"
-    FROM "features"."posts" p
-    WHERE p."title" ilike $1
-    ORDER BY "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
-    OFFSET $2 LIMIT $3`;
+            SELECT 
+                    p."id",
+                    p."title",
+                    p."shortDescription", 
+                    p."content",
+                    p."blogId", 
+                    p."blogName",
+                    p."addedAt",
+                    SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
+                    SUM(CASE WHEN l."status" = 'Dislike' THEN 1 ELSE 0 END) as "dislikesCount"
+            FROM 
+                    "features"."posts" p
+            LEFT JOIN 
+                    "features"."likes" l
+            ON
+                    l."postIdOrCommentId" = p."id"
+                    and l."isBanned" = false
+            WHERE 
+                    p."title" ilike $1
+            GROUP BY
+                    p."id",
+                    p."title", 
+                    p."shortDescription",  
+                    p."content",
+                    p."blogId", 
+                    p."blogName", 
+                    p."addedAt"
+            ORDER BY 
+                    "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
+            OFFSET  $2 
+            LIMIT   $3`;
 
     const foundPosts = await this.dataSource.query(queryData, [
       getTitleTerm(searchTitleTerm),
@@ -48,23 +77,28 @@ export class PostsRawSqlQueryRepository {
       [getTitleTerm(searchTitleTerm)],
     );
 
-    const usersMap = foundPosts.map((el) => {
-      return {
-        id: el.id,
-        title: el.title,
-        shortDescription: el.shortDescription,
-        content: el.content,
-        blogId: el.blogId,
-        blogName: el.blogName,
-        createdAt: el.addedAt.toISOString(),
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
-        },
-      };
-    });
+    const usersMap = await Promise.all(
+      foundPosts.map(async (el) => {
+        return {
+          id: el.id,
+          title: el.title,
+          shortDescription: el.shortDescription,
+          content: el.content,
+          blogId: el.blogId,
+          blogName: el.blogName,
+          createdAt: el.addedAt.toISOString(),
+          extendedLikesInfo: {
+            likesCount: +el.likesCount,
+            dislikesCount: +el.dislikesCount,
+            myStatus: await this.likesRawSqlRepository.currentStatus(
+              el.id,
+              userId,
+            ),
+            newestLikes: await this.likesRawSqlRepository.newestLikes(el.id),
+          },
+        };
+      }),
+    );
 
     return {
       pagesCount: pagesCountOfBlogs(+calculateOfFiles[0].totalCount, pageSize),
@@ -91,17 +125,16 @@ export class PostsRawSqlQueryRepository {
                 p."blogName", 
                 p."addedAt" as "createdAt",
                 SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
-                SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
-                MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
+                SUM(CASE WHEN l."status" = 'Dislike' THEN 1 ELSE 0 END) as "dislikesCount"
+       FROM 
+                "features"."posts" p 
        LEFT JOIN 
                 "features"."likes" l
        ON
                 l."postIdOrCommentId" = p."id"
                 and l."isBanned" = false
-       FROM 
-                "features"."posts" p 
        WHERE 
-                "id" = $1
+                p."id" = $1
        GROUP BY
                 p."id",
                 p."title", 
@@ -111,16 +144,8 @@ export class PostsRawSqlQueryRepository {
                 p."blogName", 
                 p."addedAt";
       `,
-        [postId, userId],
+        [postId],
       );
-
-      const newestLikes = await this.dataSource.query(`
-          SELECT 
-                    "userId", "userLogin", "addedAt"
-          FROM 
-                    "features"."likes"
-          ORDER
-      `);
 
       if (post.length < 1) {
         return null;
@@ -133,12 +158,15 @@ export class PostsRawSqlQueryRepository {
         content: post[0].content,
         blogId: post[0].blogId,
         blogName: post[0].blogName,
-        createdAt: post[0].addedAt.toISOString(),
+        createdAt: post[0].createdAt.toISOString(),
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
+          likesCount: +post[0].likesCount,
+          dislikesCount: +post[0].dislikesCount,
+          myStatus: await this.likesRawSqlRepository.currentStatus(
+            postId,
+            userId,
+          ),
+          newestLikes: await this.likesRawSqlRepository.newestLikes(postId),
         },
       };
     } catch (e) {

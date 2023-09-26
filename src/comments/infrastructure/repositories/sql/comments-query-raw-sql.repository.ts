@@ -1,33 +1,19 @@
-import {
-  PaginatorType,
-  QueryInputModel,
-} from '../../../../pagination/pagination.models';
+import { PaginatorType } from '../../../../pagination/pagination.models';
 import { CommentViewDTO } from '../../../comment.models';
-import { InjectModel } from '@nestjs/mongoose';
 import {
-  Comment,
-  CommentDocument,
-  CommentModel,
-} from '../../../comment.schemas';
-import { CommentMapper } from '../../../helpers/comment.mapping';
-import { Post, PostModel } from '../../../../posts/post.schemas';
-import {
-  getDirection,
-  getPageNumber,
-  getPageSize,
   getSkip,
-  getSortBy,
   pagesCountOfBlogs,
 } from '../../../../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../../../../common/constants';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { LikesRawSqlRepository } from '../../../../likes/infrastructure/sql/likes-raw-sql.repository';
 
 export class CommentsQueryRawSqlRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    private readonly commentMapper: CommentMapper,
+    private likesRawSqlRepository: LikesRawSqlRepository,
   ) {}
+
   async getCommentsByPostId(
     postId: string,
     pageNumber: number,
@@ -36,6 +22,20 @@ export class CommentsQueryRawSqlRepository {
     sortDirection: string,
     userId?: string,
   ): Promise<PaginatorType<CommentViewDTO[]> | null> {
+    const post = await this.dataSource
+      .query(
+        `
+    SELECT "title", "blogId"
+    FROM "features"."posts" 
+    WHERE "id" = $1
+    `,
+        [postId],
+      )
+      .then((result) => result.length === 1)
+      .catch((error) => Promise.reject(error));
+
+    if (!post) return null;
+
     const queryString = `
        SELECT 
             c."id" as "id",
@@ -44,8 +44,7 @@ export class CommentsQueryRawSqlRepository {
             u."login" as "userLogin",
             c."addedAt" AS "createdAt",
             SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
-            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
-            MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
+            SUM(CASE WHEN l."status" = 'Dislike' THEN 1 ELSE 0 END) as "dislikesCount"
       FROM 
             "features"."comments" c
       LEFT JOIN 
@@ -55,8 +54,7 @@ export class CommentsQueryRawSqlRepository {
       LEFT JOIN 
             "features"."likes" l
       ON
-            l."userId" = u."id"
-            and l."postIdOrCommentId" = c."id"
+            l."postIdOrCommentId" = c."id"
             and l."isBanned" = false
       WHERE 
             c."postId" = $1
@@ -68,34 +66,35 @@ export class CommentsQueryRawSqlRepository {
             c."addedAt"
       ORDER BY 
             c."${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
-      OFFSET $3 
-      LIMIT $4`; // todo добавить валидацию на офсет для ограничения пролистования записей .
+      OFFSET $2 
+      LIMIT $3`; // todo добавить валидацию на офсет для ограничения пролистования записей .
 
     const comments = await this.dataSource
-      .query(queryString, [
-        postId,
-        userId,
-        getSkip(pageNumber, pageSize),
-        pageSize,
-      ])
+      .query(queryString, [postId, getSkip(pageNumber, pageSize), pageSize])
       .then()
       .catch((e) => console.log(e));
-    const commentsMap = await comments.map((el) => {
-      return {
-        id: el.id,
-        content: el.content,
-        commentatorInfo: {
-          userId: el.userId,
-          userLogin: el.userLogin,
-        },
-        likesInfo: {
-          likesCount: +el.likesCount,
-          dislikesCount: +el.dislikesCount,
-          myStatus: el.myStatus ? el.myStatus : 'None',
-        },
-        createdAt: el.createdAt.toISOString(),
-      };
-    });
+
+    const commentsMap = Promise.all(
+      comments.map(async (el) => {
+        return {
+          id: el.id,
+          content: el.content,
+          commentatorInfo: {
+            userId: el.userId,
+            userLogin: el.userLogin,
+          },
+          likesInfo: {
+            likesCount: +el.likesCount,
+            dislikesCount: +el.dislikesCount,
+            myStatus: await this.likesRawSqlRepository.currentStatus(
+              el.id,
+              userId,
+            ),
+          },
+          createdAt: el.createdAt.toISOString(),
+        };
+      }),
+    );
 
     const calculateOfFiles = await this.dataSource.query(
       `
@@ -111,7 +110,7 @@ export class CommentsQueryRawSqlRepository {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: +calculateOfFiles[0].pages,
-      items: commentsMap,
+      items: await commentsMap,
     };
   }
 }

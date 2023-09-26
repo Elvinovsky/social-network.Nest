@@ -25,8 +25,7 @@ export class CommentsRawSqlRepository {
             u."login" as "userLogin",
             c."addedAt" as "createdAt",
             SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
-            SUM(CASE WHEN l."status" = 'DisLike' THEN 1 ELSE 0 END) as "dislikesCount",
-            MAX(CASE WHEN l."userId" = $2 THEN l."status" ELSE null END) as "myStatus"
+            SUM(CASE WHEN l."status" = 'Dislike' THEN 1 ELSE 0 END) as "dislikesCount"
       FROM 
             "features"."comments" c
       LEFT JOIN 
@@ -36,7 +35,7 @@ export class CommentsRawSqlRepository {
       LEFT JOIN 
             "features"."likes" l
       ON
-            and l."postIdOrCommentId" = c."id"
+            l."postIdOrCommentId" = c."id"
             and l."isBanned" = false
       WHERE 
             c."id" = $1
@@ -47,9 +46,17 @@ export class CommentsRawSqlRepository {
             u."login",
             c."addedAt";
       `,
+        [commentId],
+      );
+
+      const myStatus = await this.dataSource.query(
+        `
+      SELECT "status"
+      FROM "features"."likes"
+      WHERE "postIdOrCommentId" = $1 and "userId" = $2
+      `,
         [commentId, userId],
       );
-      console.log(result);
 
       if (result.length < 1) return null;
 
@@ -63,7 +70,7 @@ export class CommentsRawSqlRepository {
         likesInfo: {
           likesCount: +result[0].likesCount,
           dislikesCount: +result[0].dislikesCount,
-          myStatus: result[0].myStatus ? result[0].myStatus : 'None',
+          myStatus: myStatus.length < 1 ? 'None' : myStatus[0].status,
         },
         createdAt: result[0].createdAt,
       };

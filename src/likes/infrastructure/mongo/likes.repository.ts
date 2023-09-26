@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { LikeCreateDTO } from '../../like.models';
 import { Like, LikeModel } from '../../like.schemas';
 import { Status } from '../../../common/constants';
-import { UserInfo } from '../../../users/user.models';
 
 @Injectable()
 export class LikesRepository {
@@ -80,5 +79,12 @@ export class LikesRepository {
       { userId: userId },
       { $set: { isBanned: false } },
     ));
+  }
+
+  async deleteLikeInfo(userId: string, postOrCommentId: string) {
+    return !!(await this.likeModel.deleteOne({
+      userId: userId,
+      postIdOrCommentId: postOrCommentId,
+    }));
   }
 }

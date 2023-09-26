@@ -8,14 +8,7 @@ import { blogMapping } from '../../../blog.helpers';
 import { UserInfo } from '../../../../users/user.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-
-export function delayedRequest(delay) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve('Результат запроса');
-    }, delay);
-  });
-}
+import { delayedRequest } from '../../../../common/helpers';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()
@@ -78,9 +71,6 @@ export class BlogsRawSqlRepository {
           inputModel.blogOwnerInfo?.userLogin,
         ],
       );
-
-      const delay = await delayedRequest(1000);
-      console.log(delay);
 
       return blogMapping(inputModel);
     } catch (e) {

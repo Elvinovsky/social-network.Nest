@@ -17,11 +17,12 @@ import { PostMapper } from '../../../../posts/post.helpers';
 import { UserInfo } from '../../../../users/user.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { LikesRawSqlRepository } from '../../../../likes/infrastructure/sql/likes-raw-sql.repository';
 @Injectable()
 export class BlogsQueryRawSqlRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    private readonly postMapper: PostMapper,
+    private readonly likesRawSqlRepository: LikesRawSqlRepository,
   ) {}
 
   async getBlogById(blogId: string): Promise<BlogViewDTO | null> {
@@ -62,14 +63,25 @@ export class BlogsQueryRawSqlRepository {
       searchNameTerm ? `%${searchNameTerm}%` : `%%`;
 
     const queryData = `
-    SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-    FROM "features"."blogs" b
-    WHERE b."name" ilike $1
-    ORDER BY "${getSortBy(sortBy)}" ${
+            SELECT 
+                    b."id", 
+                    b."name", 
+                    b."description", 
+                    b."websiteUrl", 
+                    b."addedAt", 
+                    b."isMembership", 
+                    b."userId", 
+                    b."userLogin"
+            FROM 
+                    "features"."blogs" b
+            WHERE 
+                    b."name" ilike $1
+            ORDER BY 
+                    "${getSortBy(sortBy)}" ${
       getDirection(sortDirection) === 1 ? 'asc' : 'desc'
     }
-    OFFSET $2 LIMIT $3`;
+            OFFSET $2 
+            LIMIT $3`;
 
     try {
       const calculateOfFiles = await this.dataSource.query(
@@ -138,16 +150,25 @@ export class BlogsQueryRawSqlRepository {
     try {
       const calculateOfFiles = await this.dataSource.query(
         `
-      SELECT COUNT(*) as "totalCount"
-      FROM(
-        SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-        FROM "features"."blogs" b
-        WHERE b."name" ilike $1 and b."userId" = $2) 
+            SELECT COUNT(*) as "totalCount"
+            FROM(
+                 SELECT 
+                        b."id", 
+                        b."name", 
+                        b."description", 
+                        b."websiteUrl", 
+                        b."addedAt", 
+                        b."isMembership", 
+                        b."userId", 
+                        b."userLogin"
+            FROM 
+                    "features"."blogs" b
+            WHERE 
+                    b."name" ilike $1 
+                    and b."userId" = $2) 
       `,
         [getNameTerm(searchNameTerm), userInfo.userId],
       );
-      console.log(calculateOfFiles);
 
       const foundBlogs = await this.dataSource.query(queryData, [
         getNameTerm(searchNameTerm),
@@ -190,12 +211,37 @@ export class BlogsQueryRawSqlRepository {
   ): Promise<PaginatorType<PostViewDTO[]> | null> {
     try {
       const queryData = `
-    SELECT 
-        p."id", p."title", p."shortDescription",  p."content", p."blogId", p."blogName", p."addedAt"
-    FROM "features"."posts" p
-    WHERE p."blogId" = $1
-    ORDER BY "${sortBy}" ${sortDirection === 'asc' ? 'asc' : 'desc'}
-    OFFSET $2 LIMIT $3`;
+            SELECT 
+                    p."id", 
+                    p."title", 
+                    p."shortDescription",  
+                    p."content", 
+                    p."blogId", 
+                    p."blogName", 
+                    p."addedAt",
+                    SUM(CASE WHEN l."status" = 'Like' THEN 1 ELSE 0 END) as "likesCount",
+                    SUM(CASE WHEN l."status" = 'Dislike' THEN 1 ELSE 0 END) as "dislikesCount"
+            FROM 
+                    "features"."posts" p
+            LEFT JOIN 
+                    "features"."likes" l
+            ON
+                    l."postIdOrCommentId" = p."id"
+                    and l."isBanned" = false
+            WHERE 
+                    p."blogId" = $1
+            GROUP BY
+                    p."id",
+                    p."title", 
+                    p."shortDescription",  
+                    p."content",
+                    p."blogId", 
+                    p."blogName", 
+                    p."addedAt"
+            ORDER BY 
+                    "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
+            OFFSET  $2 
+            LIMIT   $3`;
 
       const foundPosts = await this.dataSource.query(queryData, [
         blogId,
@@ -205,32 +251,45 @@ export class BlogsQueryRawSqlRepository {
 
       const calculateOfFiles = await this.dataSource.query(
         `
-    SELECT COUNT(*) as "totalCount"
-    FROM(SELECT 
-        p."id", p."title", p."shortDescription",  p."content", p."blogId", p."blogName", p."addedAt"
-    FROM "features"."posts" p
-    WHERE p."blogId" = $1)
+            SELECT COUNT(*) as "totalCount"
+            FROM(SELECT 
+                        p."id",     
+                        p."title", 
+                        p."shortDescription",  
+                        p."content", 
+                        p."blogId", 
+                        p."blogName", 
+                        p."addedAt"
+            FROM 
+                        "features"."posts" p
+            WHERE 
+                        p."blogId" = $1)
     `,
         [blogId],
       );
 
-      const usersMap = foundPosts.map((el) => {
-        return {
-          id: el.id,
-          title: el.title,
-          shortDescription: el.shortDescription,
-          content: el.content,
-          blogId: el.blogId,
-          blogName: el.blogName,
-          createdAt: el.addedAt.toISOString(),
-          extendedLikesInfo: {
-            likesCount: 0,
-            dislikesCount: 0,
-            myStatus: 'None',
-            newestLikes: [],
-          },
-        };
-      });
+      const postsMap = Promise.all(
+        foundPosts.map(async (el) => {
+          return {
+            id: el.id,
+            title: el.title,
+            shortDescription: el.shortDescription,
+            content: el.content,
+            blogId: el.blogId,
+            blogName: el.blogName,
+            createdAt: el.addedAt.toISOString(),
+            extendedLikesInfo: {
+              likesCount: +el.likesCount,
+              dislikesCount: +el.dislikesCount,
+              myStatus: await this.likesRawSqlRepository.currentStatus(
+                el.id,
+                userId,
+              ),
+              newestLikes: await this.likesRawSqlRepository.newestLikes(el.id),
+            },
+          };
+        }),
+      );
 
       return {
         pagesCount: pagesCountOfBlogs(
@@ -240,7 +299,7 @@ export class BlogsQueryRawSqlRepository {
         page: pageNumber,
         pageSize: pageSize,
         totalCount: +calculateOfFiles[0].totalCount,
-        items: usersMap,
+        items: await postsMap,
       };
     } catch (e) {
       console.log(e);
@@ -258,22 +317,41 @@ export class BlogsQueryRawSqlRepository {
       searchNameTerm ? `%${searchNameTerm}%` : `%%`;
 
     const queryData = `
-    SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-    FROM "features"."blogs" b
-    WHERE b."name" ilike $1
-    ORDER BY "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
-    OFFSET $2 LIMIT $3`;
+            SELECT 
+                    b."id", 
+                    b."name", 
+                    b."description", 
+                    b."websiteUrl", 
+                    b."addedAt", 
+                    b."isMembership", 
+                    b."userId", 
+                    b."userLogin"
+            FROM 
+                    "features"."blogs" b
+            WHERE 
+                    b."name" ilike $1
+            ORDER BY 
+                    "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
+            OFFSET $2 
+            LIMIT $3`;
 
     try {
       const calculateOfFiles = await this.dataSource.query(
         `
-      SELECT COUNT(*) as "totalCount"
-      FROM(
-        SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-        FROM "features"."blogs" b
-        WHERE b."name" ilike $1)
+                SELECT COUNT(*) as "totalCount"
+                FROM(SELECT 
+                            b."id", 
+                            b."name", 
+                            b."description", 
+                            b."websiteUrl", 
+                            b."addedAt", 
+                            b."isMembership", 
+                            b."userId", 
+                            b."userLogin"
+                FROM 
+                            "features"."blogs" b
+                WHERE 
+                            b."name" ilike $1)
       `,
         [getNameTerm(searchNameTerm)],
       );
