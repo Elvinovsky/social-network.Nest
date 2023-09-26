@@ -26,6 +26,7 @@ export const getConfiguration = () => ({
     database: 'social-network',
     autoLoadEntities: false,
     synchronize: false,
+    ssl: { rejectUnauthorized: false },
   },
 });
 
