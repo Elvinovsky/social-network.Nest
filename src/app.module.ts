@@ -37,7 +37,7 @@ import { getConfiguration } from './configuration/getConfiguration';
 import { BloggerBlogsController } from './api/blogger/blogger-blogs.controller';
 import { SendSMTPAdapter } from './email/send-smtp-adapter';
 import { SaBlogsController } from './api/sa/sa-blogs.controller';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DeleteDbSQLRepository } from './db-clear.testing/delete-sql-testing.repository';
 import { PostsRawSqlRepository } from './posts/infrastructure/sql/posts-raw-sql.repository';
 import { PostsRawSqlQueryRepository } from './posts/infrastructure/sql/posts-raw-sql-query.repository';
@@ -46,7 +46,6 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.repository';
-import process from 'process';
 
 @Module({
   imports: [
