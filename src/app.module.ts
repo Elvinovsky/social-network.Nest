@@ -46,6 +46,7 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.repository';
+import process from 'process';
 
 @Module({
   imports: [
@@ -54,11 +55,11 @@ import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: getConfiguration().postgres_url,
+      type: 'postgres' as const,
+      url: 'postgres://Elvinovsky:nXHKtfSpU1g3@ep-hidden-wood-23954592.us-east-2.aws.neon.tech/neondb',
       autoLoadEntities: true,
       synchronize: true,
-      ssl: true,
+      ssl: { rejectUnauthorized: false },
     }),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
