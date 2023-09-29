@@ -53,9 +53,13 @@ import { LikesRawSqlRepository } from './likes/infrastructure/sql/likes-raw-sql.
     UsersModule,
     AuthModule,
     DevicesModule,
-    TypeOrmModule.forRoot(
-      getConfiguration().sqlOptions as TypeOrmModuleOptions,
-    ),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      url: getConfiguration().postgres_url,
+      autoLoadEntities: true,
+      synchronize: true,
+      ssl: true,
+    }),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },

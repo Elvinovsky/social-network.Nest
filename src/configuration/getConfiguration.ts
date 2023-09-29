@@ -27,6 +27,7 @@ export const getConfiguration = () => ({
     autoLoadEntities: false,
     synchronize: false,
   },
+  postgres_url: process.env.POSTGRES_URL,
 });
 
 export type ConfigType = ReturnType<typeof getConfiguration>;
