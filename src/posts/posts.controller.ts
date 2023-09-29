@@ -32,7 +32,6 @@ import { CommentsQueryRepo } from '../comments/infrastructure/repositories/mongo
 import { UserInfo } from '../users/user.models';
 import { CurrentSessionInfoFromAccessJWT } from '../auth/decorators/current-session-info-jwt';
 import { ParamUUIdPipe } from '../common/pipes/object-id.pipe';
-import { delayedRequest } from '../common/helpers';
 
 @Controller('posts')
 export class PostsController {
@@ -75,8 +74,6 @@ export class PostsController {
     if (result === null) {
       throw new NotFoundException();
     }
-    const delay = await delayedRequest(1000);
-    console.log(delay);
     return result;
   }
 

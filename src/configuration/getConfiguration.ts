@@ -18,15 +18,14 @@ export const getConfiguration = () => ({
       process.env.MONGO_URL ?? `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`,
   },
   sqlOptions: {
-    type: 'postgres',
-    host: 'localhost',
-    port: 5433,
-    username: 'postgres',
-    password: 'sa',
-    database: 'social-network',
+    type: process.env.DATABASE_TYPE || 'postgres',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: Number(process.env.DATABASE_PORT) || 5433,
+    username: process.env.DATABASE_USERNAME || 'postgres',
+    password: process.env.DATABASE_PASSWORD || 'sa',
+    database: process.env.DATABASE_DB || 'social-network',
     autoLoadEntities: false,
     synchronize: false,
-    ssl: { rejectUnauthorized: false },
   },
 });
 
