@@ -55,7 +55,7 @@ import * as process from 'process';
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot(
-      process.env.NODE_ENV === 'development'
+      process.env.NODE_ENV === 'Development'
         ? getConfiguration().sqlLocalOptions
         : getConfiguration().sqlRemoteOptions,
     ),

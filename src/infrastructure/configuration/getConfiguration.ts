@@ -29,13 +29,12 @@ export const getConfiguration = () => ({
     synchronize: false,
   } as TypeOrmModuleOptions,
   sqlRemoteOptions: {
-    type: 'postgres' as const,
-    url: process.env.POSTGRES_URL,
+    type: process.env.DATABASE_TYPE || 'postgres',
+    url: 'postgres://Elvinovsky:nXHKtfSpU1g3@ep-hidden-wood-23954592.us-east-2.aws.neon.tech/neondb',
     autoLoadEntities: true,
     synchronize: true,
     ssl: { rejectUnauthorized: false },
   } as TypeOrmModuleOptions,
-  postgres_url: process.env.POSTGRES_URL,
 });
 
 export type ConfigType = ReturnType<typeof getConfiguration>;
