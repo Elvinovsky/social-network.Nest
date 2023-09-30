@@ -2,13 +2,12 @@ import {
   BlogCreateDTO,
   BlogInputModel,
   BlogViewDTO,
-} from '../../../blog.models';
+} from '../../../dto/blog.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { blogMapping } from '../../../blog.helpers';
-import { UserInfo } from '../../../../users/user.models';
+import { blogMapping } from '../../helpers/blog.helpers';
+import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { delayedRequest } from '../../../../common/helpers';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()

@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../app.module';
-import { appSettings } from '../settings/app-settings';
+import { appSettings } from '../infrastructure/settings/app-settings';
 import { blogViewModel } from '../../test/blogs.e2e-spec';
-import { BlogViewDTO } from '../blogs/blog.models';
-import { PostViewDTO } from '../posts/post.models';
-import { UserViewDTO } from '../users/user.models';
-import { CommentCreateDTO } from './comment.models';
+import { BlogViewDTO } from '../blogs/dto/blog.models';
+import { PostViewDTO } from '../posts/dto/post.models';
+import { UserViewDTO } from '../users/dto/view/user-view.models';
+import { CommentCreateDTO } from './dto/comment.models';
 
 describe('COMMENTS', () => {
   let app: INestApplication;
@@ -192,13 +192,13 @@ describe('COMMENTS', () => {
     );
   });
 
-  // it('DELETE COMMENT, should return 404', async () => {
-  //   await request(httpServer)
-  //     .delete(`/comments/${createdCommentView.id}`)
-  //     .auth(accessToken, { type: 'bearer' });
-  //
-  //   await request(httpServer)
-  //     .get(`/comments/${createdCommentView.id}`)
-  //     .expect(HttpStatus.NOT_FOUND);
-  // });
+  it('DELETE COMMENT, should return 404', async () => {
+    await request(httpServer)
+      .delete(`/comments/${createdCommentView.id}`)
+      .auth(accessToken, { type: 'bearer' });
+
+    await request(httpServer)
+      .get(`/comments/${createdCommentView.id}`)
+      .expect(HttpStatus.NOT_FOUND);
+  });
 });

@@ -1,9 +1,9 @@
 import { UsersService } from '../../../users/application/users.service';
-import { EmailSenderService } from '../../../email/email.service';
-import { RegistrationInputModel } from '../../auth.models';
+import { EmailSenderService } from '../../../infrastructure/adapters/email/email.service';
+import { RegistrationInputModel } from '../../dto/auth.models';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
-import { UserViewDTO } from '../../../users/user.models';
+import { UserViewDTO } from '../../../users/dto/view/user-view.models';
 import bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 

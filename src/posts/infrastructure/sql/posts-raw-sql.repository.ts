@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostMapper } from '../../post.helpers';
+import { PostMapper } from '../post.helpers';
 import {
   BlogPostInputModel,
   PostCreateDTO,
   PostViewDTO,
-} from '../../post.models';
+} from '../../dto/post.models';
 
 @Injectable()
 export class PostsRawSqlRepository {

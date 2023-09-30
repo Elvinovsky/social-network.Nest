@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, DeviceModel } from '../../device.schemas';
-import { DeviceViewDTO, SessionCreateDTO } from '../../device.models';
-import { devicesMapper } from '../../device.helpers';
+import { Device, DeviceModel } from '../../entities/device.schemas';
+import { DeviceViewDTO, SessionCreateDTO } from '../../dto/device.models';
+import { devicesMapper } from '../helpers/device.helpers';
 @Injectable()
 export class DevicesRepository {
   constructor(@InjectModel(Device.name) private deviceModel: DeviceModel) {}

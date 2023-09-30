@@ -1,7 +1,8 @@
 import { UsersService } from '../users.service';
-import { UserInputModel, UserViewDTO } from '../../user.models';
+import { UserViewDTO } from '../../dto/view/user-view.models';
 import bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UserInputModel } from '../../dto/input/user-input.models';
 
 export class UserRegistrationToAdminCommand {
   constructor(public inputModel: UserInputModel) {}

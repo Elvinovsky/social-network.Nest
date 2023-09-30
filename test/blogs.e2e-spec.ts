@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { appSettings } from '../src/settings/app-settings';
-import { BlogViewDTO } from '../src/blogs/blog.models';
+import { appSettings } from '../src/infrastructure/settings/app-settings';
+import { BlogViewDTO } from '../src/blogs/dto/blog.models';
 
 export const blogViewModel: BlogViewDTO = {
   id: expect.stringMatching(

@@ -1,12 +1,12 @@
 import { MongooseModule } from '@nestjs/mongoose';
-import { Device, DeviceSchema } from './device.schemas';
+import { Device, DeviceSchema } from './entities/device.schemas';
 import { forwardRef, Module } from '@nestjs/common';
-import { DevicesController } from './devices.controller';
-import { DevicesService } from './devices.service';
+import { DevicesController } from './api/devices.controller';
+import { DevicesService } from './application/devices.service';
 import { DevicesRepository } from './infrastructure/mongo/devices.repository';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
-import { getConfiguration } from '../configuration/getConfiguration';
+import { getConfiguration } from '../infrastructure/configuration/getConfiguration';
 import { DevicesRawSqlRepository } from './infrastructure/sql/devices-raw-sql.repository';
 
 @Module({

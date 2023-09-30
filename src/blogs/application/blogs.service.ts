@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../blog.models';
-import { BlogsRepository } from '../infrastructure/repositories/blogs.repository';
-import { Blog } from '../blog.schemas';
-import { UserInfo } from '../../users/user.models';
+import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../dto/blog.models';
+import { BlogsRepository } from '../infrastructure/repositories/mongo/blogs.repository';
+import { Blog } from '../entities/blog.schemas';
+import { UserInfo } from '../../users/dto/view/user-view.models';
 
 //input: BlogInputModel, output: BlogViewDTO, BlogDocument
 // производится проверка заданной бизнес логики, никаких трансформаций с сущностми только передача запросов между сервисами и валидация бизнес задач

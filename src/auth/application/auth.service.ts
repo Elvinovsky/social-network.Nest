@@ -2,13 +2,13 @@ import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../../users/application/users.service';
 import bcrypt from 'bcrypt';
-import { NewPasswordRecoveryInputModel } from '../auth.models';
-import { UserInfo } from '../../users/user.models';
-import { EmailSenderService } from '../../email/email.service';
+import { NewPasswordRecoveryInputModel } from '../dto/auth.models';
+import { UserInfo } from '../../users/dto/view/user-view.models';
+import { EmailSenderService } from '../../infrastructure/adapters/email/email.service';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesService } from '../../devices/devices.service';
+import { DevicesService } from '../../devices/application/devices.service';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../../configuration/getConfiguration';
+import { ConfigType } from '../../infrastructure/configuration/getConfiguration';
 
 @Injectable()
 export class AuthService {
@@ -186,38 +186,6 @@ export class AuthService {
         }),
       },
     );
-  }
-
-  async getUserIdByRefreshToken(token: string) {
-    try {
-      const payload = (await this.jwtService.verify(token, {
-        secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
-          infer: true,
-        }),
-      })) as {
-        userInfo: UserInfo;
-        deviceId: string;
-      };
-      return payload.userInfo.userId;
-    } catch (error) {
-      return null;
-    }
-  }
-  async getDeviceIdRefreshToken(token: string) {
-    try {
-      const payload = (await this.jwtService.verify(token, {
-        secret: this.configService.get('auth.SECRET_REFRESH_KEY', {
-          infer: true,
-        }),
-      })) as {
-        userInfo: UserInfo;
-        deviceId: string;
-      };
-      return payload.deviceId;
-    } catch (error) {
-      console.log('error verify', error);
-      return null;
-    }
   }
 
   async getIATByRefreshToken(token: string): Promise<number> {

@@ -1,5 +1,5 @@
-import { PaginatorType } from '../../../../pagination/pagination.models';
-import { BlogViewDTO, SABlogViewDTO } from '../../../blog.models';
+import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
+import { BlogViewDTO, SABlogViewDTO } from '../../../dto/blog.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   getDirection,
@@ -8,16 +8,16 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../../../../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../../../../common/constants';
-import { blogsMapperSA, blogsMapping } from '../../../blog.helpers';
-import { PostViewDTO } from '../../../../posts/post.models';
-import { PostDocument } from '../../../../posts/post.schemas';
-import { PostMapper } from '../../../../posts/post.helpers';
-import { UserInfo } from '../../../../users/user.models';
+} from '../../../../infrastructure/pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
+import { blogsMapperSA, blogsMapping } from '../../helpers/blog.helpers';
+import { PostViewDTO } from '../../../../posts/dto/post.models';
+import { PostDocument } from '../../../../posts/entities/post.schemas';
+import { PostMapper } from '../../../../posts/infrastructure/post.helpers';
+import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../../likes/infrastructure/sql/likes-raw-sql.repository';
+import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
 @Injectable()
 export class BlogsQueryRawSqlRepository {
   constructor(

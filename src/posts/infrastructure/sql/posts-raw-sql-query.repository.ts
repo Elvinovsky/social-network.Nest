@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PaginatorType } from '../../../pagination/pagination.models';
-import { PostViewDTO } from '../../post.models';
+import { PaginatorType } from '../../../infrastructure/pagination/pagination.models';
+import { PostViewDTO } from '../../dto/post.models';
 import {
   getSkip,
   pagesCountOfBlogs,
-} from '../../../pagination/pagination.helpers';
+} from '../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../likes/infrastructure/sql/likes-raw-sql.repository';
+import { LikesRawSqlRepository } from '../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
 
 @Injectable()
 export class PostsRawSqlQueryRepository {

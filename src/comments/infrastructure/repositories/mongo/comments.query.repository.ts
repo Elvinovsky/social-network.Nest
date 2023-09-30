@@ -1,16 +1,16 @@
 import {
   PaginatorType,
   QueryInputModel,
-} from '../../../../pagination/pagination.models';
-import { CommentViewDTO } from '../../../comment.models';
+} from '../../../../infrastructure/pagination/pagination.models';
+import { CommentViewDTO } from '../../../dto/comment.models';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   Comment,
   CommentDocument,
   CommentModel,
-} from '../../../comment.schemas';
-import { CommentMapper } from '../../../helpers/comment.mapping';
-import { Post, PostModel } from '../../../../posts/post.schemas';
+} from '../../../entities/comment.schemas';
+import { CommentMapper } from '../../helpers/comment.mapping';
+import { Post, PostModel } from '../../../../posts/entities/post.schemas';
 import {
   getDirection,
   getPageNumber,
@@ -18,10 +18,10 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../../../../pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../../../../common/constants';
-import { UserInfo } from '../../../../users/user.models';
-import { Blog, BlogModel } from '../../../../blogs/blog.schemas';
+} from '../../../../infrastructure/pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
+import { UserInfo } from '../../../../users/dto/view/user-view.models';
+import { Blog, BlogModel } from '../../../../blogs/entities/blog.schemas';
 
 export class CommentsQueryRepo {
   constructor(

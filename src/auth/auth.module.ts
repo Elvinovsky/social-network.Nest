@@ -1,23 +1,23 @@
 import { PassportModule } from '@nestjs/passport';
-import { BasicStrategy } from './strategies/basic.strategy';
+import { BasicStrategy } from './infrastructure/strategies/basic.strategy';
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
+import { AuthController } from './api/auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthService } from './application/auth.service';
-import { LocalStrategy } from './strategies/local.strategy';
-import { EmailSenderService } from '../email/email.service';
-import { BasicAuthGuard } from './guards/basic-auth.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LocalStrategy } from './infrastructure/strategies/local.strategy';
+import { EmailSenderService } from '../infrastructure/adapters/email/email.service';
+import { BasicAuthGuard } from './infrastructure/guards/basic-auth.guard';
+import { LocalAuthGuard } from './infrastructure/guards/local-auth.guard';
 import { UsersModule } from '../users/users.module';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { JwtBearerGuard } from './guards/jwt-bearer-auth.guard';
+import { JwtRefreshGuard } from './infrastructure/guards/jwt-refresh.guard';
+import { JwtBearerGuard } from './infrastructure/guards/jwt-bearer-auth.guard';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { OptionalBearerGuard } from './guards/optional-bearer.guard';
-import { CodeExpireCheck } from './auth.models';
+import { OptionalBearerGuard } from './infrastructure/guards/optional-bearer.guard';
+import { CodeExpireCheck } from './dto/auth.models';
 import { UserRegistrationUseCase } from './application/use-cases/user-registration-use-case.';
 import { CqrsModule } from '@nestjs/cqrs';
-import { SendSMTPAdapter } from '../email/send-smtp-adapter';
+import { SendSMTPAdapter } from '../infrastructure/adapters/email/send-smtp-adapter';
 
 const useCases = [UserRegistrationUseCase];
 @Module({

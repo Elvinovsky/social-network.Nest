@@ -8,9 +8,9 @@ import {
   Comment,
   CommentDocument,
   CommentModel,
-} from '../../../comment.schemas';
-import { CommentMapper } from '../../../helpers/comment.mapping';
-import { CommentCreateDTO, CommentViewDTO } from '../../../comment.models';
+} from '../../../entities/comment.schemas';
+import { CommentMapper } from '../../helpers/comment.mapping';
+import { CommentCreateDTO, CommentViewDTO } from '../../../dto/comment.models';
 
 @Injectable()
 export class CommentsRepository {

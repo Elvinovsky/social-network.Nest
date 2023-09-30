@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostModel } from '../../post.schemas';
+import { Post, PostModel } from '../../entities/post.schemas';
 import {
   BlogPostInputModel,
   PostCreateDTO,
   PostViewDTO,
-} from '../../post.models';
-import { PostMapper } from '../../post.helpers';
+} from '../../dto/post.models';
+import { PostMapper } from '../post.helpers';
 
 @Injectable()
 export class PostsRepository {

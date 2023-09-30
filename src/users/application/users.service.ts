@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/users.repository';
+import { UsersRepository } from '../infrastructure/repositories/mongo/users.repository';
+import { SAUserViewDTO, UserViewDTO } from '../dto/view/user-view.models';
+import { RegistrationInputModel } from '../../auth/dto/auth.models';
+import { ResultsAuthForErrors } from '../../auth/infrastructure/config/auth-exceptions.constants';
+import { User, UserCreateDTO } from '../entities/mongoose/users.schema';
+import { DevicesService } from '../../devices/application/devices.service';
+import { LikesService } from '../../likes/application/likes.service';
+import { CommentsService } from '../../comments/application/comments.service';
 import {
   BanUserInputModel,
-  SAUserViewDTO,
-  UserCreateDTO,
   UserInputModel,
-  UserViewDTO,
-} from '../user.models';
-import { RegistrationInputModel } from '../../auth/auth.models';
-import { ResultsAuthForErrors } from '../../auth/auth.constants';
-import { User } from '../users.schema';
-import { DevicesService } from '../../devices/devices.service';
-import { LikesService } from '../../likes/likes.service';
-import { CommentsService } from '../../comments/comments.service';
+} from '../dto/input/user-input.models';
 
 @Injectable()
 export class UsersService {

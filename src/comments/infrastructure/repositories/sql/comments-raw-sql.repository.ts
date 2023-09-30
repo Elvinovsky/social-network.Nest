@@ -3,8 +3,8 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CommentMapper } from '../../../helpers/comment.mapping';
-import { CommentCreateDTO, CommentViewDTO } from '../../../comment.models';
+import { CommentMapper } from '../../helpers/comment.mapping';
+import { CommentCreateDTO, CommentViewDTO } from '../../../dto/comment.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 

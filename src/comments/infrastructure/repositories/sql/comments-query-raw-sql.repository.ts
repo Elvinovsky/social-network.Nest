@@ -1,12 +1,12 @@
-import { PaginatorType } from '../../../../pagination/pagination.models';
-import { CommentViewDTO } from '../../../comment.models';
+import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
+import { CommentViewDTO } from '../../../dto/comment.models';
 import {
   getSkip,
   pagesCountOfBlogs,
-} from '../../../../pagination/pagination.helpers';
+} from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../../likes/infrastructure/sql/likes-raw-sql.repository';
+import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
 
 export class CommentsQueryRawSqlRepository {
   constructor(
