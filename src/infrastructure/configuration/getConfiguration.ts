@@ -30,7 +30,7 @@ export const getConfiguration = () => ({
   } as TypeOrmModuleOptions,
   sqlRemoteOptions: {
     type: process.env.DATABASE_TYPE || 'postgres',
-    url: 'postgres://Elvinovsky:nXHKtfSpU1g3@ep-hidden-wood-23954592.us-east-2.aws.neon.tech/neondb',
+    url: String(process.env.POSTGRES_URL),
     autoLoadEntities: true,
     synchronize: true,
     ssl: { rejectUnauthorized: false },
