@@ -33,6 +33,7 @@ export const getConfiguration = () => ({
     url: process.env.POSTGRES_URL,
     autoLoadEntities: true,
     synchronize: true,
+    ssl: { rejectUnauthorized: false },
   } as TypeOrmModuleOptions,
   postgres_url: process.env.POSTGRES_URL,
 });
