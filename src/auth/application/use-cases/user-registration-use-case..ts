@@ -1,6 +1,6 @@
 import { UsersService } from '../../../users/application/users.service';
 import { EmailSenderService } from '../../../infrastructure/adapters/email/email.service';
-import { RegistrationInputModel } from '../../dto/auth.models';
+import { RegistrationInputModel } from '../../dto/auth-input.models';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { UserViewDTO } from '../../../users/dto/view/user-view.models';

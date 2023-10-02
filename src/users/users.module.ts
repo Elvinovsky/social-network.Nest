@@ -1,7 +1,7 @@
 import { UsersService } from './application/users.service';
 import { UsersRepository } from './infrastructure/repositories/mongo/users.repository';
 import { UsersQueryRepository } from './infrastructure/repositories/mongo/users.query.repo';
-import { User, UserSchema } from './entities/mongoose/users.schema';
+import { User, UserSchema } from './entities/mongoose/user-no-sql.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './api/users.controller';
@@ -11,11 +11,17 @@ import { SaUsersController } from './api/sa-users.controller';
 import { DevicesModule } from '../devices/devices.module';
 import { LikesService } from '../likes/application/likes.service';
 import { LikesRepository } from '../likes/infrastructure/repositories/mongo/likes.repository';
-import { Like, LikeSchema } from '../likes/entitties/like.schemas';
-import { Comment, CommentSchema } from '../comments/entities/comment.schemas';
+import {
+  Like,
+  LikeSchema,
+} from '../likes/entitties/mongoose/like-no-sql.schemas';
+import {
+  Comment,
+  CommentSchema,
+} from '../comments/entities/mongoose/comment-no-sql.schemas';
 import { CommentsService } from '../comments/application/comments.service';
 import { CommentsRepository } from '../comments/infrastructure/repositories/mongo/comments.repository';
-import { CommentMapper } from '../comments/infrastructure/helpers/comment.mapping';
+import { CommentMapper } from '../comments/infrastructure/helpers/comment-mapper';
 import { UsersRawSQLQueryRepository } from './infrastructure/repositories/sql/users-raw-sql-query.repository';
 import { UsersRawSQLRepository } from './infrastructure/repositories/sql/users-raw-sql.repository';
 import { getConfiguration } from '../infrastructure/configuration/getConfiguration';

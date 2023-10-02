@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { PostsQueryRepository } from '../infrastructure/mongo/posts-query-repository.service';
+import { PostsQueryRepository } from '../infrastructure/repositories/mongo/posts-query-repository.service';
 import {
   QueryInputModel,
   SearchTitleTerm,

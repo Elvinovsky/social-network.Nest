@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/repositories/mongo/users.repository';
 import { SAUserViewDTO, UserViewDTO } from '../dto/view/user-view.models';
-import { RegistrationInputModel } from '../../auth/dto/auth.models';
+import { RegistrationInputModel } from '../../auth/dto/auth-input.models';
 import { ResultsAuthForErrors } from '../../auth/infrastructure/config/auth-exceptions.constants';
-import { User, UserCreateDTO } from '../entities/mongoose/users.schema';
 import { DevicesService } from '../../devices/application/devices.service';
 import { LikesService } from '../../likes/application/likes.service';
 import { CommentsService } from '../../comments/application/comments.service';
@@ -11,6 +10,8 @@ import {
   BanUserInputModel,
   UserInputModel,
 } from '../dto/input/user-input.models';
+import { UserCreateDTO } from '../dto/create/users-create.models';
+import { userCreator } from '../infrastructure/helpers/user.helpers';
 
 @Injectable()
 export class UsersService {
@@ -30,7 +31,7 @@ export class UsersService {
     inputModel: UserInputModel,
     hash: string,
   ): Promise<UserViewDTO> {
-    const newUser: UserCreateDTO = User.CreateSA(inputModel, hash);
+    const newUser: UserCreateDTO = userCreator.createSA(inputModel, hash);
 
     return await this.usersRepository.createUser(newUser);
   }
@@ -42,7 +43,7 @@ export class UsersService {
     expirationDate: Date,
   ) {
     //собираем ДТО юзера для отправки в репозиторий.
-    const newUser: UserCreateDTO = User.Create(
+    const newUser: UserCreateDTO = userCreator.create(
       inputModel,
       hash,
       code,

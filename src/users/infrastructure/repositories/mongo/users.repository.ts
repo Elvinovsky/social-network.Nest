@@ -2,13 +2,13 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   User,
-  UserCreateDTO,
   UserDocument,
-} from '../../../entities/mongoose/users.schema';
+} from '../../../entities/mongoose/user-no-sql.schema';
 import { Model } from 'mongoose';
 import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { userMapping, userMappingSA } from '../../helpers/user.helpers';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
+import { UserCreateDTO } from '../../../dto/create/users-create.models';
 
 @Injectable()
 export class UsersRepository {

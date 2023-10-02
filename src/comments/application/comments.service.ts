@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsRepository } from '../infrastructure/repositories/mongo/comments.repository';
 import { CommentCreateDTO, CommentViewDTO } from '../dto/comment.models';
-import { Comment } from '../entities/comment.schemas';
 import { UserInfo } from '../../users/dto/view/user-view.models';
+import { commentCreator } from '../infrastructure/helpers/comment-creator';
 
 @Injectable()
 export class CommentsService {
@@ -21,7 +21,7 @@ export class CommentsService {
     userInfo: UserInfo,
     content: string,
   ): Promise<CommentViewDTO> {
-    const newComment: CommentCreateDTO = Comment.create(
+    const newComment: CommentCreateDTO = commentCreator.create(
       postId,
       userInfo,
       content,

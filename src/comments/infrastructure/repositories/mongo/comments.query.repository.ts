@@ -8,9 +8,12 @@ import {
   Comment,
   CommentDocument,
   CommentModel,
-} from '../../../entities/comment.schemas';
-import { CommentMapper } from '../../helpers/comment.mapping';
-import { Post, PostModel } from '../../../../posts/entities/post.schemas';
+} from '../../../entities/mongoose/comment-no-sql.schemas';
+import { CommentMapper } from '../../helpers/comment-mapper';
+import {
+  Post,
+  PostModel,
+} from '../../../../posts/entities/mongoose/post-no-sql.schemas';
 import {
   getDirection,
   getPageNumber,
@@ -21,7 +24,10 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
-import { Blog, BlogModel } from '../../../../blogs/entities/blog.schemas';
+import {
+  Blog,
+  BlogModel,
+} from '../../../../blogs/entities/mongoose/blog-no-sql.schemas';
 
 export class CommentsQueryRepo {
   constructor(

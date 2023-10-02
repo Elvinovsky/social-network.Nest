@@ -1,7 +1,11 @@
 import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
 import { BlogViewDTO, SABlogViewDTO } from '../../../dto/blog.models';
 import * as mongoose from 'mongoose';
-import { Blog, BlogDocument, BlogModel } from '../../../entities/blog.schemas';
+import {
+  Blog,
+  BlogDocument,
+  BlogModel,
+} from '../../../entities/mongoose/blog-no-sql.schemas';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -23,8 +27,8 @@ import {
   Post,
   PostDocument,
   PostModel,
-} from '../../../../posts/entities/post.schemas';
-import { PostMapper } from '../../../../posts/infrastructure/post.helpers';
+} from '../../../../posts/entities/mongoose/post-no-sql.schemas';
+import { PostMapper } from '../../../../posts/infrastructure/repositories/post-mapper';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 @Injectable()
 export class BlogsQueryRepo {

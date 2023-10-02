@@ -3,7 +3,7 @@ import { LikesRepository } from '../infrastructure/repositories/mongo/likes.repo
 import { LikeCreateDTO, LikeViewDTO } from '../dto/like.models';
 import { Status } from '../../infrastructure/common/constants';
 import { UserInfo } from '../../users/dto/view/user-view.models';
-import { Like } from '../entitties/like.schemas';
+import { likeCreator } from '../infrastructure/helpers/like.helpers';
 @Injectable()
 export class LikesService {
   constructor(private likesRepository: LikesRepository) {}
@@ -21,7 +21,11 @@ export class LikesService {
 
       //если пользователь не ставил ранне оценку коментарию или посту
       if (!isAlreadyLiked) {
-        const newLikeInfo = Like.Create(postOrCommentId, userInfo, statusType);
+        const newLikeInfo = likeCreator.create(
+          postOrCommentId,
+          userInfo,
+          statusType,
+        );
 
         return this.likesRepository.addLikeInfo(newLikeInfo);
       }

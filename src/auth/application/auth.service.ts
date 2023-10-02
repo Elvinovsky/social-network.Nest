@@ -2,7 +2,7 @@ import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../../users/application/users.service';
 import bcrypt from 'bcrypt';
-import { NewPasswordRecoveryInputModel } from '../dto/auth.models';
+import { NewPasswordRecoveryInputModel } from '../dto/auth-input.models';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { EmailSenderService } from '../../infrastructure/adapters/email/email.service';
 import { JwtService } from '@nestjs/jwt';

@@ -8,8 +8,8 @@ import {
   Comment,
   CommentDocument,
   CommentModel,
-} from '../../../entities/comment.schemas';
-import { CommentMapper } from '../../helpers/comment.mapping';
+} from '../../../entities/mongoose/comment-no-sql.schemas';
+import { CommentMapper } from '../../helpers/comment-mapper';
 import { CommentCreateDTO, CommentViewDTO } from '../../../dto/comment.models';
 
 @Injectable()

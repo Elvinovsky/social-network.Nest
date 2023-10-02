@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { BlogCreateDTO, BlogInputModel, BlogViewDTO } from '../dto/blog.models';
 import { BlogsRepository } from '../infrastructure/repositories/mongo/blogs.repository';
-import { Blog } from '../entities/blog.schemas';
 import { UserInfo } from '../../users/dto/view/user-view.models';
+import { blogCreator } from '../infrastructure/helpers/blog.helpers';
 
 //input: BlogInputModel, output: BlogViewDTO, BlogDocument
 // производится проверка заданной бизнес логики, никаких трансформаций с сущностми только передача запросов между сервисами и валидация бизнес задач
@@ -13,7 +13,7 @@ export class BlogsService {
     return this.blogsRepository.findBlogById(id);
   }
   async createBlogSA(inputModel: BlogInputModel): Promise<BlogViewDTO> {
-    const createBlog: BlogCreateDTO = Blog.createBlogSA(inputModel);
+    const createBlog: BlogCreateDTO = blogCreator.createSA(inputModel);
     return await this.blogsRepository.addNewBlog(createBlog);
   }
 
@@ -21,7 +21,7 @@ export class BlogsService {
     inputModel: BlogInputModel,
     userInfo: UserInfo,
   ): Promise<BlogViewDTO> {
-    const createBlog: BlogCreateDTO = Blog.createBlog(inputModel, userInfo);
+    const createBlog: BlogCreateDTO = blogCreator.create(inputModel, userInfo);
     return await this.blogsRepository.addNewBlog(createBlog);
   }
 

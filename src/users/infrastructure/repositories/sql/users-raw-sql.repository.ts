@@ -3,7 +3,7 @@ import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
-import { UserCreateDTO } from '../../../entities/mongoose/users.schema';
+import { UserCreateDTO } from '../../../dto/create/users-create.models';
 
 @Injectable()
 export class UsersRawSQLRepository {

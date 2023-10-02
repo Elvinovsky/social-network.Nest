@@ -5,7 +5,10 @@ import {
 } from '../../../dto/blog.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModel } from '../../../entities/blog.schemas';
+import {
+  Blog,
+  BlogModel,
+} from '../../../entities/mongoose/blog-no-sql.schemas';
 import { blogMapping } from '../../helpers/blog.helpers';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 

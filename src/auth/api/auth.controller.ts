@@ -21,7 +21,7 @@ import {
   NewPasswordRecoveryInputModel,
   RegistrationConfirmationCodeModel,
   RegistrationInputModel,
-} from '../dto/auth.models';
+} from '../dto/auth-input.models';
 import { AuthService } from '../application/auth.service';
 import { UsersService } from '../../users/application/users.service';
 import { UserInfo, UserViewDTO } from '../../users/dto/view/user-view.models';
@@ -39,7 +39,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import requestIp from 'request-ip';
 import { CurrentSessionInfoFromRefreshJWT } from '../infrastructure/decorators/current-session-info-from-cookie-jwt';
 import { CurrentSessionInfoFromAccessJWT } from '../infrastructure/decorators/current-session-info-jwt';
-import { UserCreateDTO } from '../../users/entities/mongoose/users.schema';
+import { UserCreateDTO } from '../../users/dto/create/users-create.models';
 
 @Controller('auth')
 export class AuthController {

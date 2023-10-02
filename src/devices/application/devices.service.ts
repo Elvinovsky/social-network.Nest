@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DevicesRepository } from '../infrastructure/mongo/devices.repository';
+import { DevicesRepository } from '../infrastructure/repositories/mongo/devices.repository';
 import { SessionCreateDTO } from '../dto/device.models';
-import { Device } from '../entities/device.schemas';
 import { UserInfo } from '../../users/dto/view/user-view.models';
+import { deviceCreator } from '../infrastructure/helpers/device.helpers';
 @Injectable()
 export class DevicesService {
   constructor(protected devicesRepository: DevicesRepository) {}
@@ -18,7 +18,7 @@ export class DevicesService {
     ip: string,
     deviceName: string,
   ) {
-    const newDeviceSession: SessionCreateDTO = Device.create(
+    const newDeviceSession: SessionCreateDTO = deviceCreator.create(
       userInfo,
       deviceId,
       issuedAt,

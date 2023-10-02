@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import add from 'date-fns/add';
-import { SessionCreateDTO } from '../dto/device.models';
-import { UserInfo } from '../../users/dto/view/user-view.models';
+import { SessionCreateDTO } from '../../dto/device.models';
+import { UserInfo } from '../../../users/dto/view/user-view.models';
 
 export type DeviceDocument = HydratedDocument<Device>;
 

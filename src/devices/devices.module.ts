@@ -1,13 +1,16 @@
 import { MongooseModule } from '@nestjs/mongoose';
-import { Device, DeviceSchema } from './entities/device.schemas';
+import {
+  Device,
+  DeviceSchema,
+} from './entities/mongoose/device-no-sql.schemas';
 import { forwardRef, Module } from '@nestjs/common';
 import { DevicesController } from './api/devices.controller';
 import { DevicesService } from './application/devices.service';
-import { DevicesRepository } from './infrastructure/mongo/devices.repository';
+import { DevicesRepository } from './infrastructure/repositories/mongo/devices.repository';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { getConfiguration } from '../infrastructure/configuration/getConfiguration';
-import { DevicesRawSqlRepository } from './infrastructure/sql/devices-raw-sql.repository';
+import { DevicesRawSqlRepository } from './infrastructure/repositories/sql/devices-raw-sql.repository';
 
 @Module({
   imports: [

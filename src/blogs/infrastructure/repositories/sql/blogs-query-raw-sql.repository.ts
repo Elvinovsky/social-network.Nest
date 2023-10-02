@@ -12,8 +12,8 @@ import {
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { blogsMapperSA, blogsMapping } from '../../helpers/blog.helpers';
 import { PostViewDTO } from '../../../../posts/dto/post.models';
-import { PostDocument } from '../../../../posts/entities/post.schemas';
-import { PostMapper } from '../../../../posts/infrastructure/post.helpers';
+import { PostDocument } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
+import { PostMapper } from '../../../../posts/infrastructure/repositories/post-mapper';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';

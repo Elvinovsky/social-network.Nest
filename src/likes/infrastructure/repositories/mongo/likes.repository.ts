@@ -1,7 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { LikeCreateDTO } from '../../../dto/like.models';
-import { Like, LikeModel } from '../../../entitties/like.schemas';
+import {
+  Like,
+  LikeModel,
+} from '../../../entitties/mongoose/like-no-sql.schemas';
 import { Status } from '../../../../infrastructure/common/constants';
 
 @Injectable()

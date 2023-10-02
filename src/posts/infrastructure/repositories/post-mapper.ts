@@ -1,8 +1,8 @@
-import { PostCreateDTO, PostViewDTO } from '../dto/post.models';
+import { PostCreateDTO, PostViewDTO } from '../../dto/post.models';
 import { Injectable } from '@nestjs/common';
-import { LikesService } from '../../likes/application/likes.service';
-import { LikeViewDTO } from '../../likes/dto/like.models';
-import { PostDocument } from '../entities/post.schemas';
+import { LikesService } from '../../../likes/application/likes.service';
+import { LikeViewDTO } from '../../../likes/dto/like.models';
+import { PostDocument } from '../../entities/mongoose/post-no-sql.schemas';
 
 @Injectable()
 export class PostMapper {

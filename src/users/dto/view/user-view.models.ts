@@ -1,4 +1,4 @@
-import { BanInfo } from '../../entities/mongoose/users.schema';
+import { BanInfo } from '../create/users-create.models';
 
 export type MeViewModel = {
   email: string;

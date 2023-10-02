@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostsRepository } from '../infrastructure/mongo/posts.repository';
+import { PostsRepository } from '../infrastructure/repositories/mongo/posts.repository';
 import {
   BlogPostInputModel,
   PostCreateDTO,
@@ -8,8 +8,8 @@ import {
 } from '../dto/post.models';
 import { BlogsService } from '../../blogs/application/blogs.service';
 import { UserInfo } from '../../users/dto/view/user-view.models';
-import { Post } from '../entities/post.schemas';
 import { BlogCreateDTO } from '../../blogs/dto/blog.models';
+import { postCreator } from '../infrastructure/repositories/post-creator';
 
 @Injectable()
 export class PostsService {
@@ -40,7 +40,7 @@ export class PostsService {
     if (!foundBlog) {
       return null;
     }
-    const newPost = Post.create(inputModel, foundBlog.name, blogId);
+    const newPost = postCreator.create(inputModel, foundBlog.name, blogId);
 
     return this.postsRepository.createPost(newPost);
   }
@@ -54,7 +54,7 @@ export class PostsService {
       return null;
     }
 
-    const newPost: PostCreateDTO = Post.create(
+    const newPost: PostCreateDTO = postCreator.create(
       inputModel,
       foundBlog.name,
       inputModel.blogId,

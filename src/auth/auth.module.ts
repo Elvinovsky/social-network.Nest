@@ -14,7 +14,7 @@ import { JwtBearerGuard } from './infrastructure/guards/jwt-bearer-auth.guard';
 import { DevicesModule } from '../devices/devices.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { OptionalBearerGuard } from './infrastructure/guards/optional-bearer.guard';
-import { CodeExpireCheck } from './dto/auth.models';
+import { CodeExpireCheck } from './dto/auth-input.models';
 import { UserRegistrationUseCase } from './application/use-cases/user-registration-use-case.';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SendSMTPAdapter } from '../infrastructure/adapters/email/send-smtp-adapter';

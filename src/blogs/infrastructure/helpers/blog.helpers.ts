@@ -1,9 +1,12 @@
 import {
   BlogCreateDTO,
+  BlogInputModel,
   BlogViewDTO,
   SABlogViewDTO,
 } from '../../dto/blog.models';
-import { BlogDocument } from '../../entities/blog.schemas';
+import { BlogDocument } from '../../entities/mongoose/blog-no-sql.schemas';
+import { UserInfo } from '../../../users/dto/view/user-view.models';
+import { v4 as uuidv4 } from 'uuid';
 
 export const blogsMapping = (array: Array<BlogDocument>): BlogViewDTO[] => {
   return array.map((el) => {
@@ -43,3 +46,41 @@ export const blogsMapperSA = (
     };
   });
 };
+
+class BlogCreator {
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  addedAt: Date;
+  /**
+   * True if user has not expired membership subscription to blog
+   */
+  isMembership: boolean;
+  blogOwnerInfo: UserInfo | null;
+
+  create(inputModel: BlogInputModel, blogOwnerInfo: UserInfo): BlogCreateDTO {
+    const blog: BlogCreateDTO = new BlogCreator();
+    blog.id = uuidv4();
+    blog.name = inputModel.name;
+    blog.description = inputModel.description;
+    blog.websiteUrl = inputModel.websiteUrl;
+    blog.addedAt = new Date();
+    blog.isMembership = false;
+    blog.blogOwnerInfo = blogOwnerInfo;
+    return blog;
+  }
+  createSA(inputModel: BlogInputModel): BlogCreateDTO {
+    const blog: BlogCreateDTO = new BlogCreator();
+    blog.id = uuidv4();
+    blog.name = inputModel.name;
+    blog.description = inputModel.description;
+    blog.websiteUrl = inputModel.websiteUrl;
+    blog.addedAt = new Date();
+    blog.isMembership = false;
+    blog.blogOwnerInfo = null;
+    return blog;
+  }
+}
+
+export const blogCreator = new BlogCreator();

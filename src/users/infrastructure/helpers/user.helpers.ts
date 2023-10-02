@@ -1,5 +1,12 @@
-import { UserDocument } from '../../entities/mongoose/users.schema';
+import { UserDocument } from '../../entities/mongoose/user-no-sql.schema';
 import { SAUserViewDTO, UserViewDTO } from '../../dto/view/user-view.models';
+import { UserInputModel } from '../../dto/input/user-input.models';
+import {
+  BanInfo,
+  EmailConfirmationModel,
+  UserCreateDTO,
+} from '../../dto/create/users-create.models';
+import { v4 as uuidv4 } from 'uuid';
 
 export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
   return array.map((el) => {
@@ -66,3 +73,60 @@ export const filterLoginOrEmail = (
       }
     : {};
 };
+
+class UserCreator {
+  id: string;
+  login: string;
+  passwordHash: string;
+  email: string;
+  addedAt: Date;
+  emailConfirmation: EmailConfirmationModel;
+  banInfo: BanInfo;
+
+  create(
+    inputModel: UserInputModel,
+    hash: string,
+    code: string,
+    expireDate: Date,
+  ): UserCreateDTO {
+    const user: UserCreateDTO = new UserCreator();
+
+    user.id = uuidv4();
+    user.login = inputModel.login;
+    user.passwordHash = hash;
+    user.email = inputModel.email;
+    user.addedAt = new Date();
+    user.emailConfirmation = {
+      confirmationCode: code,
+      expirationDate: expireDate,
+      isConfirmed: false,
+    };
+    user.banInfo = {
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+    };
+    return user;
+  }
+  createSA(inputModel: UserInputModel, hash: string): UserCreateDTO {
+    const user: UserCreateDTO = new UserCreator();
+
+    user.id = uuidv4();
+    user.login = inputModel.login;
+    user.passwordHash = hash;
+    user.email = inputModel.email;
+    user.addedAt = new Date();
+    user.emailConfirmation = {
+      confirmationCode: null,
+      expirationDate: null,
+      isConfirmed: true,
+    };
+    user.banInfo = {
+      isBanned: false,
+      banDate: null,
+      banReason: null,
+    };
+    return user;
+  }
+}
+export const userCreator = new UserCreator();

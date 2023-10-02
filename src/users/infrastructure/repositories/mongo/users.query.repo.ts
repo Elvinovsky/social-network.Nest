@@ -2,7 +2,10 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
 import { MeViewModel, UserViewDTO } from '../../../dto/view/user-view.models';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../../../entities/mongoose/users.schema';
+import {
+  User,
+  UserDocument,
+} from '../../../entities/mongoose/user-no-sql.schema';
 import { Model } from 'mongoose';
 import { usersMapping, usersMappingSA } from '../../helpers/user.helpers';
 import {

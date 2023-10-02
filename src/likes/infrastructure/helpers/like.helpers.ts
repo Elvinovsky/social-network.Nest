@@ -25,3 +25,33 @@
 //     };
 //   }
 // }
+
+import { UserInfo } from '../../../users/dto/view/user-view.models';
+import { LikeCreateDTO } from '../../dto/like.models';
+
+class LikeCreator {
+  status: string;
+  userId: string;
+  userLogin: string;
+  postIdOrCommentId: string;
+  addedAt: Date;
+  isBanned: boolean;
+
+  create(
+    postOrCommentId: string,
+    userInfo: UserInfo,
+    statusType: string,
+  ): LikeCreateDTO {
+    const newLike: LikeCreateDTO = new LikeCreator();
+    newLike.status = statusType;
+    newLike.userId = userInfo.userId;
+    newLike.userLogin = userInfo.userLogin;
+    newLike.postIdOrCommentId = postOrCommentId;
+    newLike.addedAt = new Date();
+    newLike.isBanned = false;
+
+    return newLike;
+  }
+}
+
+export const likeCreator = new LikeCreator();

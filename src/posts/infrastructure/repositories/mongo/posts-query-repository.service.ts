@@ -1,9 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument, PostModel } from '../../entities/post.schemas';
-import { PaginatorType } from '../../../infrastructure/pagination/pagination.models';
-import { PostCreateDTO, PostViewDTO } from '../../dto/post.models';
+import {
+  Post,
+  PostDocument,
+  PostModel,
+} from '../../../entities/mongoose/post-no-sql.schemas';
+import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
+import { PostCreateDTO, PostViewDTO } from '../../../dto/post.models';
 import {
   getDirection,
   getPageNumber,
@@ -11,9 +15,9 @@ import {
   getSkip,
   getSortBy,
   pagesCountOfBlogs,
-} from '../../../infrastructure/pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../../../infrastructure/common/constants';
-import { PostMapper } from '../post.helpers';
+} from '../../../../infrastructure/pagination/pagination.helpers';
+import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
+import { PostMapper } from '../post-mapper';
 
 @Injectable()
 export class PostsQueryRepository {
