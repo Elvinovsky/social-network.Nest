@@ -46,7 +46,6 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/likes-raw-sql.repository';
-import * as process from 'process';
 
 @Module({
   imports: [
@@ -55,9 +54,9 @@ import * as process from 'process';
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot(
-      process.env.NODE_ENV === 'Development'
-        ? getConfiguration().sqlLocalOptions
-        : getConfiguration().sqlRemoteOptions,
+      getConfiguration().NODE_ENV === 'Development'
+        ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
+        : getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([

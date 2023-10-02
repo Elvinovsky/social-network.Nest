@@ -2,6 +2,7 @@ import * as process from 'process';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const getConfiguration = () => ({
+  NODE_ENV: String(process.env.NODE_ENV),
   auth: {
     USER_NAME_BASIC_GUARD: process.env.BASIC_USER_NAME ?? 'admin',
     PASSWORD_BASIC_GUARD: process.env.BASIC_PASS ?? 'qwerty',
@@ -18,23 +19,25 @@ export const getConfiguration = () => ({
     MONGO_URI:
       process.env.MONGO_URL ?? `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`,
   },
-  sqlLocalOptions: {
-    type: String(process.env.DATABASE_TYPE) || 'postgres',
-    host: String(process.env.DATABASE_HOST) || 'localhost',
-    port: Number(process.env.DATABASE_PORT) || 5433,
-    username: String(process.env.DATABASE_USERNAME) || 'postgres',
-    password: String(process.env.DATABASE_PASSWORD) || 'sa',
-    database: String(process.env.DATABASE_DB) || 'social-network',
-    autoLoadEntities: false,
-    synchronize: false,
-  } as TypeOrmModuleOptions,
-  sqlRemoteOptions: {
-    type: String(process.env.DATABASE_TYPE) || 'postgres',
-    url: String(process.env.POSTGRES_URL),
-    autoLoadEntities: true,
-    synchronize: true,
-    ssl: { rejectUnauthorized: false },
-  } as TypeOrmModuleOptions,
+  SQL_OPTIONS: {
+    sqlLocalOptions: {
+      type: String(process.env.DATABASE_TYPE) || 'postgres',
+      host: String(process.env.DATABASE_HOST) || 'localhost',
+      port: Number(process.env.DATABASE_PORT) || 5433,
+      username: String(process.env.DATABASE_USERNAME) || 'postgres',
+      password: String(process.env.DATABASE_PASSWORD) || 'sa',
+      database: String(process.env.DATABASE_DB) || 'social-network',
+      autoLoadEntities: false,
+      synchronize: false,
+    } as TypeOrmModuleOptions,
+    sqlRemoteOptions: {
+      type: String(process.env.DATABASE_TYPE) || 'postgres',
+      url: String(process.env.POSTGRES_URL),
+      autoLoadEntities: true,
+      synchronize: true,
+      ssl: { rejectUnauthorized: false },
+    } as TypeOrmModuleOptions,
+  },
 });
 
 export type ConfigType = ReturnType<typeof getConfiguration>;

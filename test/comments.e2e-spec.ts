@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from '../app.module';
-import { appSettings } from '../infrastructure/settings/app-settings';
-import { blogViewModel } from '../../test/blogs.e2e-spec';
-import { BlogViewDTO } from '../blogs/dto/blog.models';
-import { PostViewDTO } from '../posts/dto/post.models';
-import { UserViewDTO } from '../users/dto/view/user-view.models';
-import { CommentCreateDTO } from './dto/comment.models';
+import { AppModule } from '../src/app.module';
+import { appSettings } from '../src/infrastructure/settings/app-settings';
+import { blogViewModel } from './blogs.e2e-spec';
+import { BlogViewDTO } from '../src/blogs/dto/blog.models';
+import { PostViewDTO } from '../src/posts/dto/post.models';
+import { UserViewDTO } from '../src/users/dto/view/user-view.models';
+import { CommentCreateDTO } from '../src/comments/dto/comment.models';
 
 describe('COMMENTS', () => {
   let app: INestApplication;
