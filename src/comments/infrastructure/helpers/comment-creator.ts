@@ -1,13 +1,8 @@
 import { UserInfo } from '../../../users/dto/view/user-view.models';
-import { CommentatorInfo, CommentCreateDTO } from '../../dto/comment.models';
+import { CommentCreateDTO } from '../../dto/comment.models';
 import { v4 as uuidv4 } from 'uuid';
 
-class CommentCreator {
-  id: string;
-  postId: string;
-  content: string;
-  commentatorInfo: CommentatorInfo;
-  addedAt: Date;
+class CommentCreator extends CommentCreateDTO {
   create(
     postId: string,
     userInfo: UserInfo,

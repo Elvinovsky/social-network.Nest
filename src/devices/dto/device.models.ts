@@ -18,7 +18,7 @@ export class SessionInputModel {
    * id of connected device session
    */
 }
-export type SessionCreateDTO = {
+export class SessionCreateDTO {
   userInfo: UserInfo;
   deviceId: string;
   issuedAt: number;
@@ -26,7 +26,7 @@ export type SessionCreateDTO = {
   title: string | null;
   lastActiveDate: Date;
   expirationDate: Date;
-};
+}
 
 export type DeviceViewDTO = {
   ip: string;

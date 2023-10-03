@@ -73,7 +73,7 @@ export class BlogPostInputModel {
   content: string;
 }
 
-export type PostCreateDTO = {
+export class PostCreateDTO {
   id: string;
   title: string;
   shortDescription: string;
@@ -81,7 +81,7 @@ export type PostCreateDTO = {
   blogId: string;
   blogName: string;
   addedAt: Date;
-};
+}
 
 export type PostViewDTO = {
   id: string;

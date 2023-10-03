@@ -17,7 +17,7 @@ import {
   pagesCountOfBlogs,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
-import { PostMapper } from '../post-mapper';
+import { PostMapper } from '../../helpers/post-mapper';
 
 @Injectable()
 export class PostsQueryRepository {

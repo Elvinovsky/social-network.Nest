@@ -1,15 +1,7 @@
 import { BlogPostInputModel, PostCreateDTO } from '../../dto/post.models';
 import { v4 as uuidv4 } from 'uuid';
 
-class PostCreator {
-  id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  addedAt: Date;
-
+class PostCreator extends PostCreateDTO {
   create(
     inputModel: BlogPostInputModel,
     blogName: string,

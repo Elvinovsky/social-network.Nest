@@ -20,11 +20,11 @@ export type LikeViewDTO = {
   login: string;
 };
 
-export type LikeCreateDTO = {
+export class LikeCreateDTO {
   status: string;
   userId: string;
   userLogin: string;
   postIdOrCommentId: string;
   addedAt: Date;
   isBanned: boolean;
-};
+}

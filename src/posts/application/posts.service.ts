@@ -9,7 +9,7 @@ import {
 import { BlogsService } from '../../blogs/application/blogs.service';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { BlogCreateDTO } from '../../blogs/dto/blog.models';
-import { postCreator } from '../infrastructure/repositories/post-creator';
+import { postCreator } from '../infrastructure/helpers/post-creator';
 
 @Injectable()
 export class PostsService {

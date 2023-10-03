@@ -29,14 +29,7 @@
 import { UserInfo } from '../../../users/dto/view/user-view.models';
 import { LikeCreateDTO } from '../../dto/like.models';
 
-class LikeCreator {
-  status: string;
-  userId: string;
-  userLogin: string;
-  postIdOrCommentId: string;
-  addedAt: Date;
-  isBanned: boolean;
-
+class LikeCreator extends LikeCreateDTO {
   create(
     postOrCommentId: string,
     userInfo: UserInfo,

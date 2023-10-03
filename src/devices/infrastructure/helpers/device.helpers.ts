@@ -16,14 +16,7 @@ export const devicesMapper = (
   });
 };
 
-class DeviceCreator {
-  userInfo: UserInfo;
-  deviceId: string;
-  issuedAt: number;
-  ip: string | null;
-  title: string | null;
-  lastActiveDate: Date;
-  expirationDate: Date;
+class DeviceCreator extends SessionCreateDTO {
   create(
     userInfo: UserInfo,
     deviceId: string,

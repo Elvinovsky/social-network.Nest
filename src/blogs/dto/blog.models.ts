@@ -23,7 +23,7 @@ export class BlogInputModel {
   websiteUrl: string;
 }
 
-export type BlogCreateDTO = {
+export class BlogCreateDTO {
   id: string;
   name: string;
   description: string;
@@ -34,7 +34,7 @@ export type BlogCreateDTO = {
    */
   isMembership: boolean;
   blogOwnerInfo: UserInfo | null;
-};
+}
 
 export type BlogViewDTO = {
   id: string;

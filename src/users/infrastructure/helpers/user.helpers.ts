@@ -1,11 +1,7 @@
 import { UserDocument } from '../../entities/mongoose/user-no-sql.schema';
 import { SAUserViewDTO, UserViewDTO } from '../../dto/view/user-view.models';
 import { UserInputModel } from '../../dto/input/user-input.models';
-import {
-  BanInfo,
-  EmailConfirmationModel,
-  UserCreateDTO,
-} from '../../dto/create/users-create.models';
+import { UserCreateDTO } from '../../dto/create/users-create.models';
 import { v4 as uuidv4 } from 'uuid';
 
 export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
@@ -74,15 +70,7 @@ export const filterLoginOrEmail = (
     : {};
 };
 
-class UserCreator {
-  id: string;
-  login: string;
-  passwordHash: string;
-  email: string;
-  addedAt: Date;
-  emailConfirmation: EmailConfirmationModel;
-  banInfo: BanInfo;
-
+class UserCreator extends UserCreateDTO {
   create(
     inputModel: UserInputModel,
     hash: string,

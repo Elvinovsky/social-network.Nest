@@ -13,7 +13,7 @@ import {
 } from './blogs/entities/mongoose/blog-no-sql.schemas';
 import { LikesService } from './likes/application/likes.service';
 import { LikesRepository } from './likes/infrastructure/repositories/mongo/likes.repository';
-import { PostMapper } from './posts/infrastructure/repositories/post-mapper';
+import { PostMapper } from './posts/infrastructure/helpers/post-mapper';
 import {
   Post,
   PostSchema,

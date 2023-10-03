@@ -47,18 +47,7 @@ export const blogsMapperSA = (
   });
 };
 
-class BlogCreator {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  addedAt: Date;
-  /**
-   * True if user has not expired membership subscription to blog
-   */
-  isMembership: boolean;
-  blogOwnerInfo: UserInfo | null;
-
+class BlogCreator extends BlogCreateDTO {
   create(inputModel: BlogInputModel, blogOwnerInfo: UserInfo): BlogCreateDTO {
     const blog: BlogCreateDTO = new BlogCreator();
     blog.id = uuidv4();

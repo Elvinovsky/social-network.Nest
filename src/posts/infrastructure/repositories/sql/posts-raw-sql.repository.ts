@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostMapper } from '../post-mapper';
+import { PostMapper } from '../../helpers/post-mapper';
 import {
   BlogPostInputModel,
   PostCreateDTO,

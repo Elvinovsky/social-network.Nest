@@ -28,7 +28,7 @@ import {
   PostDocument,
   PostModel,
 } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
-import { PostMapper } from '../../../../posts/infrastructure/repositories/post-mapper';
+import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 @Injectable()
 export class BlogsQueryRepo {

@@ -260,6 +260,7 @@ export class UsersRawSQLRepository {
 
   async deleteUserById(userId: string): Promise<Document | null> {
     try {
+      //todo realize cascade delete
       const result = await this.dataSource.query(
         `
       DELETE FROM "user"."accountData"

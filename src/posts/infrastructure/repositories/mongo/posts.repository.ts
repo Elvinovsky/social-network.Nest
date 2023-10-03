@@ -9,7 +9,7 @@ import {
   PostCreateDTO,
   PostViewDTO,
 } from '../../../dto/post.models';
-import { PostMapper } from '../post-mapper';
+import { PostMapper } from '../../helpers/post-mapper';
 
 @Injectable()
 export class PostsRepository {
