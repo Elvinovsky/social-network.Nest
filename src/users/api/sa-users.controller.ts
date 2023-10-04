@@ -90,6 +90,7 @@ export class SaUsersController {
       queryLogin.searchLoginTerm,
     );
   }
+
   @Put(':id/ban')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
