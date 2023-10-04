@@ -66,9 +66,9 @@ export class UsersRepository {
    */
   async deleteUserById(userId: string): Promise<Document | null> {
     try {
-      return this.userModel.findByIdAndDelete({ id: userId });
-    } catch (e) {
-      console.log(e);
+      return this.userModel.deleteOne({ id: userId }).lean();
+    } catch (err) {
+      console.log(err);
       throw new InternalServerErrorException();
     }
   }
