@@ -31,7 +31,7 @@ import { refreshCookieOptions } from '../../infrastructure/common/helpers';
 import { ResultsAuthForErrors } from '../infrastructure/config/auth-exceptions.constants';
 import { DevicesService } from '../../devices/application/devices.service';
 import { JwtRefreshGuard } from '../infrastructure/guards/jwt-refresh.guard';
-import { UsersQueryRepository } from '../../users/infrastructure/repositories/mongo/users.query.repo';
+import { UsersMongooseQueryRepository } from '../../users/infrastructure/repositories/mongo/users-mongoose.query.repo';
 import { JwtBearerGuard } from '../infrastructure/guards/jwt-bearer-auth.guard';
 //import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserRegistrationCommand } from '../application/use-cases/user-registration-use-case.';
@@ -47,7 +47,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly devicesService: DevicesService,
-    private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly usersQueryRepository: UsersMongooseQueryRepository,
     private commandBus: CommandBus,
   ) {}
 

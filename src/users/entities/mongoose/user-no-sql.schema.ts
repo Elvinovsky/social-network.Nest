@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import {
-  BanInfo,
+  BanInfoModel,
   EmailConfirmationModel,
 } from '../../dto/create/users-create.models';
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<UserMongooseEntity>;
 
 @Schema()
-export class User {
+export class UserMongooseEntity {
   @Prop({ required: true })
   id: string;
 
@@ -27,8 +27,8 @@ export class User {
   @Prop({ type: EmailConfirmationModel, required: true })
   emailConfirmation: EmailConfirmationModel;
 
-  @Prop({ type: BanInfo, required: true })
-  banInfo: BanInfo;
+  @Prop({ type: BanInfoModel, required: true })
+  banInfo: BanInfoModel;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(UserMongooseEntity);

@@ -4,9 +4,9 @@ export class EmailConfirmationModel {
   isConfirmed: boolean;
 }
 
-export class BanInfo {
+export class BanInfoModel {
   isBanned: boolean;
-  banDate: string | null;
+  banDate: Date | null;
   banReason: string | null;
 }
 
@@ -17,5 +17,5 @@ export class UserCreateDTO {
   email: string;
   addedAt: Date;
   emailConfirmation: EmailConfirmationModel;
-  banInfo: BanInfo;
+  banInfo: BanInfoModel;
 }

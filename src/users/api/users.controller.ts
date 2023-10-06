@@ -1,16 +1,9 @@
 import {
-  BadRequestException,
-  Body,
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   NotFoundException,
   Param,
-  Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import {
@@ -18,14 +11,13 @@ import {
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { UsersQueryRepository } from '../infrastructure/repositories/mongo/users.query.repo';
-import { CommandBus } from '@nestjs/cqrs';
+import { UsersMongooseQueryRepository } from '../infrastructure/repositories/mongo/users-mongoose.query.repo';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly usersQueryRepo: UsersQueryRepository,
+    private readonly usersQueryRepo: UsersMongooseQueryRepository,
   ) {}
   @Get()
   async getUsers(

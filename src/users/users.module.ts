@@ -1,7 +1,10 @@
 import { UsersService } from './application/users.service';
-import { UsersRepository } from './infrastructure/repositories/mongo/users.repository';
-import { UsersQueryRepository } from './infrastructure/repositories/mongo/users.query.repo';
-import { User, UserSchema } from './entities/mongoose/user-no-sql.schema';
+import { UsersMongooseRepository } from './infrastructure/repositories/mongo/users-mongoose.repository';
+import { UsersMongooseQueryRepository } from './infrastructure/repositories/mongo/users-mongoose.query.repo';
+import {
+  UserMongooseEntity,
+  UserSchema,
+} from './entities/mongoose/user-no-sql.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './api/users.controller';
@@ -26,12 +29,24 @@ import { UsersRawSQLQueryRepository } from './infrastructure/repositories/sql/us
 import { UsersRawSQLRepository } from './infrastructure/repositories/sql/users-raw-sql.repository';
 import { getConfiguration } from '../infrastructure/configuration/getConfiguration';
 import { CommentsRawSqlRepository } from '../comments/infrastructure/repositories/sql/comments-raw-sql.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersTypeormRepository } from './infrastructure/repositories/typeorm/users-typeorm.repository';
+import {
+  BanInfoTypeOrmEntity,
+  EmailConfirmTypeOrmEntity,
+  UserTypeOrmEntity,
+} from './entities/typeorm/user-sql.schemas';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
   imports: [
+    TypeOrmModule.forFeature([
+      UserTypeOrmEntity,
+      EmailConfirmTypeOrmEntity,
+      BanInfoTypeOrmEntity,
+    ]),
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
+      { name: UserMongooseEntity.name, schema: UserSchema },
       { name: Like.name, schema: LikeSchema },
       { name: Comment.name, schema: CommentSchema },
     ]),
@@ -42,17 +57,19 @@ const useCases = [UserRegistrationToAdminUseCase];
   providers: [
     ...useCases,
     {
-      provide: UsersRepository,
+      provide: UsersMongooseRepository,
       useClass:
         getConfiguration().repo_type === 'Mongo'
-          ? UsersRepository
-          : UsersRawSQLRepository,
+          ? UsersMongooseRepository
+          : getConfiguration().repo_type === 'sql'
+          ? UsersRawSQLRepository
+          : UsersTypeormRepository,
     },
     {
-      provide: UsersQueryRepository,
+      provide: UsersMongooseQueryRepository,
       useClass:
         getConfiguration().repo_type === 'Mongo'
-          ? UsersQueryRepository
+          ? UsersMongooseQueryRepository
           : UsersRawSQLQueryRepository,
     },
     LikesService,
@@ -70,6 +87,6 @@ const useCases = [UserRegistrationToAdminUseCase];
 
     UsersService,
   ],
-  exports: [UsersService, UsersQueryRepository],
+  exports: [UsersService, UsersMongooseQueryRepository],
 })
 export class UsersModule {}

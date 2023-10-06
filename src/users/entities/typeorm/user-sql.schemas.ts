@@ -1,44 +1,40 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
-class EmailConfirmation {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class EmailConfirmTypeOrmEntity {
+  @PrimaryColumn()
+  @OneToOne(() => UserTypeOrmEntity, (u) => u.id)
+  userId: string;
 
-  @Column()
-  confirmationCode: string | null;
+  @Column({ default: null })
+  confirmationCode: string;
 
-  @Column()
-  expirationDate: Date | null;
+  @Column({ default: null })
+  expirationDate: Date;
 
   @Column()
   isConfirmed: boolean;
 }
 
 @Entity()
-class BanInfo {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class BanInfoTypeOrmEntity {
+  @PrimaryColumn()
+  @OneToOne(() => UserTypeOrmEntity, (u) => u.id)
+  userId: string;
 
   @Column()
   isBanned: boolean;
 
-  @Column()
-  banDate: string | null;
+  @Column({ default: null })
+  banDate: Date;
 
-  @Column()
-  banReason: string | null;
+  @Column({ default: null })
+  banReason: string;
 }
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
+export class UserTypeOrmEntity {
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -52,12 +48,4 @@ export class User {
 
   @Column()
   addedAt: Date;
-
-  @OneToOne(() => EmailConfirmation)
-  @JoinColumn()
-  emailConfirmation: EmailConfirmation;
-
-  @OneToOne(() => BanInfo)
-  @JoinColumn()
-  banInfo: BanInfo;
 }

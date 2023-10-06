@@ -27,8 +27,8 @@ export const getConfiguration = () => ({
       username: String(process.env.DATABASE_USERNAME) || 'postgres',
       password: String(process.env.DATABASE_PASSWORD) || 'sa',
       database: String(process.env.DATABASE_DB) || 'social-network',
-      autoLoadEntities: false,
-      synchronize: false,
+      autoLoadEntities: true,
+      synchronize: true,
     } as TypeOrmModuleOptions,
     sqlRemoteOptions: {
       type: String(process.env.DATABASE_TYPE) || 'postgres',

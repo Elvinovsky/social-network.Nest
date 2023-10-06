@@ -3,7 +3,7 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { MeViewModel, UserViewDTO } from '../../../dto/view/user-view.models';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  User,
+  UserMongooseEntity,
   UserDocument,
 } from '../../../entities/mongoose/user-no-sql.schema';
 import { Model } from 'mongoose';
@@ -20,8 +20,11 @@ import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants
 import mongoose from 'mongoose';
 
 @Injectable()
-export class UsersQueryRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+export class UsersMongooseQueryRepository {
+  constructor(
+    @InjectModel(UserMongooseEntity.name)
+    private userModel: Model<UserDocument>,
+  ) {}
   async getSortedUsers(
     searchEmailTerm?: string,
     searchLoginTerm?: string,

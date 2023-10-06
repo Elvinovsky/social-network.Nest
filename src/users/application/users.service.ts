@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/repositories/mongo/users.repository';
+import { UsersMongooseRepository } from '../infrastructure/repositories/mongo/users-mongoose.repository';
 import { SAUserViewDTO, UserViewDTO } from '../dto/view/user-view.models';
 import { RegistrationInputModel } from '../../auth/dto/auth-input.models';
 import { ResultsAuthForErrors } from '../../auth/infrastructure/config/auth-exceptions.constants';
@@ -16,7 +16,7 @@ import { userCreator } from '../infrastructure/helpers/user.helpers';
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
     private devicesService: DevicesService,
     private likesService: LikesService,
     private commentsService: CommentsService,
@@ -62,7 +62,7 @@ export class UsersService {
     return this.usersRepository.updateLogin(userId, login);
   }
 
-  async deleteUserById(id: string): Promise<Document | null> {
+  async deleteUserById(id: string): Promise<number | null> {
     return this.usersRepository.deleteUserById(id);
   }
 
@@ -76,9 +76,8 @@ export class UsersService {
       return ResultsAuthForErrors.email;
     }
 
-    const userLogin = await this.usersRepository.findUserByLogin(
-      inputModel.login,
-    );
+    const userLogin: UserCreateDTO | null =
+      await this.usersRepository.findUserByLogin(inputModel.login);
     if (userLogin) {
       return ResultsAuthForErrors.login;
     }
@@ -109,6 +108,7 @@ export class UsersService {
   }
 
   async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
+    debugger;
     const badBoy: SAUserViewDTO | null = await this.usersRepository.findUser(
       userId,
     );
@@ -116,7 +116,7 @@ export class UsersService {
     if (!badBoy) {
       return null;
     }
-    if (badBoy.banInfo.isBanned === inputModel.isBanned) {
+    if (badBoy.banInfo?.isBanned === inputModel.isBanned) {
       return false;
     }
     if (inputModel.isBanned === true) {

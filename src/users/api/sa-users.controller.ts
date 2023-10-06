@@ -24,7 +24,7 @@ import {
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { UsersQueryRepository } from '../infrastructure/repositories/mongo/users.query.repo';
+import { UsersMongooseQueryRepository } from '../infrastructure/repositories/mongo/users-mongoose.query.repo';
 import {
   BanUserInputModel,
   UserInputModel,
@@ -34,7 +34,7 @@ import {
 export class SaUsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly usersQueryRepo: UsersQueryRepository,
+    private readonly usersQueryRepo: UsersMongooseQueryRepository,
     private commandBus: CommandBus,
   ) {}
 
@@ -120,7 +120,7 @@ export class SaUsersController {
   @Delete(':userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('userId') userId: string) {
-    const result: Document | null = await this.usersService.deleteUserById(
+    const result: number | null = await this.usersService.deleteUserById(
       userId,
     );
 

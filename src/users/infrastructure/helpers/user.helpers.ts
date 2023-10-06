@@ -1,13 +1,14 @@
-import { UserDocument } from '../../entities/mongoose/user-no-sql.schema';
 import { SAUserViewDTO, UserViewDTO } from '../../dto/view/user-view.models';
 import { UserInputModel } from '../../dto/input/user-input.models';
 import { UserCreateDTO } from '../../dto/create/users-create.models';
 import { v4 as uuidv4 } from 'uuid';
 
-export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
+export const usersMappingSA = (
+  array: Array<UserCreateDTO>,
+): SAUserViewDTO[] => {
   return array.map((el) => {
     return {
-      id: el._id.toString(),
+      id: el.id.toString(),
       login: el.login,
       email: el.email,
       createdAt: el.addedAt.toISOString(),
@@ -16,7 +17,17 @@ export const usersMappingSA = (array: Array<UserDocument>): SAUserViewDTO[] => {
   });
 };
 
-export const userMapping = (user: UserDocument): UserViewDTO => {
+export const userMapping = (
+  user:
+    | UserCreateDTO
+    | {
+        id: string;
+        login: string;
+        passwordHash: string;
+        email: string;
+        addedAt: Date;
+      },
+): UserViewDTO => {
   return {
     id: user.id,
     login: user.login,
@@ -25,10 +36,10 @@ export const userMapping = (user: UserDocument): UserViewDTO => {
   };
 };
 
-export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
+export const usersMapping = (array: Array<UserCreateDTO>): UserViewDTO[] => {
   return array.map((el) => {
     return {
-      id: el._id.toString(),
+      id: el.id.toString(),
       login: el.login,
       email: el.email,
       createdAt: el.addedAt.toISOString(),
@@ -36,9 +47,9 @@ export const usersMapping = (array: Array<UserDocument>): UserViewDTO[] => {
   });
 };
 
-export const userMappingSA = (user: UserDocument): SAUserViewDTO => {
+export const userMappingSA = (user: UserCreateDTO): SAUserViewDTO => {
   return {
-    id: user._id.toString(),
+    id: user.id.toString(),
     login: user.login,
     email: user.email,
     createdAt: user.addedAt.toISOString(),

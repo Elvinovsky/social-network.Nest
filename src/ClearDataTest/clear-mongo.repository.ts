@@ -8,7 +8,7 @@ import {
   Post,
   PostModel,
 } from '../posts/entities/mongoose/post-no-sql.schemas';
-import { User } from '../users/entities/mongoose/user-no-sql.schema';
+import { UserMongooseEntity } from '../users/entities/mongoose/user-no-sql.schema';
 import { Model } from 'mongoose';
 import {
   Like,
@@ -26,7 +26,8 @@ import {
 @Injectable()
 export class ClearMongoRepository {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(UserMongooseEntity.name)
+    private userModel: Model<UserMongooseEntity>,
     @InjectModel(Blog.name) private blogModel: BlogModel,
     @InjectModel(Post.name) private postModel: PostModel,
     @InjectModel(Comment.name) private commentModel: CommentModel,

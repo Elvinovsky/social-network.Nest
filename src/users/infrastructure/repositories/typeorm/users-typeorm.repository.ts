@@ -1,10 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  BanInfoSql,
-  EmailConfirmationSql,
-  UserSql,
+  BanInfoTypeOrmEntity,
+  EmailConfirmTypeOrmEntity,
+  UserTypeOrmEntity,
 } from '../../../entities/typeorm/user-sql.schemas';
-import { DeepPartial, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { userMapping, userMappingSA } from '../../helpers/user.helpers';
 import { UserCreateDTO } from '../../../dto/create/users-create.models';
@@ -14,14 +14,14 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UsersTypeormRepository {
   constructor(
-    @InjectRepository(UserSql)
-    protected usersRepo: Repository<UserSql>,
+    @InjectRepository(UserTypeOrmEntity)
+    protected usersRepo: Repository<UserTypeOrmEntity>,
 
-    @InjectRepository(BanInfoSql)
-    protected banRepo: Repository<BanInfoSql>,
+    @InjectRepository(BanInfoTypeOrmEntity)
+    protected banRepo: Repository<BanInfoTypeOrmEntity>,
 
-    @InjectRepository(EmailConfirmationSql)
-    protected emailRepo: Repository<EmailConfirmationSql>,
+    @InjectRepository(EmailConfirmTypeOrmEntity)
+    protected emailRepo: Repository<EmailConfirmTypeOrmEntity>,
   ) {}
   /**
    * Поиск пользователя по его идентификатору.
@@ -31,14 +31,29 @@ export class UsersTypeormRepository {
    */
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
     try {
-      const user = (await this.usersRepo.findOne({
-        where: { id: userId },
-      })) as UserCreateDTO | null;
-      console.log(user);
+      const user = await this.usersRepo.findOneBy({
+        id: userId,
+      });
+
+      const banInfo = await this.banRepo.findOneBy({ userId: userId });
+
+      const emailConfirmation = await this.emailRepo.findOneBy({
+        userId: userId,
+      });
+
+      console.log(user, banInfo, emailConfirmation);
+
       if (!user) {
         return null;
       }
-      return userMappingSA(user);
+
+      const userMapDTO = {
+        ...user,
+        banInfo: banInfo,
+        emailConfirmation: emailConfirmation,
+      } as UserCreateDTO;
+
+      return userMappingSA(userMapDTO);
     } catch (e) {
       console.log('error UsersTypeormRepository', e);
       throw new Error();
@@ -57,22 +72,11 @@ export class UsersTypeormRepository {
         id: userId,
       });
 
-      const banInfo = await this.banRepo.findOneBy({ userId: userId });
-
-      const emailConfirmation = await this.emailRepo.findOneBy({
-        userId: userId,
-      });
-
-      console.log(user, banInfo, emailConfirmation);
-
       if (!user) {
         return null;
       }
 
-
-
-        return userMapping(user);
-      }
+      return userMapping(user);
     } catch (e) {
       console.log('error usersRepository', e);
       throw new Error();
@@ -86,10 +90,27 @@ export class UsersTypeormRepository {
    * @throws error, если возникает ошибка при сохранении пользователя в базе данных.
    */
   async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
-    const deepPartialUserSql: DeepPartial<UserSql> =
-      inputModel as DeepPartial<UserSql>;
+    const user = this.usersRepo.create({
+      id: inputModel.id,
+      addedAt: inputModel.addedAt,
+      email: inputModel.email,
+      passwordHash: inputModel.passwordHash,
+      login: inputModel.login,
+    });
 
-    await this.usersRepo.save(deepPartialUserSql);
+    const banInfo = this.banRepo.create({
+      userId: inputModel.id,
+      isBanned: inputModel.banInfo.isBanned,
+    });
+
+    const emailConfirmation = this.emailRepo.create({
+      userId: inputModel.id,
+      isConfirmed: inputModel.emailConfirmation.isConfirmed,
+    });
+
+    await this.usersRepo.save(user);
+    await this.banRepo.save(banInfo);
+    await this.emailRepo.save(emailConfirmation);
 
     return userMapping(inputModel);
   }
@@ -98,12 +119,15 @@ export class UsersTypeormRepository {
    * Удаление пользователя по его идентификатору.
    * @param userId Идентификатор пользователя.
    * @returns Объект Document, представляющий результат операции удаления.
-   * @throws InternalServerErrorException, если возникает ошибка при взаимодействии с базой данных.
+   * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
   async deleteUserById(userId: string): Promise<number | null> {
     try {
-      const deleteResult = await this.usersRepo.delete({ id: userId });
-      return deleteResult.raw;
+      const deleteUser = await this.usersRepo.delete({ id: userId });
+      await this.banRepo.delete({ userId: userId });
+      await this.emailRepo.delete({ userId: userId });
+
+      return deleteUser.raw;
     } catch (err) {
       console.log(err);
       throw new Error();
@@ -118,11 +142,25 @@ export class UsersTypeormRepository {
    */
   async findUserByEmail(email: string) {
     try {
-      const result = (await this.usersRepo.findOneBy({
+      const user = await this.usersRepo.findOneBy({
         email: email,
-      })) as UserCreateDTO | null;
+      });
 
-      return result;
+      if (!user) return null;
+
+      const banInfo = await this.banRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      const emailInfo = await this.emailRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      return {
+        ...user,
+        banInfo: banInfo,
+        emailConfirmation: emailInfo,
+      } as UserCreateDTO;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -136,11 +174,25 @@ export class UsersTypeormRepository {
    */
   async findUserByLogin(login: string) {
     try {
-      const result = (await this.usersRepo.findOneBy({
+      const user = await this.usersRepo.findOneBy({
         login: login,
-      })) as UserCreateDTO | null;
+      });
 
-      return result;
+      if (!user) return null;
+
+      const banInfo = await this.banRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      const emailInfo = await this.emailRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      return {
+        ...user,
+        banInfo: banInfo,
+        emailConfirmation: emailInfo,
+      } as UserCreateDTO;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -155,11 +207,25 @@ export class UsersTypeormRepository {
    */
   async findUserByCode(code: string): Promise<UserCreateDTO | null> {
     try {
-      const result = (await this.usersRepo.findOneBy({
+      const emailInfo = await this.emailRepo.findOneBy({
         confirmationCode: code,
-      })) as UserCreateDTO | null;
+      });
 
-      return result;
+      if (!emailInfo) return null;
+
+      const user = await this.usersRepo.findOneBy({
+        id: emailInfo.userId,
+      });
+
+      const banInfo = await this.banRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      return {
+        ...user,
+        banInfo: banInfo,
+        emailConfirmation: emailInfo,
+      } as UserCreateDTO;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -177,18 +243,26 @@ export class UsersTypeormRepository {
   ): Promise<UserCreateDTO | null> {
     try {
       // Ищем пользователя в базе данных по логину или адресу электронной почты
-      const user = (await this.usersRepo.findOneBy([
-        { login: loginOrEmail },
-        { email: loginOrEmail },
-      ])) as UserCreateDTO | null;
+      const user = await this.usersRepo.findOne({
+        where: [{ login: loginOrEmail }, { email: loginOrEmail }],
+      });
 
       // Если пользователь не найден, возвращаем null
-      if (!user) {
-        return null;
-      }
+      if (!user) return null;
 
-      // Возвращаем найденного пользователя
-      return user as UserCreateDTO;
+      const banInfo = await this.banRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      const emailInfo = await this.emailRepo.findOneBy({
+        userId: user?.id,
+      });
+
+      return {
+        ...user,
+        banInfo: banInfo,
+        emailConfirmation: emailInfo,
+      } as UserCreateDTO;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -204,7 +278,7 @@ export class UsersTypeormRepository {
   async confirmEmail(code: string): Promise<boolean> {
     try {
       // Обновляем статус подтверждения адреса электронной почты пользователя
-      const isUpdate = await this.usersRepo.update(
+      const isUpdate = await this.emailRepo.update(
         {
           confirmationCode: code,
         },
@@ -227,14 +301,17 @@ export class UsersTypeormRepository {
    */
   async updateConfirmationCodeByEmail(email: string, newCode: string) {
     try {
-      const isUpdated = await this.usersRepo.update(
-        {
-          email: email,
-        },
-        { confirmationCode: newCode },
-      );
+      const user = await this.usersRepo.findOneBy({
+        email: email,
+      });
 
-      return isUpdated.affected === 1;
+      const codeUpdate = await this.emailRepo.update(
+        { userId: user?.id },
+        {
+          confirmationCode: newCode,
+        },
+      );
+      return codeUpdate.affected === 1;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -250,12 +327,16 @@ export class UsersTypeormRepository {
    */
   async updatePasswordForUser(hash: string, code: string) {
     try {
-      const result = await this.usersRepo.update(
-        { confirmationCode: code },
+      const emailInfo = await this.emailRepo.findOneBy({
+        confirmationCode: code,
+      });
+
+      const updatePassword = await this.usersRepo.update(
+        { id: emailInfo?.userId },
         { passwordHash: hash },
       );
 
-      return result.affected === 1;
+      return updatePassword.affected === 1;
     } catch (e) {
       console.log(e);
       throw new Error();
@@ -264,28 +345,19 @@ export class UsersTypeormRepository {
 
   async banUser(userId: string, inputModel: BanUserInputModel) {
     try {
-      const user = await this.usersRepo.findOne({
-        where: { id: userId },
-        relations: ['banInfo'],
-      });
-      console.log(user);
+      const user = await this.usersRepo.findOneBy({ id: userId });
+
       if (!user) return null;
 
-      // Создайте экземпляр QueryBuilder для обновления записи
-      const qb = this.usersRepo.createQueryBuilder();
-      const date = new Date();
-      // Установите обновляемые значения
-      await qb
-        .update(BanInfoSql)
-        .set({
-          banDate: date,
-          isBanned: inputModel.isBanned,
+      const updateBanInfo = await this.banRepo.update(
+        { userId: user.id },
+        {
           banReason: inputModel.banReason,
-        })
-        .where({ userId: userId })
-        .execute();
-
-      return true;
+          banDate: new Date(),
+          isBanned: inputModel.isBanned,
+        },
+      );
+      return updateBanInfo.affected === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');
@@ -294,17 +366,18 @@ export class UsersTypeormRepository {
 
   async unBanUser(userId: string, inputModel: BanUserInputModel) {
     try {
-      const updateResult = await this.usersRepo.update(
+      const user = await this.usersRepo.findOneBy({ id: userId });
+
+      if (!user) return null;
+
+      const updateBanInfo = await this.banRepo.update(
+        { userId: user.id },
         {
-          id: userId,
-        },
-        {
+          banReason: inputModel.banReason,
           isBanned: inputModel.isBanned,
-          banReason: undefined,
-          banDate: undefined,
         },
       );
-      return updateResult.affected === 1;
+      return updateBanInfo.affected === 1;
     } catch (e) {
       console.log(e);
       throw new Error('something went wrong');

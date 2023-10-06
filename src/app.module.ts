@@ -4,7 +4,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/entities/mongoose/user-no-sql.schema';
+import {
+  UserMongooseEntity,
+  UserSchema,
+} from './users/entities/mongoose/user-no-sql.schema';
 import { BlogsController } from './blogs/api/blogs.controller';
 import { BlogsQueryRepo } from './blogs/infrastructure/repositories/mongo/blogs.query.repo';
 import {
@@ -69,13 +72,13 @@ import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/l
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot(
-      getConfiguration().NODE_ENV === 'Development'
+      getConfiguration().NODE_ENV === 'Development' // todo realize class or function
         ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
         : getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
+      { name: UserMongooseEntity.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Like.name, schema: LikeSchema },
@@ -98,7 +101,7 @@ import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/l
     {
       provide: ClearMongoRepository,
       useClass:
-        getConfiguration().repo_type === 'Mongo'
+        getConfiguration().repo_type === 'Mongo' // todo realize class or function
           ? ClearMongoRepository
           : ClearSQLRepository,
     },

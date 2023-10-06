@@ -1,4 +1,4 @@
-import { BanInfo } from '../create/users-create.models';
+import { BanInfoModel } from '../create/users-create.models';
 
 export type MeViewModel = {
   email: string;
@@ -22,5 +22,5 @@ export class SAUserViewDTO {
   login: string;
   email: string;
   createdAt: string;
-  banInfo: BanInfo;
+  banInfo: BanInfoModel;
 }
