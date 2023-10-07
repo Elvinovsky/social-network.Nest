@@ -66,13 +66,13 @@ export class UsersMongooseQueryRepository {
   }
 
   async getSortedUsersForSA(
-    banStatus: string,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
     sortDirection: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
+    banStatus?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
       let filter: mongoose.FilterQuery<UserDocument> = {};

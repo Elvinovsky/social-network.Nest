@@ -15,7 +15,9 @@ export const getSortBy = (sortBy?: string): string => {
   return sortBy ? sortBy : DEFAULT_PAGE_SortBy;
 };
 export const getDirection = (sortDirection?: string) => {
-  return sortDirection === 'asc' ? SortDirection.Asc : SortDirection.Desc;
+  return sortDirection?.toLowerCase() === 'asc'
+    ? SortDirection.Asc
+    : SortDirection.Desc;
 };
 export const getSkip = (pageNumber = 1, pageSize = 10): number => {
   return (+pageNumber - 1) * +pageSize;

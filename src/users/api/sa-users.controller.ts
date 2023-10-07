@@ -80,15 +80,26 @@ export class SaUsersController {
     @Query() queryLogin: SearchLoginTerm,
     @Query() queryBanStatus: QueryBanStatus,
   ) {
+    console.log(queryLogin.searchLoginTerm, queryEmail.searchEmailTerm);
     return this.usersQueryRepo.getSortedUsersForSA(
-      queryBanStatus.banStatus,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
       queryEmail.searchEmailTerm,
       queryLogin.searchLoginTerm,
+      queryBanStatus?.banStatus,
     );
+  }
+
+  @Get(':userId')
+  @UseGuards(BasicAuthGuard)
+  async getUser(@Param('userId') userId: string) {
+    const result = await this.usersService.getUserSA(userId);
+    if (!result) {
+      throw new NotFoundException();
+    }
+    return result;
   }
 
   @Put(':id/ban')

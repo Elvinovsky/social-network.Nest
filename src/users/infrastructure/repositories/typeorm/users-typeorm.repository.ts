@@ -5,8 +5,8 @@ import {
   UserTypeOrmEntity,
 } from '../../../entities/typeorm/user-sql.schemas';
 import { Repository } from 'typeorm';
-import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
-import { userMapping, userMappingSA } from '../../helpers/user.helpers';
+import { UserViewDTO } from '../../../dto/view/user-view.models';
+import { userMapping } from '../../helpers/user.helpers';
 import { UserCreateDTO } from '../../../dto/create/users-create.models';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
 import { Injectable } from '@nestjs/common';
@@ -29,31 +29,27 @@ export class UsersTypeormRepository {
    * @returns Объект SAUserViewDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async findUser(userId: string): Promise<SAUserViewDTO | null> {
+  async findUser(userId: string) {
     try {
-      const user = await this.usersRepo.findOneBy({
-        id: userId,
+      const user = await this.usersRepo.findOne({
+        where: { id: userId },
+        relations: { banInfo: true, emailConfirmation: true },
       });
+      // .createQueryBuilder('u')
+      //
+      // .leftJoinAndSelect('u.emailConfirmation', 'e')
+      // .where('e.userId = :userId', { userId: userId })
+      // .leftJoinAndSelect('u.banInfo', 'b')
+      // .where('b.userId = :userId', { userId: userId })
+      // .getOne();
 
-      const banInfo = await this.banRepo.findOneBy({ userId: userId });
-
-      const emailConfirmation = await this.emailRepo.findOneBy({
-        userId: userId,
-      });
-
-      console.log(user, banInfo, emailConfirmation);
+      console.log(user);
 
       if (!user) {
         return null;
       }
 
-      const userMapDTO = {
-        ...user,
-        banInfo: banInfo,
-        emailConfirmation: emailConfirmation,
-      } as UserCreateDTO;
-
-      return userMappingSA(userMapDTO);
+      return user;
     } catch (e) {
       console.log('error UsersTypeormRepository', e);
       throw new Error();
@@ -90,29 +86,34 @@ export class UsersTypeormRepository {
    * @throws error, если возникает ошибка при сохранении пользователя в базе данных.
    */
   async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
-    const user = this.usersRepo.create({
-      id: inputModel.id,
-      addedAt: inputModel.addedAt,
-      email: inputModel.email,
-      passwordHash: inputModel.passwordHash,
-      login: inputModel.login,
-    });
+    try {
+      const user = this.usersRepo.create({
+        id: inputModel.id,
+        addedAt: inputModel.addedAt,
+        email: inputModel.email,
+        passwordHash: inputModel.passwordHash,
+        login: inputModel.login,
+        banInfo: {
+          userId: inputModel.id,
+          isBanned: inputModel.banInfo.isBanned,
+          banDate: inputModel.banInfo.banDate,
+          banReason: inputModel.banInfo.banReason,
+        },
+        emailConfirmation: {
+          userId: inputModel.id,
+          expirationDate: inputModel.emailConfirmation.expirationDate,
+          confirmationCode: inputModel.emailConfirmation.confirmationCode,
+          isConfirmed: inputModel.emailConfirmation.isConfirmed,
+        },
+      });
 
-    const banInfo = this.banRepo.create({
-      userId: inputModel.id,
-      isBanned: inputModel.banInfo.isBanned,
-    });
+      await this.usersRepo.save(user);
 
-    const emailConfirmation = this.emailRepo.create({
-      userId: inputModel.id,
-      isConfirmed: inputModel.emailConfirmation.isConfirmed,
-    });
-
-    await this.usersRepo.save(user);
-    await this.banRepo.save(banInfo);
-    await this.emailRepo.save(emailConfirmation);
-
-    return userMapping(inputModel);
+      return userMapping(inputModel);
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
   }
 
   /**

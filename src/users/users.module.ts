@@ -36,6 +36,7 @@ import {
   EmailConfirmTypeOrmEntity,
   UserTypeOrmEntity,
 } from './entities/typeorm/user-sql.schemas';
+import { UsersTypeormQueryRepo } from './infrastructure/repositories/typeorm/users-typeorm-query.repo';
 
 const useCases = [UserRegistrationToAdminUseCase];
 @Module({
@@ -70,7 +71,9 @@ const useCases = [UserRegistrationToAdminUseCase];
       useClass:
         getConfiguration().repo_type === 'Mongo'
           ? UsersMongooseQueryRepository
-          : UsersRawSQLQueryRepository,
+          : getConfiguration().repo_type === 'sql'
+          ? UsersRawSQLQueryRepository
+          : UsersTypeormQueryRepo,
     },
     LikesService,
     LikesRepository,

@@ -69,6 +69,21 @@ describe('SA USERS', () => {
     createdUserView = createdUser.body;
   });
 
+  it('GET USER BY ID, should return BlogViewModel', async () => {
+    await request(httpServer)
+      .get(`/sa/users/${createdUserView.id}`)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK)
+      .then((reqRes) =>
+        expect(reqRes.body).toEqual({
+          id: createdUserView.id,
+          login: 'elvinovsky',
+          email: 'elvinovsky@google.com',
+          createdAt: expect.any(String),
+        }),
+      );
+  });
+
   it('GET USERS, should return 200 and array items', async () => {
     await request(httpServer)
       .get('/sa/users')

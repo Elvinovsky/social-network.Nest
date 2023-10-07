@@ -1,8 +1,9 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import request from 'supertest';
 import { UserViewDTO } from '../src/users/dto/view/user-view.models';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
+
+import request from 'supertest';
 import { appSettings } from '../src/infrastructure/settings/app-settings';
 
 describe('SA USERS', () => {
@@ -38,7 +39,7 @@ describe('SA USERS', () => {
   });
 
   it('CREATE USER, should return 401', async () => {
-    await request(httpServer)
+    const createdUser = await request(httpServer)
       .post('/sa/users')
       .auth('invalid', 'qwerty', { type: 'basic' })
       .send({
@@ -67,6 +68,21 @@ describe('SA USERS', () => {
     });
 
     createdUserView = createdUser.body;
+  });
+
+  it('GET USER BY ID, should return BlogViewModel', async () => {
+    await request(httpServer)
+      .get(`/sa/users/${createdUserView.id}`)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK)
+      .then((reqRes) =>
+        expect(reqRes.body).toEqual({
+          id: createdUserView.id,
+          login: 'elvinovsky',
+          email: 'elvinovsky@google.com',
+          createdAt: expect.any(String),
+        }),
+      );
   });
 
   it('GET USERS, should return 200 and array items', async () => {
