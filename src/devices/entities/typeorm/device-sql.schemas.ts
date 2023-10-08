@@ -1,26 +1,30 @@
-import { UserInfo } from '../../../users/dto/view/user-view.models';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { UserTypeOrmEntity } from '../../../users/entities/typeorm/user-sql.schemas';
 
 @Entity()
-export class Device {
-  @PrimaryGeneratedColumn()
+export class DeviceTypeOrmEntity {
+  @PrimaryColumn({ nullable: false })
   deviceId: string;
 
-  @Column('simple-json')
-  userInfo: UserInfo;
+  @OneToOne(() => UserTypeOrmEntity, (User) => User.id, { nullable: false })
+  @JoinColumn()
+  user: UserTypeOrmEntity;
 
-  @Column()
+  @Column({ nullable: false })
+  userId: string;
+
+  @Column({ nullable: false, type: 'bigint' })
   issuedAt: number;
 
-  @Column()
+  @Column({ nullable: false })
   ip: string;
 
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
-  @Column()
+  @Column({ nullable: false, type: 'timestamp with time zone' })
   lastActiveDate: Date;
 
-  @Column()
+  @Column({ nullable: false, type: 'timestamp with time zone' })
   expirationDate: Date;
 }
