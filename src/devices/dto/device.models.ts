@@ -22,12 +22,19 @@ export class SessionCreateDTO {
   userInfo: UserInfo;
   deviceId: string;
   issuedAt: number;
-  ip: string | null;
-  title: string | null;
+  ip: string;
+  title: string;
   lastActiveDate: Date;
   expirationDate: Date;
 }
-
+export class DeviceWithoutUser {
+  deviceId: string;
+  issuedAt: number;
+  ip: string;
+  title: string;
+  lastActiveDate: Date;
+  expirationDate: Date;
+}
 export type DeviceViewDTO = {
   ip: string;
   /**
