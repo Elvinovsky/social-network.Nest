@@ -35,7 +35,8 @@ export class DevicesRepository {
     return devicesMapper(devicesSessions); // Применяем функцию маппинга и возвращаем массив устройств.
   }
   async addDeviceSession(deviceSession: SessionCreateDTO): Promise<void> {
-    await this.deviceModel.create(deviceSession);
+    const newSession = new this.deviceModel(deviceSession);
+    await newSession.save();
   }
   async updateDeviceSession(
     newIssuedAt: number,
