@@ -128,7 +128,9 @@ export class UsersTypeormRepository {
       await this.banRepo.delete({ userId: userId });
       await this.emailRepo.delete({ userId: userId });
 
-      return deleteUser.raw;
+      if (!deleteUser?.affected || deleteUser.affected === 0) return null;
+
+      return deleteUser.affected;
     } catch (err) {
       console.log(err);
       throw new Error();

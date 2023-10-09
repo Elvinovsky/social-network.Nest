@@ -41,7 +41,7 @@ export class UsersTypeormQueryRepo {
     searchLoginTerm?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
-      const banFilter = (banStatus?: string) => {
+      const banFilter = (banStatus: string) => {
         return banStatus === 'banned' ? true : false;
       };
 
@@ -56,13 +56,13 @@ export class UsersTypeormQueryRepo {
 
       const queryBuilder = this.usersRepo
         .createQueryBuilder('u')
-        .leftJoinAndSelect('u.banInfo', 'b')
-        .leftJoinAndSelect('u.emailConfirmation', 'e')
+        //.leftJoin('u.banInfo', 'b')
+        // .leftJoin('u.emailConfirmation', 'e')
         .where('(u.login ILIKE :login OR u.email ILIKE :email)', {
           login: getLoginTerm(searchLoginTerm),
           email: getEmailTerm(searchEmailTerm),
         })
-        .andWhere('b.isBanned = :isBanned', { isBanned: banFilter(banStatus) })
+        //.andWhere('b.isBanned = :isBanned', { isBanned: banFilter(banStatus) })
         .orderBy('u.' + getSortBy(sortBy), sortDirectionSQL(sortDirection))
         .offset(getSkip(pageNumber, pageSize))
         .limit(pageSize);

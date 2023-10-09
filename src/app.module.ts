@@ -64,6 +64,9 @@ import { BlogsQueryRawSqlRepository } from './blogs/infrastructure/repositories/
 import { CommentsRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/likes-raw-sql.repository';
+import { ClearTypeOrmRepository } from './ClearDataTest/clear-typeorm.repository';
+import { UserTypeOrmEntity } from './users/entities/typeorm/user-sql.schemas';
+import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schemas';
 
 @Module({
   imports: [
@@ -77,6 +80,7 @@ import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/l
       //   :
       getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
+    TypeOrmModule.forFeature([UserTypeOrmEntity, DeviceTypeOrmEntity]),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: UserMongooseEntity.name, schema: UserSchema },
@@ -104,7 +108,9 @@ import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/l
       useClass:
         getConfiguration().repo_type === 'Mongo' // todo realize class or function
           ? ClearMongoRepository
-          : ClearSQLRepository,
+          : getConfiguration().repo_type === 'sql'
+          ? ClearSQLRepository
+          : ClearTypeOrmRepository,
     },
 
     EmailSenderService,
