@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
+import Mail from 'nodemailer/lib/mailer';
 
 @Injectable()
 export class SendSMTPAdapter {
-  async send(mailOptions) {
+  async send(mailOptions: Mail.Options) {
     try {
-      const transporter = await createTransport({
+      const transporter = createTransport({
         host: 'smtp.mail.ru',
         port: 465,
         secure: true, // true for 465, false for other ports
@@ -17,11 +18,9 @@ export class SendSMTPAdapter {
 
       await transporter.verify();
 
-      transporter.sendMail(
-        mailOptions /*(r, e) => {
+      transporter.sendMail(mailOptions, (r, e) => {
         console.log(e);
-      }*/,
-      );
+      });
 
       return true;
     } catch (err) {

@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import {
   BanStatus,
   DEFAULT_PAGE_NUMBER,
@@ -55,7 +55,6 @@ export class SearchTitleTerm {
 }
 export class SearchEmailTerm {
   @IsOptional()
-  @IsEmail()
   searchEmailTerm: string;
 }
 export class SearchLoginTerm {

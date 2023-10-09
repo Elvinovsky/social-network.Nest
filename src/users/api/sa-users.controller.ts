@@ -86,9 +86,9 @@ export class SaUsersController {
       query.pageSize,
       query.sortBy,
       query.sortDirection,
-      queryEmail.searchEmailTerm,
-      queryLogin.searchLoginTerm,
-      queryBanStatus?.banStatus,
+      queryBanStatus.banStatus,
+      queryEmail?.searchEmailTerm,
+      queryLogin?.searchLoginTerm,
     );
   }
 

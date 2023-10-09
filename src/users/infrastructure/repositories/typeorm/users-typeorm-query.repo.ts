@@ -36,9 +36,9 @@ export class UsersTypeormQueryRepo {
     pageSize: number,
     sortBy: string,
     sortDirection: string,
+    banStatus: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
-    banStatus?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
       const banFilter = (banStatus?: string) => {

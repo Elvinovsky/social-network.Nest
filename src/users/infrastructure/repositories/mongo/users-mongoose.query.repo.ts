@@ -70,9 +70,9 @@ export class UsersMongooseQueryRepository {
     pageSize: number,
     sortBy: string,
     sortDirection: string,
+    banStatus: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
-    banStatus?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     try {
       let filter: mongoose.FilterQuery<UserDocument> = {};

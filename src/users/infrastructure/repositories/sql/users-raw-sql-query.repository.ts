@@ -16,14 +16,17 @@ import { InjectDataSource } from '@nestjs/typeorm';
 export class UsersRawSQLQueryRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getSortedUsersForSA(
-    banStatus: string,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
     sortDirection: string,
+    banStatus: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
+    const banFilter = (banStatus?: string) => {
+      return banStatus === 'banned' ? true : false;
+    };
     const getEmailTerm = (searchEmailTerm?: string): string =>
       searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
 
@@ -31,17 +34,32 @@ export class UsersRawSQLQueryRepository {
       searchLoginTerm ? `%${searchLoginTerm}%` : `%%`;
 
     const queryString = `
-        SELECT u."id", u."login", u."email", u."addedAt" as "createdAt"
-        FROM "user"."accountData" u
-        WHERE u."login" ilike $1 or u."email" ilike $2
-        ORDER BY "${getSortBy(sortBy)}" ${
+        SELECT 
+                u."id", 
+                u."login", 
+                u."email", 
+                u."addedAt" as "createdAt",
+                b."isBanned"
+        FROM 
+                "user"."accountData" u
+        LEFT JOIN 
+                "user"."banInfo" b
+        ON 
+                b."userId" = u."id"
+        WHERE 
+               ( b."isBanned" = $3 )
+                and (u."login" LIKE $1 
+                or u."email" LIKE $2 )
+        ORDER BY 
+                "${getSortBy(sortBy)}" ${
       getDirection(sortDirection) === 1 ? 'Asc' : 'Desc'
     }
-      OFFSET $3 LIMIT $4`; // todo добавить валидацию на офсет для ограничения пролистования записей .
+      OFFSET $4 LIMIT $5`; // todo добавить валидацию на офсет для ограничения пролистования записей .
 
     const users = await this.dataSource.query(queryString, [
       getLoginTerm(searchLoginTerm),
       getEmailTerm(searchEmailTerm),
+      banFilter(banStatus),
       getSkip(pageNumber, pageSize),
       pageSize,
     ]);
@@ -52,17 +70,36 @@ export class UsersRawSQLQueryRepository {
         login: el.login,
         email: el.email,
         createdAt: el.createdAt.toISOString(),
+        isBanned: el.isBanned,
       };
     });
 
     const calculateOfFiles = await this.dataSource.query(
       `
      SELECT COUNT(*) as "totalCount"
-        FROM ( SELECT u."id", u."login", u."email", u."addedAt" as "createdAt"
-        FROM "user"."accountData" u
-        WHERE u."login" ilike $1 or u."email" ilike $2)
+        FROM (  SELECT 
+                u."id", 
+                u."login", 
+                u."email", 
+                u."addedAt" as "createdAt",
+                b."isBanned"
+        FROM 
+                "user"."accountData" u
+        LEFT JOIN 
+                "user"."banInfo" b
+        ON 
+                b."userId" = u."id"
+        WHERE 
+               ( b."isBanned" = $3 )
+                and (u."login" LIKE $1 
+                or u."email" LIKE $2 )
+                )
         `,
-      [getLoginTerm(searchLoginTerm), getEmailTerm(searchEmailTerm)],
+      [
+        getLoginTerm(searchLoginTerm),
+        getEmailTerm(searchEmailTerm),
+        banFilter(banStatus),
+      ],
     );
     return {
       pagesCount: pagesCountOfBlogs(

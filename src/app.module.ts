@@ -72,9 +72,10 @@ import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/l
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot(
-      getConfiguration().NODE_ENV === 'Development' // todo realize class or function
-        ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
-        : getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
+      // getConfiguration().NODE_ENV === 'Development' // todo realize class or function
+      //   ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
+      //   :
+      getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
