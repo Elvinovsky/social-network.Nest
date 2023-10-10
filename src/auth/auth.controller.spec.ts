@@ -106,6 +106,16 @@ describe('AUTH', () => {
     });
   });
 
+  it('LOGIN, should return 401', async () => {
+    await request(httpServer)
+      .post('/auth/login')
+      .send({
+        loginOrEmail: 'validLogin',
+        password: 'validpassword',
+      })
+      .expect(401);
+  });
+
   it('EMAIL CONFIRMATION, should return 204', async () => {
     const email = 'valid@gg.com';
     const user = await usersRepo.findUserByEmail(email);
@@ -132,5 +142,18 @@ describe('AUTH', () => {
         code: user.emailConfirmation.confirmationCode,
       })
       .expect(HttpStatus.BAD_REQUEST);
+  });
+
+  it('LOGIN, should return accessToken in body and refreshToken in cookie', async () => {
+    await request(httpServer)
+      .post('/auth/login')
+      .send({
+        loginOrEmail: 'validLogin',
+        password: 'validpassword',
+      })
+      .expect(200)
+      .then((body) =>
+        expect(body.body).toEqual({ accessToken: expect.any(String) }),
+      );
   });
 });

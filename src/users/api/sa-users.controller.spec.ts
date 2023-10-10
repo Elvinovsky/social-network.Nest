@@ -25,16 +25,6 @@ describe('SA USERS', () => {
     httpServer = app.getHttpServer();
 
     await request(httpServer).delete('/testing/all-data');
-
-    // const loginGetTokens = await request(httpServer)
-    //   .post('/auth/login')
-    //   .send({
-    //     loginOrEmail: 'elvinovsky',
-    //     password: '123qwer',
-    //   })
-    //   .expect(HttpStatus.OK);
-
-    // accessToken = loginGetTokens.body.accessToken;
   });
 
   it('CREATE USER, should return 401', async () => {
