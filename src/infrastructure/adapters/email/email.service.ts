@@ -9,7 +9,7 @@ export class EmailSenderService {
     code: string,
   ): Promise<boolean> {
     const mailOptions = {
-      from: 'ELVIN <elov2024@mail.ru>', // sender address
+      from: 'ELVIN <elvin199468@outlook.com>', // sender address
       to: email, // list of receivers
       subject: 'email confirmation', // Subject line
       html: `<h1>Thanks for your registration</h1>
@@ -26,7 +26,7 @@ export class EmailSenderService {
     newCode: string,
   ): Promise<boolean> {
     const mailOptions = {
-      from: 'ELVIN <elov2024@mail.ru>', // sender address
+      from: 'ELVIN <elvin199468@outlook.com>', // sender address
       to: email, // list of receivers
       subject: 'PASSWORD RECOVERY', // Subject line
       html: ` <h1>To finish password recovery</h1>

@@ -19,19 +19,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const responseBody = exception.getResponse() as {
         message: Array<object>;
       };
-      responseBody.message.forEach((m) => errorsMessages.push(m));
 
-      response.status(status).json({
-        errorsMessages,
+      if (typeof responseBody.message === 'object') {
+        responseBody?.message?.forEach((m) => errorsMessages.push(m));
+        return response.status(status).send({
+          errorsMessages,
+        });
+      }
+
+      return response.status(status).json({
+        responseBody,
       });
     } else if (status === 401) {
-      response.sendStatus(status);
+      return response.sendStatus(status);
     } else if (status === 403) {
-      response.sendStatus(status);
+      return response.sendStatus(status);
     } else if (status === 404) {
-      response.sendStatus(status);
+      return response.sendStatus(status);
     } else {
-      response.status(status).json({
+      return response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
@@ -47,11 +53,11 @@ export class ErrorExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     if (process.env.NODE_ENV !== 'production') {
-      response
+      return response
         .status(500)
         .send({ error: exception.toString(), stack: exception.stack });
     } else {
-      response.status(500).send('Something went wrong');
+      return response.status(500).send('Something went wrong');
     }
   }
 }

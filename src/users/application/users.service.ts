@@ -40,15 +40,9 @@ export class UsersService {
     inputModel: UserInputModel,
     hash: string,
     code: string,
-    expirationDate: Date,
   ) {
     //собираем ДТО юзера для отправки в репозиторий.
-    const newUser: UserCreateDTO = userCreator.create(
-      inputModel,
-      hash,
-      code,
-      expirationDate,
-    );
+    const newUser: UserCreateDTO = userCreator.create(inputModel, hash, code);
 
     //отправляем ДТО в репозиторий
     return this.usersRepository.createUser(newUser);

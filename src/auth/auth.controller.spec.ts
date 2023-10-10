@@ -3,14 +3,31 @@ import { AppModule } from '../app.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { appSettings } from '../infrastructure/settings/app-settings';
 import request from 'supertest';
+import { UsersMongooseRepository } from '../users/infrastructure/repositories/mongo/users-mongoose.repository';
+
 describe('AUTH', () => {
   let app: INestApplication;
   let httpServer: INestApplication<any>;
 
+  let usersRepo: UsersMongooseRepository;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
+      providers: [
+        {
+          provide: UsersMongooseRepository,
+          useValue: {
+            findOne: jest.fn(),
+            findUser: jest.fn(),
+          },
+        },
+      ],
     }).compile();
+
+    usersRepo = moduleFixture.get<UsersMongooseRepository>(
+      UsersMongooseRepository,
+    );
 
     app = moduleFixture.createNestApplication();
     appSettings(app);
@@ -87,5 +104,33 @@ describe('AUTH', () => {
         },
       ],
     });
+  });
+
+  it('EMAIL CONFIRMATION, should return 204', async () => {
+    const email = 'valid@gg.com';
+    const user = await usersRepo.findUserByEmail(email);
+
+    if (!user) return HttpStatus.INTERNAL_SERVER_ERROR;
+
+    await request(httpServer)
+      .post('/auth/registration-confirmation')
+      .send({
+        code: user.emailConfirmation.confirmationCode,
+      })
+      .expect(HttpStatus.NO_CONTENT);
+  });
+
+  it('EMAIL CONFIRMATION, should return 400', async () => {
+    const email = 'valid@gg.com';
+    const user = await usersRepo.findUserByEmail(email);
+
+    if (!user) return HttpStatus.INTERNAL_SERVER_ERROR;
+
+    await request(httpServer)
+      .post('/auth/registration-confirmation')
+      .send({
+        code: user.emailConfirmation.confirmationCode,
+      })
+      .expect(HttpStatus.BAD_REQUEST);
   });
 });

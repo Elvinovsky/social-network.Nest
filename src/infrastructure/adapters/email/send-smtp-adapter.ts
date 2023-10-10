@@ -10,19 +10,24 @@ export class SendSMTPAdapter {
   async send(mailOptions: Mail.Options) {
     try {
       const transporter = createTransport({
-        host: 'smtp.mail.ru',
-        port: 465,
-        secure: true, // true for 465, false for other ports
+        host: 'smtp-mail.outlook.com',
+        port: 587, //  порт 587 для STARTTLS
+        secure: false, // false для использования STARTTLS
         auth: {
           user: this.configService.get('mail_auth.user', { infer: true }),
           pass: this.configService.get('mail_auth.password', { infer: true }),
+        },
+        requireTLS: true, // Обязательное использование TLS
+        tls: {
+          ciphers: 'SSLv3', // Установка желаемого набора шифров
         },
       });
 
       await transporter.verify();
 
-      transporter.sendMail(mailOptions, (r, e) => {
+      transporter.sendMail(mailOptions, (e) => {
         console.log(e);
+        return false;
       });
 
       return true;

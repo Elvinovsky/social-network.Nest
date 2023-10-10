@@ -2,6 +2,7 @@ import { SAUserViewDTO, UserViewDTO } from '../../dto/view/user-view.models';
 import { UserInputModel } from '../../dto/input/user-input.models';
 import { UserCreateDTO } from '../../dto/create/users-create.models';
 import { v4 as uuidv4 } from 'uuid';
+import { add } from 'date-fns';
 
 export const usersMappingSA = (
   array: Array<UserCreateDTO>,
@@ -86,8 +87,11 @@ class UserCreator extends UserCreateDTO {
     inputModel: UserInputModel,
     hash: string,
     code: string,
-    expireDate: Date,
   ): UserCreateDTO {
+    const expirationDate: Date = add(new Date(), {
+      hours: 1,
+      minutes: 10,
+    });
     const user: UserCreateDTO = new UserCreator();
 
     user.id = uuidv4();
@@ -97,7 +101,7 @@ class UserCreator extends UserCreateDTO {
     user.addedAt = new Date();
     user.emailConfirmation = {
       confirmationCode: code,
-      expirationDate: expireDate,
+      expirationDate: expirationDate,
       isConfirmed: false,
     };
     user.banInfo = {
