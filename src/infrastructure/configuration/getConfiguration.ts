@@ -13,7 +13,10 @@ export const getConfiguration = () => ({
     REFRESH_TOKEN_EXPIRATION_TIME:
       process.env.REFRESH_TOKEN_EXPIRATION_TIME ?? '20m',
   },
-  mail_auth: { user: process.env.AUTH_EMAIL, password: process.env.AUTH_PASS },
+  mail_auth: {
+    user: String(process.env.AUTH_EMAIL),
+    password: String(process.env.AUTH_PASS),
+  },
   repo_type: process.env.REPO_TYPE,
   mongoDBOptions: {
     DB_NAME: process.env.DB_NAME,
