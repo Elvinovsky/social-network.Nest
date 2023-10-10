@@ -117,6 +117,16 @@ export class AuthController {
         },
       ]);
     }
+
+    //если код уже подтвержден
+    if (foundUser.emailConfirmation.isConfirmed) {
+      throw new BadRequestException([
+        {
+          field: 'code',
+          message: 'code already confirmed',
+        },
+      ]);
+    }
     //подтвержаем эл/почту юзера.
     await this.authService.confirmationEmail(codeModel.code);
   }
