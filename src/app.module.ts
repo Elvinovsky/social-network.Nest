@@ -65,7 +65,11 @@ import { CommentsRawSqlRepository } from './comments/infrastructure/repositories
 import { CommentsQueryRawSqlRepository } from './comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { LikesRawSqlRepository } from './likes/infrastructure/repositories/sql/likes-raw-sql.repository';
 import { ClearTypeOrmRepository } from './ClearDataTest/clear-typeorm.repository';
-import { UserTypeOrmEntity } from './users/entities/typeorm/user-sql.schemas';
+import {
+  BanInfoTypeOrmEntity,
+  EmailConfirmTypeOrmEntity,
+  UserTypeOrmEntity,
+} from './users/entities/typeorm/user-sql.schemas';
 import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schemas';
 
 @Module({
@@ -80,7 +84,12 @@ import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schem
       //   :
       getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
-    TypeOrmModule.forFeature([UserTypeOrmEntity, DeviceTypeOrmEntity]),
+    TypeOrmModule.forFeature([
+      UserTypeOrmEntity,
+      DeviceTypeOrmEntity,
+      BanInfoTypeOrmEntity,
+      EmailConfirmTypeOrmEntity,
+    ]),
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: UserMongooseEntity.name, schema: UserSchema },

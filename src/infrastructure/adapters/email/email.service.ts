@@ -14,7 +14,7 @@ export class EmailSenderService {
       subject: 'email confirmation', // Subject line
       html: `<h1>Thanks for your registration</h1>
         <p>To finish registration please follow the link below:
-            <a href='https://somesite.net?code=${code}'>complete registration</a>
+            <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
         </p>`, // plain text body
     };
     // send mail

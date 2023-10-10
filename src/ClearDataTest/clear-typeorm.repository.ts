@@ -17,16 +17,16 @@ export class ClearTypeOrmRepository {
     @InjectRepository(DeviceTypeOrmEntity)
     protected devicesRepo: Repository<DeviceTypeOrmEntity>,
 
-    @InjectRepository(DeviceTypeOrmEntity)
+    @InjectRepository(BanInfoTypeOrmEntity)
     protected banRepo: Repository<BanInfoTypeOrmEntity>,
 
-    @InjectRepository(DeviceTypeOrmEntity)
+    @InjectRepository(EmailConfirmTypeOrmEntity)
     protected emailRepo: Repository<EmailConfirmTypeOrmEntity>,
   ) {}
   async deleteDB() {
     await this.devicesRepo.createQueryBuilder('d').delete().execute();
+    await this.usersRepo.createQueryBuilder('u').delete().execute();
     await this.banRepo.createQueryBuilder('b').delete().execute();
     await this.emailRepo.createQueryBuilder('e').delete().execute();
-    await this.usersRepo.createQueryBuilder('u').delete().execute();
   }
 }
