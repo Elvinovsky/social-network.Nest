@@ -29,7 +29,6 @@ export class Blog {
   @Prop({ type: UserInfo || null })
   blogOwnerInfo: UserInfo | null;
 
-  //todo
   unbindOwner(blog: BlogDocument) {
     if (!blog.blogOwnerInfo?.userId) {
       throw new Error('something went wrong');

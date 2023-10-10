@@ -302,7 +302,6 @@ export class AuthController {
     throw new InternalServerErrorException(); // Ошибка: что то пошло не так.
   }
 
-  // todo send email confirm code
   @Put('email-recovery')
   @UseGuards(JwtBearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
