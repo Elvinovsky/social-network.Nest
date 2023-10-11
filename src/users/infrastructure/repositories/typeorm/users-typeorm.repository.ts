@@ -87,25 +87,7 @@ export class UsersTypeormRepository {
    */
   async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
     try {
-      const user = this.usersRepo.create({
-        id: inputModel.id,
-        addedAt: inputModel.addedAt,
-        email: inputModel.email,
-        passwordHash: inputModel.passwordHash,
-        login: inputModel.login,
-        banInfo: {
-          userId: inputModel.id,
-          isBanned: inputModel.banInfo.isBanned,
-          banDate: inputModel.banInfo.banDate,
-          banReason: inputModel.banInfo.banReason,
-        },
-        emailConfirmation: {
-          userId: inputModel.id,
-          expirationDate: inputModel.emailConfirmation.expirationDate,
-          confirmationCode: inputModel.emailConfirmation.confirmationCode,
-          isConfirmed: inputModel.emailConfirmation.isConfirmed,
-        },
-      });
+      const user = this.usersRepo.create(inputModel);
 
       await this.usersRepo.save(user);
 

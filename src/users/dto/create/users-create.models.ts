@@ -1,10 +1,12 @@
 export class EmailConfirmationModel {
+  userId: string;
   confirmationCode: string | null;
   expirationDate: Date | null;
   isConfirmed: boolean;
 }
 
 export class BanInfoModel {
+  userId: string;
   isBanned: boolean;
   banDate: Date | null;
   banReason: string | null;
@@ -18,4 +20,22 @@ export class UserCreateDTO {
   addedAt: Date;
   emailConfirmation: EmailConfirmationModel;
   banInfo: BanInfoModel;
+}
+
+export class UserFullDTO {
+  id: string;
+  login: string;
+  passwordHash: string;
+  email: string;
+  addedAt: Date;
+  emailConfirmation: {
+    confirmationCode: string | null;
+    expirationDate: Date | null;
+    isConfirmed: boolean;
+  };
+  banInfo: {
+    isBanned: boolean;
+    banDate: Date | null;
+    banReason: string | null;
+  };
 }

@@ -3,7 +3,7 @@ import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
-import { UserCreateDTO } from '../../../dto/create/users-create.models';
+import { UserFullDTO } from '../../../dto/create/users-create.models';
 
 @Injectable()
 export class UsersRawSQLRepository {
@@ -11,7 +11,7 @@ export class UsersRawSQLRepository {
 
   async findUserLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<UserCreateDTO | null> {
+  ): Promise<UserFullDTO | null> {
     try {
       // Ищем пользователя в базе данных по логину или адресу электронной почты
       const user = await this.dataSource.query(
@@ -37,15 +37,15 @@ export class UsersRawSQLRepository {
         passwordHash: user[0].passwordHash,
         email: user[0].email,
         addedAt: user[0].addedAt,
-        banInfo: {
-          isBanned: user[0].isBanned,
-          banDate: user[0].banDate,
-          banReason: user[0].banReason,
-        },
         emailConfirmation: {
           isConfirmed: user[0].isConfirmed,
           expirationDate: user[0].expirationDate,
           confirmationCode: user[0].confirmationCode,
+        },
+        banInfo: {
+          isBanned: user[0].isBanned,
+          banDate: user[0].banDate,
+          banReason: user[0].banReason,
         },
       };
     } catch (e) {
@@ -106,7 +106,7 @@ export class UsersRawSQLRepository {
     };
   }
 
-  async findUserByEmail(email: string): Promise<UserCreateDTO | null> {
+  async findUserByEmail(email: string): Promise<UserFullDTO | null> {
     const user = await this.dataSource.query(
       `
             SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", 
@@ -141,7 +141,7 @@ export class UsersRawSQLRepository {
     };
   }
 
-  async findUserByLogin(login: string): Promise<UserCreateDTO | null> {
+  async findUserByLogin(login: string): Promise<UserFullDTO | null> {
     const user = await this.dataSource.query(
       `
             SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", e."isConfirmed", e."expirationDate", e."confirmationCode", b."isBanned", b."banDate", b."banReason"
@@ -175,7 +175,7 @@ export class UsersRawSQLRepository {
     };
   }
 
-  async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
+  async createUser(inputModel: UserFullDTO): Promise<UserViewDTO> {
     try {
       const newUser = await this.dataSource.query(
         `INSERT INTO "user"."accountData" (
@@ -276,7 +276,7 @@ export class UsersRawSQLRepository {
     }
   }
 
-  async findUserByCode(code: string): Promise<UserCreateDTO | null> {
+  async findUserByCode(code: string): Promise<UserFullDTO | null> {
     const user = await this.dataSource.query(
       `
     SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", e."isConfirmed", e."expirationDate", e."confirmationCode", b."isBanned", b."banDate", b."banReason"

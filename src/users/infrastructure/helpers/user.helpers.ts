@@ -54,7 +54,11 @@ export const userMappingSA = (user: UserCreateDTO): SAUserViewDTO => {
     login: user.login,
     email: user.email,
     createdAt: user.addedAt.toISOString(),
-    banInfo: user.banInfo,
+    banInfo: {
+      isBanned: user.banInfo.isBanned,
+      banDate: user.banInfo.banDate,
+      banReason: user.banInfo.banReason,
+    },
   };
 };
 
@@ -99,12 +103,15 @@ class UserCreator extends UserCreateDTO {
     user.passwordHash = hash;
     user.email = inputModel.email;
     user.addedAt = new Date();
+
     user.emailConfirmation = {
+      userId: user.id,
       confirmationCode: code,
       expirationDate: expirationDate,
       isConfirmed: false,
     };
     user.banInfo = {
+      userId: user.id,
       isBanned: false,
       banDate: null,
       banReason: null,
@@ -120,11 +127,13 @@ class UserCreator extends UserCreateDTO {
     user.email = inputModel.email;
     user.addedAt = new Date();
     user.emailConfirmation = {
+      userId: user.id,
       confirmationCode: null,
       expirationDate: null,
       isConfirmed: true,
     };
     user.banInfo = {
+      userId: user.id,
       isBanned: false,
       banDate: null,
       banReason: null,

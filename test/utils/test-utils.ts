@@ -2,6 +2,14 @@ import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { BlogViewDTO } from '../../src/blogs/dto/blog.models';
 
+export function delayedRequest(delay) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('Результат запроса');
+    }, delay);
+  });
+}
+
 export const blogViewModel: BlogViewDTO = {
   id: expect.stringMatching(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i,

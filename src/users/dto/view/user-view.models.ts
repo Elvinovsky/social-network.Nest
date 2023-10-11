@@ -1,5 +1,3 @@
-import { BanInfoModel } from '../create/users-create.models';
-
 export type MeViewModel = {
   email: string;
   login: string;
@@ -22,5 +20,9 @@ export class SAUserViewDTO {
   login: string;
   email: string;
   createdAt: string;
-  banInfo: BanInfoModel;
+  banInfo: {
+    isBanned: boolean;
+    banDate: Date | null;
+    banReason: string | null;
+  };
 }
