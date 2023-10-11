@@ -109,7 +109,7 @@ export class AuthService {
   async _isPasswordCorrect(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
-  async login(userInfo: UserInfo, deviceName: string, ip: string) {
+  async login(userInfo: UserInfo, userAgent: string, ip: string | null) {
     try {
       const deviceId = uuidv4();
 
@@ -132,7 +132,7 @@ export class AuthService {
         deviceId,
         issuedAt,
         ip,
-        deviceName,
+        userAgent,
       );
 
       return { createJWTAccessToken, createJWTRefreshToken };

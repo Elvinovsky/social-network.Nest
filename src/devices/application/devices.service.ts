@@ -15,7 +15,7 @@ export class DevicesService {
     userInfo: UserInfo,
     deviceId: string,
     issuedAt: number,
-    ip: string,
+    ip: string | null,
     deviceName: string,
   ) {
     const newDeviceSession: SessionCreateDTO = deviceCreator.create(

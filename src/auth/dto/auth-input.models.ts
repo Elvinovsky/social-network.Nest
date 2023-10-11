@@ -15,7 +15,7 @@ import { AuthService } from '../application/auth.service';
 export class RegistrationInputModel {
   @IsNotEmpty()
   @Matches(/^[a-zA-Z0-9_-]*$/)
-  @Length(3, 10)
+  @Length(3, 11)
   login: string;
   @IsNotEmpty()
   @Length(6, 20)

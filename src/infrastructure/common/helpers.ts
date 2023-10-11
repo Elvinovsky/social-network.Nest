@@ -13,11 +13,3 @@ export const refreshCookieOptions: CookieOptions = {
   sameSite: 'none',
   secure: true,
 };
-
-export function delayedRequest(delay) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('Результат запроса');
-    }, delay);
-  });
-}

@@ -79,10 +79,9 @@ import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schem
     AuthModule,
     DevicesModule,
     TypeOrmModule.forRoot(
-      // getConfiguration().NODE_ENV === 'Development' // todo realize class or function
-      //   ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
-      //   :
-      getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
+      getConfiguration().NODE_ENV === 'Development' // todo realize class or function
+        ? getConfiguration().SQL_OPTIONS.sqlLocalOptions
+        : getConfiguration().SQL_OPTIONS.sqlRemoteOptions,
     ),
     TypeOrmModule.forFeature([
       UserTypeOrmEntity,

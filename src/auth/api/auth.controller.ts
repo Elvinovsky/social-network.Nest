@@ -33,13 +33,13 @@ import { DevicesService } from '../../devices/application/devices.service';
 import { JwtRefreshGuard } from '../infrastructure/guards/jwt-refresh.guard';
 import { UsersMongooseQueryRepository } from '../../users/infrastructure/repositories/mongo/users-mongoose.query.repo';
 import { JwtBearerGuard } from '../infrastructure/guards/jwt-bearer-auth.guard';
-//import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserRegistrationCommand } from '../application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
 import requestIp from 'request-ip';
 import { CurrentSessionInfoFromRefreshJWT } from '../infrastructure/decorators/current-session-info-from-cookie-jwt';
 import { CurrentSessionInfoFromAccessJWT } from '../infrastructure/decorators/current-session-info-jwt';
 import { UserCreateDTO } from '../../users/dto/create/users-create.models';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -53,8 +53,8 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  // @UseGuards(ThrottlerGuard)
-  // @Throttle(5, 10)
+  @Throttle(5, 10)
+  @UseGuards(ThrottlerGuard)
   async registration(@Body() inputModel: RegistrationInputModel) {
     //ищем юзера в БД по эл/почте
     const isUserExists: true | ResultsAuthForErrors =
@@ -90,9 +90,46 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('registration-email-resending')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
+  async emailResending(@Body() emailModel: EmailInputModel) {
+    // ищем юзера в БД по эл/почте.
+    const foundUser: UserCreateDTO | null =
+      await this.usersService.findUserByEmail(emailModel.email);
+
+    if (foundUser === null) {
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email not exists',
+        },
+      ]);
+    }
+
+    // если почта уже подтвержена выдаем ошибку 400 ошибку
+    if (foundUser.emailConfirmation.isConfirmed) {
+      throw new BadRequestException([
+        {
+          field: 'email',
+          message: 'email already confirmed',
+        },
+      ]);
+    }
+
+    //обновляем код и отправляем по электронной почте
+    const isSendCode = await this.authService.sendUpdateConfirmCodeByEmail(
+      emailModel.email,
+    );
+
+    //если код не отправился выдаем 500 ошибку
+    if (!isSendCode) throw new PreconditionFailedException();
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
-  // @UseGuards(ThrottlerGuard)
-  // @Throttle(5, 10)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   async registrationConfirm(
     @Body() codeModel: RegistrationConfirmationCodeModel,
   ) {
@@ -131,46 +168,9 @@ export class AuthController {
     await this.authService.confirmationEmail(codeModel.code);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('registration-email-resending')
-  // @UseGuards(ThrottlerGuard)
-  // @Throttle(5, 10)
-  async emailResending(@Body() emailModel: EmailInputModel) {
-    // ищем юзера в БД по эл/почте.
-    const foundUser: UserCreateDTO | null =
-      await this.usersService.findUserByEmail(emailModel.email);
-
-    if (foundUser === null) {
-      throw new BadRequestException([
-        {
-          field: 'email',
-          message: 'email not exists',
-        },
-      ]);
-    }
-
-    // если почта уже подтвержена выдаем ошибку 400 ошибку
-    if (foundUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException([
-        {
-          field: 'email',
-          message: 'email already confirmed',
-        },
-      ]);
-    }
-
-    //обновляем код и отправляем по электронной почте
-    const isSendCode = await this.authService.sendUpdateConfirmCodeByEmail(
-      emailModel.email,
-    );
-
-    //если код не отправился выдаем 500 ошибку
-    if (!isSendCode) throw new PreconditionFailedException();
-  }
-
   @Post('login')
-  // @Throttle(5, 10)
-  @UseGuards(/*ThrottlerGuard,*/ LocalAuthGuard)
+  @Throttle(5, 10)
+  @UseGuards(ThrottlerGuard, LocalAuthGuard)
   async login(
     @CurrentUserIdLocal() user: UserViewDTO,
     @Headers('user-agent') userAgent: string,
@@ -299,7 +299,7 @@ export class AuthController {
     if (user) {
       return user; // Отправка информации о пользователе.
     }
-    throw new InternalServerErrorException(); // Ошибка: что то пошло не так.
+    return null;
   }
 
   @Put('email-recovery')

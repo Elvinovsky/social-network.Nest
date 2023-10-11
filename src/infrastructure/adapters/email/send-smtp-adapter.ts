@@ -7,7 +7,7 @@ import { ConfigType } from '../../configuration/getConfiguration';
 @Injectable()
 export class SendSMTPAdapter {
   constructor(private configService: ConfigService<ConfigType>) {}
-  async send(mailOptions: Mail.Options) {
+  send(mailOptions: Mail.Options) {
     try {
       const transporter = createTransport({
         host: 'smtp.mail.ru',
@@ -19,12 +19,9 @@ export class SendSMTPAdapter {
         },
       });
 
-      await transporter.verify();
+      transporter.verify();
 
-      transporter.sendMail(mailOptions, (e) => {
-        console.log(e);
-        return false;
-      });
+      transporter.sendMail(mailOptions);
 
       return true;
     } catch (err) {

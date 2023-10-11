@@ -4,6 +4,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { appSettings } from '../infrastructure/settings/app-settings';
 import request from 'supertest';
 import { UsersMongooseRepository } from '../users/infrastructure/repositories/mongo/users-mongoose.repository';
+import { delayedRequest } from '../../test/utils/test-utils';
 
 describe('AUTH', () => {
   let app: INestApplication;
@@ -39,19 +40,19 @@ describe('AUTH', () => {
     await request(httpServer).delete('/testing/all-data');
   });
 
-  it('REGISTRATION, should return 400, because login more than 10 characters', async () => {
+  it('REGISTRATION, should return 400, because login more than 11 characters', async () => {
     await request(httpServer)
       .post('/auth/registration')
       .send({
         password: 'validpassword',
         email: 'valid@gg.com',
-        login: 'loginmoretensimbols',
+        login: 'loginmoretensimbolsss',
       })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
             field: 'login',
-            message: 'login must be shorter than or equal to 10 characters',
+            message: 'login must be shorter than or equal to 11 characters',
           },
         ],
       });
@@ -144,7 +145,7 @@ describe('AUTH', () => {
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('LOGIN, should return accessToken in body and refreshToken in cookie', async () => {
+  it('LOGIN, should return accessToken in body', async () => {
     await request(httpServer)
       .post('/auth/login')
       .send({
@@ -155,5 +156,131 @@ describe('AUTH', () => {
       .then((body) =>
         expect(body.body).toEqual({ accessToken: expect.any(String) }),
       );
+  });
+
+  it('TOO_MANY_REQUESTS REGISTRATION, should return 204', async () => {
+    const delay = await delayedRequest(10000);
+    console.log(delay);
+    const user1 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid1password',
+        email: 'valid1@gg.com',
+        login: 'valid1Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const user2 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid2password',
+        email: 'valid2@gg.com',
+        login: 'valid2Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const user3 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid3password',
+        email: 'valid3@gg.com',
+        login: 'valid3Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const user4 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid4password',
+        email: 'valid4@gg.com',
+        login: 'valid4Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const user5 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid5password',
+        email: 'valid5@gg.com',
+        login: 'valid5Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid6password',
+        email: 'valid6@gg.com',
+        login: 'valid6Login',
+      })
+      .expect(HttpStatus.TOO_MANY_REQUESTS);
+
+    const delay1 = await delayedRequest(20000);
+    console.log(delay1);
+
+    const user6 = await request(httpServer)
+      .post('/auth/registration')
+      .send({
+        password: 'valid6password',
+        email: 'valid6@gg.com',
+        login: 'valid6Login',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const users = await request(httpServer)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK);
+
+    expect(users.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 7,
+      items: [
+        {
+          id: expect.any(String),
+          login: 'valid6Login',
+          email: 'valid6@gg.com',
+          createdAt: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          login: 'valid5Login',
+          email: 'valid5@gg.com',
+          createdAt: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          login: 'valid4Login',
+          email: 'valid4@gg.com',
+          createdAt: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          login: 'valid3Login',
+          email: 'valid3@gg.com',
+          createdAt: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          login: 'valid2Login',
+          email: 'valid2@gg.com',
+        },
+        {
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          login: 'valid1Login',
+          email: 'valid1@gg.com',
+        },
+        {
+          id: expect.any(String),
+          login: 'validLogin',
+          email: 'valid@gg.com',
+          createdAt: expect.any(String),
+        },
+      ],
+    });
   });
 });

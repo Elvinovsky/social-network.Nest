@@ -28,20 +28,20 @@ export class DevicesTypeormRepository {
   async getDevicesSessionsByUserId(
     userId: string,
   ): Promise<DeviceViewDTO[] | null> {
-    const devicesSessions = await this.devicesRepo
-      .createQueryBuilder('d')
-      .select(
-        `d.deviceId, d.issuedAt, d.ip, d.title, d.lastActiveDate, d.expirationDate,`,
-      )
-      .leftJoin('d.user', 'u')
-      .where('u.id= :id', { id: userId })
-      .getMany();
+    try {
+      const devicesSessions = await this.devicesRepo.find({
+        where: { userId: userId },
+      });
 
-    if (devicesSessions.length < 1) {
-      return null; // Возвращаем null, если устройства не найдены.
+      if (devicesSessions.length < 1) {
+        return null; // Возвращаем null, если устройства не найдены.
+      }
+
+      return devicesMapper(devicesSessions); //  возвращаем массив устройств.}
+    } catch (e) {
+      console.log(e);
+      throw new Error();
     }
-
-    return devicesMapper(devicesSessions); //  возвращаем массив устройств.
   }
   async addDeviceSession(deviceSession: SessionCreateDTO): Promise<void> {
     const session = this.devicesRepo.create({
@@ -87,13 +87,19 @@ export class DevicesTypeormRepository {
     issuedAt: number,
     userId: string,
   ): Promise<boolean> {
-    const result = await this.devicesRepo
-      .createQueryBuilder('d')
-      .delete()
-      .where(` d.userId= :userId`, { userId: userId })
-      .andWhere('d.issuedAt <> :issuedAt', { issuedAt: issuedAt })
-      .execute();
-    return !!result?.affected;
+    try {
+      const result = await this.devicesRepo
+        .createQueryBuilder()
+        .delete()
+        .where(` userId= :userId`, { userId: userId })
+        .andWhere('issuedAt <> :issuedAt', { issuedAt: issuedAt })
+        .execute();
+
+      return !!result?.affected;
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
   }
   async deleteAllDevicesAdminOrder(userId: string): Promise<number> {
     const result = await this.devicesRepo.delete({ userId: userId });

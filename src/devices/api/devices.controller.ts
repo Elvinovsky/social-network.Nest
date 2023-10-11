@@ -31,11 +31,10 @@ export class DevicesController {
   ) {
     // Получаем id пользователя из JwtRefreshGuard
     const userId = sessionInfo.userInfo.userId;
-    console.log(userId);
+
     // Ищем устройства пользователя
     const devicesSessionsByUser =
       await this.devicesService.getDevicesSessionsByUserId(userId);
-    console.log(userId);
 
     return devicesSessionsByUser;
   }

@@ -22,7 +22,7 @@ class DeviceCreator extends SessionCreateDTO {
     userInfo: UserInfo,
     deviceId: string,
     issuedAt: number,
-    ip: string,
+    ip: string | null,
     deviceName: string,
   ): SessionCreateDTO {
     const newSession: SessionCreateDTO = new DeviceCreator();
@@ -30,8 +30,8 @@ class DeviceCreator extends SessionCreateDTO {
     newSession.userInfo = userInfo;
     newSession.deviceId = deviceId;
     newSession.issuedAt = issuedAt;
-    newSession.ip = ip ?? 'ip';
-    newSession.title = deviceName ?? 'deviceName';
+    newSession.ip = ip ?? 'ip undefined';
+    newSession.title = deviceName ?? 'tittle undefined';
     newSession.lastActiveDate = new Date();
     newSession.expirationDate = add(new Date(), {
       seconds: 20,
