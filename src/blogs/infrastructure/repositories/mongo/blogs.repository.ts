@@ -6,7 +6,7 @@ import {
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Blog,
+  BlogMongooseEntity,
   BlogModel,
 } from '../../../entities/mongoose/blog-no-sql.schemas';
 import { blogMapping } from '../../helpers/blog.helpers';
@@ -15,7 +15,9 @@ import { UserInfo } from '../../../../users/dto/view/user-view.models';
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: BlogModel) {}
+  constructor(
+    @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
+  ) {}
 
   // Находит блог по заданному ID
   // Возвращает BlogDocument или null, если блог не найден

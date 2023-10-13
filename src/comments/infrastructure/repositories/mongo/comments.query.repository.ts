@@ -25,7 +25,7 @@ import {
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import {
-  Blog,
+  BlogMongooseEntity,
   BlogModel,
 } from '../../../../blogs/entities/mongoose/blog-no-sql.schemas';
 
@@ -33,7 +33,7 @@ export class CommentsQueryRepo {
   constructor(
     @InjectModel(Comment.name) private commentModel: CommentModel,
     @InjectModel(Post.name) private postModel: PostModel,
-    @InjectModel(Blog.name) private blogModel: BlogModel,
+    @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
     private readonly commentMapper: CommentMapper,
   ) {}
   async getCommentsByPostId(

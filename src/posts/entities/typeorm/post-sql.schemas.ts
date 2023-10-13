@@ -1,5 +1,5 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Blog } from '../../../blogs/entities/typeorm/blog-sql.schemas';
+import { BlogTypeOrmEntity } from '../../../blogs/entities/typeorm/blog-sql.schemas';
 
 @Entity()
 export class Post {
@@ -15,10 +15,10 @@ export class Post {
   @Column()
   content: string;
 
-  @OneToOne(() => Blog, (b) => b.id)
+  @OneToOne(() => BlogTypeOrmEntity, (b) => b.id)
   blogId: string;
 
-  @OneToOne(() => Blog, (b) => b.name)
+  @OneToOne(() => BlogTypeOrmEntity, (b) => b.name)
   blogName: string;
 
   @Column()

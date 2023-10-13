@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Blog,
+  BlogMongooseEntity,
   BlogModel,
 } from '../blogs/entities/mongoose/blog-no-sql.schemas';
 import { Injectable } from '@nestjs/common';
@@ -28,7 +28,7 @@ export class ClearMongoRepository {
   constructor(
     @InjectModel(UserMongooseEntity.name)
     private userModel: Model<UserMongooseEntity>,
-    @InjectModel(Blog.name) private blogModel: BlogModel,
+    @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
     @InjectModel(Post.name) private postModel: PostModel,
     @InjectModel(Comment.name) private commentModel: CommentModel,
     @InjectModel(Like.name) private likeModel: LikeModel,

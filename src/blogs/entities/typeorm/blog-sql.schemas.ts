@@ -1,9 +1,8 @@
-import { UserInfo } from '../../../users/dto/view/user-view.models';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { UserTypeOrmEntity } from '../../../users/entities/typeorm/user-sql.schemas';
 
 @Entity()
-export class Blog {
+export class BlogTypeOrmEntity {
   @PrimaryColumn({ type: 'uuid' })
   id: string;
 
@@ -22,11 +21,11 @@ export class Blog {
   @Column({ nullable: false, type: 'boolean' })
   isMembership: boolean;
 
-  @ManyToOne(() => UserTypeOrmEntity, (u) => u.id, {
+  @OneToMany(() => UserTypeOrmEntity, (u) => u.id, {
     cascade: true,
     nullable: true,
   })
-  blogOwnerInfo: UserInfo | null;
+  blogOwnerInfo: UserTypeOrmEntity | null;
 
   @Column()
   userId: string;

@@ -11,7 +11,7 @@ import {
 import { BlogsController } from './blogs/api/blogs.controller';
 import { BlogsQueryRepo } from './blogs/infrastructure/repositories/mongo/blogs.query.repo';
 import {
-  Blog,
+  BlogMongooseEntity,
   BlogSchema,
 } from './blogs/entities/mongoose/blog-no-sql.schemas';
 import { LikesService } from './likes/application/likes.service';
@@ -71,6 +71,7 @@ import {
   UserTypeOrmEntity,
 } from './users/entities/typeorm/user-sql.schemas';
 import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schemas';
+import { BlogsTypeOrmRepository } from './blogs/infrastructure/repositories/typeorm/blogs-typeorm.repository';
 
 @Module({
   imports: [
@@ -92,7 +93,7 @@ import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schem
     MongooseModule.forRoot(getConfiguration().mongoDBOptions.MONGO_URI),
     MongooseModule.forFeature([
       { name: UserMongooseEntity.name, schema: UserSchema },
-      { name: Blog.name, schema: BlogSchema },
+      { name: BlogMongooseEntity.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Like.name, schema: LikeSchema },
       { name: Comment.name, schema: CommentSchema },
@@ -129,7 +130,9 @@ import { DeviceTypeOrmEntity } from './devices/entities/typeorm/device-sql.schem
       useClass:
         getConfiguration().repo_type === 'Mongo'
           ? BlogsRepository
-          : BlogsRawSqlRepository,
+          : getConfiguration().repo_type === 'sql'
+          ? BlogsRawSqlRepository
+          : BlogsTypeOrmRepository,
     },
     {
       provide: BlogsQueryRepo,

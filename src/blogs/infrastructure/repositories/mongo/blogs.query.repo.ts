@@ -2,7 +2,7 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { BlogViewDTO, SABlogViewDTO } from '../../../dto/blog.models';
 import * as mongoose from 'mongoose';
 import {
-  Blog,
+  BlogMongooseEntity,
   BlogDocument,
   BlogModel,
 } from '../../../entities/mongoose/blog-no-sql.schemas';
@@ -33,7 +33,7 @@ import { UserInfo } from '../../../../users/dto/view/user-view.models';
 @Injectable()
 export class BlogsQueryRepo {
   constructor(
-    @InjectModel(Blog.name) private readonly blogModel: BlogModel,
+    @InjectModel(BlogMongooseEntity.name) private readonly blogModel: BlogModel,
     @InjectModel(Post.name) private readonly postModel: PostModel,
     private readonly postMapper: PostMapper,
   ) {}

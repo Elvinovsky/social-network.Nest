@@ -2,12 +2,12 @@ import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { UserInfo } from '../../../users/dto/view/user-view.models';
 
-export type BlogDocument = HydratedDocument<Blog>;
+export type BlogDocument = HydratedDocument<BlogMongooseEntity>;
 
 export type BlogModel = Model<BlogDocument>;
 
 @Schema()
-export class Blog {
+export class BlogMongooseEntity {
   @Prop({ required: true })
   id: string;
 
@@ -43,9 +43,9 @@ export class Blog {
   }
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const BlogSchema = SchemaFactory.createForClass(BlogMongooseEntity);
 
 BlogSchema.methods = {
-  unbindOwner: Blog.prototype.unbindOwner,
-  bindOwner: Blog.prototype.bindOwner,
+  unbindOwner: BlogMongooseEntity.prototype.unbindOwner,
+  bindOwner: BlogMongooseEntity.prototype.bindOwner,
 };
