@@ -66,23 +66,41 @@ Prettier: Инструмент для форматирования кода.
 Проект использует следующие переменные среды:
 
 NODE_ENV: Окружение проекта (например, Development, Production).
+
 MONGO_URL: URL для подключения к MongoDB.
+
 DB_NAME: Имя базы данных MongoDB.
+
 ACCESS_JWT_SECRET_KEY: Секретный ключ для создания JWT токенов.
+
 REFRESH_JWT_SECRET_KEY: Секретный ключ для создания обновляемых JWT токенов.
+
 ACCESS_TOKEN_EXPIRATION_TIME: Время жизни обычных JWT токенов.
+
 REFRESH_TOKEN_EXPIRATION_TIME: Время жизни обновляемых JWT токенов.
+
 AUTH_EMAIL: Электронная почта для аутентификации в приложении.
+
 AUTH_PASS: Пароль для аутентификации в приложении.
+
 BASIC_USER_NAME: Имя пользователя для базовой аутентификации.
+
 BASIC_PASS: Пароль для базовой аутентификации.
+
 REPO_TYPE: Тип репозитория, который используется в проекте (constants : typeORM | Mongo | sql).
+
 DATABASE_TYPE: Тип базы данных SQL (например, postgres, mysql).
+
 DATABASE_HOST: Хост для локальной базы данных SQL.
+
 DATABASE_PORT: Порт для локальной базы данных SQL.
+
 DATABASE_DB: Имя для локальной базы данных SQL.
+
 DATABASE_USERNAME: Имя пользователя для локальной базы данных SQL.
+
 DATABASE_PASSWORD: Пароль пользователя для локальной базы данных SQL.
+
 POSTGRES_URL: URL для подключения к удаленной базе данных.
 
 ## Запуск проекта
