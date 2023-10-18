@@ -1,5 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { JoinColumn } from 'typeorm';
+import { DeviceTypeOrmEntity } from '../../../devices/entities/typeorm/device-sql.schemas';
 
 @Entity()
 export class EmailConfirmTypeOrmEntity {
@@ -63,4 +64,10 @@ export class UserTypeOrmEntity {
   )
   @JoinColumn()
   emailConfirmation: EmailConfirmTypeOrmEntity;
+
+  @OneToMany(() => DeviceTypeOrmEntity, (Device) => Device.userId, {
+    cascade: true,
+    nullable: true,
+  })
+  device: DeviceTypeOrmEntity;
 }

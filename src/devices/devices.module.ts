@@ -14,6 +14,7 @@ import { DevicesRawSqlRepository } from './infrastructure/repositories/sql/devic
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DeviceTypeOrmEntity } from './entities/typeorm/device-sql.schemas';
 import { DevicesTypeormRepository } from './infrastructure/repositories/typeorm/devices-typeorm.repository';
+import { IDeviceRepository } from '../infrastructure/repositoriesModule/repositories.module';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { DevicesTypeormRepository } from './infrastructure/repositories/typeorm/
   providers: [
     DevicesService,
     {
-      provide: DevicesRepository,
+      provide: IDeviceRepository,
       useClass:
         getConfiguration().repo_type === 'Mongo'
           ? DevicesRepository

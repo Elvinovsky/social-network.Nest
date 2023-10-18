@@ -11,10 +11,11 @@ import {
 } from '../../../entities/mongoose/blog-no-sql.schemas';
 import { blogMapping } from '../../helpers/blog.helpers';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
+import { IBlogRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()
-export class BlogsRepository {
+export class BlogsRepository implements IBlogRepository {
   constructor(
     @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
   ) {}

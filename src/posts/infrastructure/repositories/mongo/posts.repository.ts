@@ -10,12 +10,13 @@ import {
   PostViewDTO,
 } from '../../../dto/post.models';
 import { PostMapper } from '../../helpers/post-mapper';
+import { IPostRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class PostsRepository {
+export class PostsRepository implements IPostRepository {
   constructor(
+    protected postMapper: PostMapper,
     @InjectModel(Post.name) private readonly postModel: PostModel,
-    private readonly postMapper: PostMapper,
   ) {}
 
   async findPostById(id: string): Promise<boolean> {

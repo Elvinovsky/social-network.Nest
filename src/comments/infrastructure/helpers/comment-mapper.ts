@@ -1,8 +1,6 @@
 import { CommentCreateDTO, CommentViewDTO } from '../../dto/comment.models';
 import { LikesService } from '../../../likes/application/likes.service';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class CommentMapper {
   constructor(private readonly likesService: LikesService) {}
   async comment(

@@ -77,6 +77,10 @@ describe('COMMENTS', () => {
     createdUserView = createdUser.body;
   });
 
+  afterAll(async () => {
+    await request(httpServer).delete('/testing/all-data');
+  });
+
   it('GET COMMENTS, should return pagination view for comments with an empty array of objects', async () => {
     await request(httpServer)
       .get(`/posts/${createdPostView.id}/comments`)

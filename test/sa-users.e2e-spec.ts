@@ -2,7 +2,6 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { UserViewDTO } from '../src/users/dto/view/user-view.models';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-
 import request from 'supertest';
 import { appSettings } from '../src/infrastructure/settings/app-settings';
 
@@ -36,6 +35,10 @@ describe('SA USERS', () => {
     //   .expect(HttpStatus.OK);
 
     // accessToken = loginGetTokens.body.accessToken;
+  });
+
+  afterAll(async () => {
+    await request(httpServer).delete('/testing/all-data');
   });
 
   it('CREATE USER, should return 401', async () => {

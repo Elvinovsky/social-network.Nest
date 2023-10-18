@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CommentsRepository } from '../infrastructure/repositories/mongo/comments.repository';
 import { CommentCreateDTO, CommentViewDTO } from '../dto/comment.models';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { commentCreator } from '../infrastructure/helpers/comment-creator';
+import { ICommentRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(private readonly commentsRepository: ICommentRepository) {}
   async findCommentById(id: string) {
     return this.commentsRepository.findCommentById(id);
   }

@@ -3,15 +3,16 @@ import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
-import { UserFullDTO } from '../../../dto/create/users-create.models';
+import { UserCreateDTO } from '../../../dto/create/users-create.models';
+import { IUserRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersRawSQLRepository {
+export class UsersRawSQLRepository implements IUserRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async findUserLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<UserFullDTO | null> {
+  ): Promise<UserCreateDTO | null> {
     try {
       // Ищем пользователя в базе данных по логину или адресу электронной почты
       const user = await this.dataSource.query(
@@ -38,11 +39,13 @@ export class UsersRawSQLRepository {
         email: user[0].email,
         addedAt: user[0].addedAt,
         emailConfirmation: {
+          userId: user[0].id,
           isConfirmed: user[0].isConfirmed,
           expirationDate: user[0].expirationDate,
           confirmationCode: user[0].confirmationCode,
         },
         banInfo: {
+          userId: user[0].id,
           isBanned: user[0].isBanned,
           banDate: user[0].banDate,
           banReason: user[0].banReason,
@@ -106,7 +109,7 @@ export class UsersRawSQLRepository {
     };
   }
 
-  async findUserByEmail(email: string): Promise<UserFullDTO | null> {
+  async findUserByEmail(email: string): Promise<UserCreateDTO | null> {
     const user = await this.dataSource.query(
       `
             SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", 
@@ -128,20 +131,22 @@ export class UsersRawSQLRepository {
       passwordHash: user[0].passwordHash,
       email: user[0].email,
       addedAt: user[0].addedAt,
-      banInfo: {
-        isBanned: user[0].isBanned,
-        banDate: user[0].banDate,
-        banReason: user[0].banReason,
-      },
       emailConfirmation: {
+        userId: user[0].id,
         isConfirmed: user[0].isConfirmed,
         expirationDate: user[0].expirationDate,
         confirmationCode: user[0].confirmationCode,
       },
+      banInfo: {
+        userId: user[0].id,
+        isBanned: user[0].isBanned,
+        banDate: user[0].banDate,
+        banReason: user[0].banReason,
+      },
     };
   }
 
-  async findUserByLogin(login: string): Promise<UserFullDTO | null> {
+  async findUserByLogin(login: string): Promise<UserCreateDTO | null> {
     const user = await this.dataSource.query(
       `
             SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", e."isConfirmed", e."expirationDate", e."confirmationCode", b."isBanned", b."banDate", b."banReason"
@@ -162,20 +167,22 @@ export class UsersRawSQLRepository {
       passwordHash: user[0].passwordHash,
       email: user[0].email,
       addedAt: user[0].addedAt,
-      banInfo: {
-        isBanned: user[0].isBanned,
-        banDate: user[0].banDate,
-        banReason: user[0].banReason,
-      },
       emailConfirmation: {
+        userId: user[0].id,
         isConfirmed: user[0].isConfirmed,
         expirationDate: user[0].expirationDate,
         confirmationCode: user[0].confirmationCode,
       },
+      banInfo: {
+        userId: user[0].id,
+        isBanned: user[0].isBanned,
+        banDate: user[0].banDate,
+        banReason: user[0].banReason,
+      },
     };
   }
 
-  async createUser(inputModel: UserFullDTO): Promise<UserViewDTO> {
+  async createUser(inputModel: UserCreateDTO): Promise<UserViewDTO> {
     try {
       const newUser = await this.dataSource.query(
         `INSERT INTO "user"."accountData" (
@@ -258,7 +265,7 @@ export class UsersRawSQLRepository {
     }
   }
 
-  async deleteUserById(userId: string): Promise<Document | null> {
+  async deleteUserById(userId: string): Promise<number | null> {
     try {
       //todo realize cascade delete
       const result = await this.dataSource.query(
@@ -269,14 +276,14 @@ export class UsersRawSQLRepository {
         [userId],
       );
       if (result[1] !== 1) return null;
-      return result;
+      return result[1];
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
     }
   }
 
-  async findUserByCode(code: string): Promise<UserFullDTO | null> {
+  async findUserByCode(code: string): Promise<UserCreateDTO | null> {
     const user = await this.dataSource.query(
       `
     SELECT u."id", u."login", u."passwordHash", u."email", u."addedAt", e."isConfirmed", e."expirationDate", e."confirmationCode", b."isBanned", b."banDate", b."banReason"
@@ -299,15 +306,17 @@ export class UsersRawSQLRepository {
       passwordHash: user[0].passwordHash,
       email: user[0].email,
       addedAt: user[0].addedAt,
-      banInfo: {
-        isBanned: user[0].isBanned,
-        banDate: user[0].banDate,
-        banReason: user[0].banReason,
-      },
       emailConfirmation: {
+        userId: user[0].id,
         isConfirmed: user[0].isConfirmed,
         expirationDate: user[0].expirationDate,
         confirmationCode: user[0].confirmationCode,
+      },
+      banInfo: {
+        userId: user[0].id,
+        isBanned: user[0].isBanned,
+        banDate: user[0].banDate,
+        banReason: user[0].banReason,
       },
     };
   }

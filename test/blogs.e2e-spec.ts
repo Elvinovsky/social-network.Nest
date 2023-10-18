@@ -36,6 +36,10 @@ describe('BLOGS', () => {
     await request(httpServer).delete('/testing/all-data');
   });
 
+  afterAll(async () => {
+    await request(httpServer).delete('/testing/all-data');
+  });
+
   it('1 – GET BLOGS, should return 200 and empty array items', async () => {
     await request(httpServer).get('/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,

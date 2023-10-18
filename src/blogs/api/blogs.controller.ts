@@ -13,16 +13,16 @@ import {
   QueryInputModel,
   SearchNameTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { BlogsQueryRepo } from '../infrastructure/repositories/mongo/blogs.query.repo';
 import { BlogViewDTO } from '../dto/blog.models';
 import { PostViewDTO } from '../../posts/dto/post.models';
 import { OptionalBearerGuard } from '../../auth/infrastructure/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../../auth/infrastructure/decorators/current-userId-optional.decorator';
 import { ParamUUIdPipe } from '../../infrastructure/common/pipes/object-id.pipe';
+import { IBlogQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(private readonly blogsQueryRepo: BlogsQueryRepo) {}
+  constructor(private readonly blogsQueryRepo: IBlogQueryRepository) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)

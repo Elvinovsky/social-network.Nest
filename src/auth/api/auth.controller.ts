@@ -31,7 +31,6 @@ import { refreshCookieOptions } from '../../infrastructure/common/helpers';
 import { ResultsAuthForErrors } from '../infrastructure/config/auth-exceptions.constants';
 import { DevicesService } from '../../devices/application/devices.service';
 import { JwtRefreshGuard } from '../infrastructure/guards/jwt-refresh.guard';
-import { UsersMongooseQueryRepository } from '../../users/infrastructure/repositories/mongo/users-mongoose.query.repo';
 import { JwtBearerGuard } from '../infrastructure/guards/jwt-bearer-auth.guard';
 import { UserRegistrationCommand } from '../application/use-cases/user-registration-use-case.';
 import { CommandBus } from '@nestjs/cqrs';
@@ -40,6 +39,7 @@ import { CurrentSessionInfoFromRefreshJWT } from '../infrastructure/decorators/c
 import { CurrentSessionInfoFromAccessJWT } from '../infrastructure/decorators/current-session-info-jwt';
 import { UserCreateDTO } from '../../users/dto/create/users-create.models';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { IUserQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('auth')
 export class AuthController {
@@ -47,7 +47,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly devicesService: DevicesService,
-    private readonly usersQueryRepository: UsersMongooseQueryRepository,
+    private readonly usersQueryRepository: IUserQueryRepository,
     private commandBus: CommandBus,
   ) {}
 

@@ -9,12 +9,12 @@ import {
 } from 'class-validator';
 import { ExtendedLikesViewDTO } from '../../likes/dto/like.models';
 import { Injectable } from '@nestjs/common';
-import { BlogsRepository } from '../../blogs/infrastructure/repositories/mongo/blogs.repository';
+import { IBlogRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 @ValidatorConstraint({ name: 'BlogExists', async: true })
 export class BlogIdExistenceCheck implements ValidatorConstraintInterface {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(private blogsRepository: IBlogRepository) {}
   async validate(id: string, args: ValidationArguments) {
     const blog = await this.blogsRepository.findBlogById(id);
     return !!blog;

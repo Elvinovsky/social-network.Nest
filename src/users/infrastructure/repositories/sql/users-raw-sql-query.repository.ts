@@ -11,10 +11,91 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { IUserQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersRawSQLQueryRepository {
+export class UsersRawSQLQueryRepository implements IUserQueryRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  async getSortedUsers(
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
+    searchEmailTerm?: string,
+    searchLoginTerm?: string,
+  ): Promise<PaginatorType<UserViewDTO[]>> {
+    try {
+      const getEmailTerm = (searchEmailTerm?: string): string =>
+        searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
+
+      const getLoginTerm = (searchLoginTerm?: string): string =>
+        searchLoginTerm ? `%${searchLoginTerm}%` : `%%`;
+
+      const queryString = `
+        SELECT 
+                u."id", 
+                u."login", 
+                u."email", 
+                u."addedAt" as "createdAt"
+        FROM 
+                "user"."accountData" u
+        WHERE 
+                u."login" LIKE $1 
+                or u."email" LIKE $2 
+        ORDER BY 
+                "${getSortBy(sortBy)}" ${
+        getDirection(sortDirection) === 1 ? 'Asc' : 'Desc'
+      }
+      OFFSET $3 LIMIT $4`; // todo добавить валидацию на офсет для ограничения пролистования записей .
+
+      const users = await this.dataSource.query(queryString, [
+        getLoginTerm(searchLoginTerm),
+        getEmailTerm(searchEmailTerm),
+        getSkip(pageNumber, pageSize),
+        pageSize,
+      ]);
+
+      const usersMap = await users.map((el) => {
+        return {
+          id: el.id,
+          login: el.login,
+          email: el.email,
+          createdAt: el.createdAt.toISOString(),
+        };
+      });
+
+      const calculateOfFiles = await this.dataSource.query(
+        `
+     SELECT COUNT(*) as "totalCount"
+        FROM (  SELECT 
+                u."id", 
+                u."login", 
+                u."email", 
+                u."addedAt" as "createdAt"
+        FROM 
+                "user"."accountData" u 
+        WHERE 
+                u."login" LIKE $1 
+                or u."email" LIKE $2 )
+        `,
+        [getLoginTerm(searchLoginTerm), getEmailTerm(searchEmailTerm)],
+      );
+      return {
+        pagesCount: pagesCountOfBlogs(
+          +calculateOfFiles[0].totalCount,
+          getPageSize(pageSize),
+        ),
+        page: getPageNumber(pageNumber),
+        pageSize: getPageSize(pageSize),
+        totalCount: +calculateOfFiles[0].totalCount,
+        items: usersMap,
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
+  }
+
   async getSortedUsersForSA(
     pageNumber: number,
     pageSize: number,

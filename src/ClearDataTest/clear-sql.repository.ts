@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { IClearRepository } from '../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class ClearSQLRepository {
+export class ClearSQLRepository implements IClearRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async deleteDB() {
     await this.dataSource.query(`

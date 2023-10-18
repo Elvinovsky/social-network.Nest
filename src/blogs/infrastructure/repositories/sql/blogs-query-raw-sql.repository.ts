@@ -1,6 +1,6 @@
 import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
 import { BlogViewDTO, SABlogViewDTO } from '../../../dto/blog.models';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   getDirection,
   getPageNumber,
@@ -9,20 +9,20 @@ import {
   getSortBy,
   pagesCountOfBlogs,
 } from '../../../../infrastructure/pagination/pagination.helpers';
-import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { blogsMapperSA, blogsMapping } from '../../helpers/blog.helpers';
 import { PostViewDTO } from '../../../../posts/dto/post.models';
-import { PostDocument } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
-import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
+import { IBlogQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
+import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
+
 @Injectable()
-export class BlogsQueryRawSqlRepository {
+export class BlogsQueryRawSqlRepository implements IBlogQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    private readonly likesRawSqlRepository: LikesRawSqlRepository,
+    protected postMapper: PostMapper, // private readonly likesRawSqlRepository: LikesRawSqlRepository,
   ) {}
 
   async getBlogById(blogId: string): Promise<BlogViewDTO | null> {
@@ -48,7 +48,7 @@ export class BlogsQueryRawSqlRepository {
       };
     } catch (e) {
       console.log(e, 'error findBlogById method');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 
@@ -125,7 +125,7 @@ export class BlogsQueryRawSqlRepository {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
   async getSortedBlogsForCurrentBlogger(
@@ -197,7 +197,7 @@ export class BlogsQueryRawSqlRepository {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 
@@ -268,29 +268,6 @@ export class BlogsQueryRawSqlRepository {
         [blogId],
       );
 
-      const postsMap = Promise.all(
-        foundPosts.map(async (el) => {
-          return {
-            id: el.id,
-            title: el.title,
-            shortDescription: el.shortDescription,
-            content: el.content,
-            blogId: el.blogId,
-            blogName: el.blogName,
-            createdAt: el.addedAt.toISOString(),
-            extendedLikesInfo: {
-              likesCount: +el.likesCount,
-              dislikesCount: +el.dislikesCount,
-              myStatus: await this.likesRawSqlRepository.currentStatus(
-                el.id,
-                userId,
-              ),
-              newestLikes: await this.likesRawSqlRepository.newestLikes(el.id),
-            },
-          };
-        }),
-      );
-
       return {
         pagesCount: pagesCountOfBlogs(
           +calculateOfFiles[0].totalCount,
@@ -299,11 +276,11 @@ export class BlogsQueryRawSqlRepository {
         page: pageNumber,
         pageSize: pageSize,
         totalCount: +calculateOfFiles[0].totalCount,
-        items: await postsMap,
+        items: await this.postMapper.mapPosts(foundPosts, userId),
       };
     } catch (e) {
       console.log(e);
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
   async getSortedBlogsForSA(
@@ -385,7 +362,7 @@ export class BlogsQueryRawSqlRepository {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 }

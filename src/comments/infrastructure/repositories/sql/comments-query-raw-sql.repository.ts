@@ -6,12 +6,13 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
+import { ICommentQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
+import { CommentMapper } from '../../helpers/comment-mapper';
 
-export class CommentsQueryRawSqlRepository {
+export class CommentsQueryRawSqlRepository implements ICommentQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    private likesRawSqlRepository: LikesRawSqlRepository,
+    private readonly commentMapper: CommentMapper,
   ) {}
 
   async getCommentsByPostId(
@@ -74,28 +75,6 @@ export class CommentsQueryRawSqlRepository {
       .then()
       .catch((e) => console.log(e));
 
-    const commentsMap = Promise.all(
-      comments.map(async (el) => {
-        return {
-          id: el.id,
-          content: el.content,
-          commentatorInfo: {
-            userId: el.userId,
-            userLogin: el.userLogin,
-          },
-          likesInfo: {
-            likesCount: +el.likesCount,
-            dislikesCount: +el.dislikesCount,
-            myStatus: await this.likesRawSqlRepository.currentStatus(
-              el.id,
-              userId,
-            ),
-          },
-          createdAt: el.createdAt.toISOString(),
-        };
-      }),
-    );
-
     const calculateOfFiles = await this.dataSource.query(
       `
         SELECT count(*) as "pages"
@@ -110,7 +89,7 @@ export class CommentsQueryRawSqlRepository {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: +calculateOfFiles[0].pages,
-      items: await commentsMap,
+      items: await this.commentMapper.comments(comments, userId),
     };
   }
 }

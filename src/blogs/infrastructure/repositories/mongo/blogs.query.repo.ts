@@ -6,7 +6,7 @@ import {
   BlogDocument,
   BlogModel,
 } from '../../../entities/mongoose/blog-no-sql.schemas';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   getDirection,
@@ -22,20 +22,21 @@ import {
   blogsMapperSA,
   blogsMapping,
 } from '../../helpers/blog.helpers';
-import { PostViewDTO } from '../../../../posts/dto/post.models';
+import { PostCreateDTO, PostViewDTO } from '../../../../posts/dto/post.models';
 import {
   Post,
-  PostDocument,
   PostModel,
 } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
 import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
+import { IBlogQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
+
 @Injectable()
-export class BlogsQueryRepo {
+export class BlogsQueryRepo implements IBlogQueryRepository {
   constructor(
     @InjectModel(BlogMongooseEntity.name) private readonly blogModel: BlogModel,
     @InjectModel(Post.name) private readonly postModel: PostModel,
-    private readonly postMapper: PostMapper,
+    protected postMapper: PostMapper,
   ) {}
 
   async getBlogById(id: string): Promise<BlogViewDTO | null> {
@@ -50,7 +51,7 @@ export class BlogsQueryRepo {
       return blogMapping(foundBlog);
     } catch (e) {
       console.log(e, 'error findBlogById method');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 
@@ -90,7 +91,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
   async getSortedBlogsForCurrentBlogger(
@@ -133,7 +134,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
   async getSortedPostsBlog(
@@ -151,7 +152,7 @@ export class BlogsQueryRepo {
       }
 
       const calculateOfFiles = await this.postModel.countDocuments({ blogId });
-      const Posts: PostDocument[] = await this.postModel
+      const Posts: PostCreateDTO[] = await this.postModel
         .find({
           blogId: blogId,
         })
@@ -172,7 +173,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'error getSortedPostsByBlogID');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 
@@ -213,7 +214,7 @@ export class BlogsQueryRepo {
       };
     } catch (e) {
       console.log(e, 'getSortedBlogs method error');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 }

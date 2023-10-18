@@ -9,9 +9,10 @@ import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
 import { userMapping, userMappingSA } from '../../helpers/user.helpers';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
 import { UserCreateDTO } from '../../../dto/create/users-create.models';
+import { IUserRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersMongooseRepository {
+export class UsersMongooseRepository implements IUserRepository {
   constructor(
     @InjectModel(UserMongooseEntity.name)
     private userModel: Model<UserDocument>,

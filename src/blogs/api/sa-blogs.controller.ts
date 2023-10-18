@@ -20,17 +20,17 @@ import {
   QueryInputModel,
   SearchNameTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { BlogsQueryRepo } from '../infrastructure/repositories/mongo/blogs.query.repo';
 import { UsersService } from '../../users/application/users.service';
 import { BlogsService } from '../application/blogs.service';
 import { BlogInputModel, BlogViewDTO } from '../dto/blog.models';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/dto/post.models';
 import { PostsService } from '../../posts/application/posts.service';
+import { IBlogQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('sa/blogs')
 export class SaBlogsController {
   constructor(
-    private blogsQueryRepo: BlogsQueryRepo,
+    private blogsQueryRepo: IBlogQueryRepository,
     private blogsService: BlogsService,
     private usersService: UsersService,
     private postsService: PostsService,

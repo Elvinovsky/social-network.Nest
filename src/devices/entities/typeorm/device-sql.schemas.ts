@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserTypeOrmEntity } from '../../../users/entities/typeorm/user-sql.schemas';
 
 @Entity()
@@ -6,7 +6,8 @@ export class DeviceTypeOrmEntity {
   @PrimaryColumn({ nullable: false })
   deviceId: string;
 
-  @OneToMany(() => UserTypeOrmEntity, (u) => u.id, {
+  @ManyToOne(() => UserTypeOrmEntity, (u) => u.id, {
+    cascade: true,
     nullable: false,
   })
   @JoinColumn()

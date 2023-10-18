@@ -3,21 +3,21 @@ import { AppModule } from '../src/app.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { appSettings } from '../src/infrastructure/settings/app-settings';
 import request from 'supertest';
-import { UsersMongooseRepository } from '../src/users/infrastructure/repositories/mongo/users-mongoose.repository';
 import { delayedRequest } from '../test/utils/test-utils';
+import { IUserRepository } from '../src/infrastructure/repositoriesModule/repositories.module';
 
 describe('AUTH', () => {
   let app: INestApplication;
   let httpServer: INestApplication<any>;
 
-  let usersRepo: UsersMongooseRepository;
+  let usersRepo: IUserRepository;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
         {
-          provide: UsersMongooseRepository,
+          provide: IUserRepository,
           useValue: {
             findOne: jest.fn(),
             findUser: jest.fn(),
@@ -26,9 +26,7 @@ describe('AUTH', () => {
       ],
     }).compile();
 
-    usersRepo = moduleFixture.get<UsersMongooseRepository>(
-      UsersMongooseRepository,
-    );
+    usersRepo = moduleFixture.get<IUserRepository>(IUserRepository);
 
     app = moduleFixture.createNestApplication();
     appSettings(app);
@@ -37,6 +35,10 @@ describe('AUTH', () => {
 
     httpServer = app.getHttpServer();
 
+    await request(httpServer).delete('/testing/all-data');
+  });
+
+  afterAll(async () => {
     await request(httpServer).delete('/testing/all-data');
   });
 

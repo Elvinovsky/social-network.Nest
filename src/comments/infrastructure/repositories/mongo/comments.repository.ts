@@ -11,14 +11,18 @@ import {
 } from '../../../entities/mongoose/comment-no-sql.schemas';
 import { CommentMapper } from '../../helpers/comment-mapper';
 import { CommentCreateDTO, CommentViewDTO } from '../../../dto/comment.models';
+import { ICommentRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class CommentsRepository {
+export class CommentsRepository implements ICommentRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: CommentModel,
     private readonly commentMapper: CommentMapper,
   ) {}
-  async getCommentById(commentId: string, userId: any) {
+  async getCommentById(
+    commentId: string,
+    userId: any,
+  ): Promise<CommentViewDTO | null> {
     try {
       const result: CommentCreateDTO | null = await this.commentModel.findOne({
         id: commentId,
@@ -85,7 +89,7 @@ export class CommentsRepository {
     );
     return bannedComments.matchedCount >= 1;
   }
-  async unBanCommentsUserId(userId: string) {
+  async unBanCommentsUserId(userId: string): Promise<boolean> {
     const unBannedComments = await this.commentModel.updateMany(
       { 'commentatorInfo.userId': userId },
       { $set: { 'commentatorInfo.isBanned': false } },

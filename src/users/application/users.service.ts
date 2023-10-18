@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UsersMongooseRepository } from '../infrastructure/repositories/mongo/users-mongoose.repository';
 import { SAUserViewDTO, UserViewDTO } from '../dto/view/user-view.models';
 import { RegistrationInputModel } from '../../auth/dto/auth-input.models';
 import { ResultsAuthForErrors } from '../../auth/infrastructure/config/auth-exceptions.constants';
@@ -12,11 +11,12 @@ import {
 } from '../dto/input/user-input.models';
 import { UserCreateDTO } from '../dto/create/users-create.models';
 import { userCreator } from '../infrastructure/helpers/user.helpers';
+import { IUserRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly usersRepository: IUserRepository,
     private devicesService: DevicesService,
     private likesService: LikesService,
     private commentsService: CommentsService,

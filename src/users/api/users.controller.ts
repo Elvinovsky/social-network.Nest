@@ -11,25 +11,28 @@ import {
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { UsersMongooseQueryRepository } from '../infrastructure/repositories/mongo/users-mongoose.query.repo';
+import { IUserQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly usersQueryRepo: UsersMongooseQueryRepository,
+    private readonly usersQueryRepo: IUserQueryRepository,
   ) {}
   @Get()
   async getUsers(
-    @Query() query: QueryInputModel & SearchEmailTerm & SearchLoginTerm,
+    @Query()
+    query: QueryInputModel,
+    @Query() queryEmail: SearchEmailTerm,
+    @Query() queryLogin: SearchLoginTerm,
   ) {
     return this.usersQueryRepo.getSortedUsers(
-      query.searchEmailTerm,
-      query.searchLoginTerm,
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
+      queryEmail?.searchEmailTerm,
+      queryLogin?.searchLoginTerm,
     );
   }
   @Get(':userId')

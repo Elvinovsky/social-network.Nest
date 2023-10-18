@@ -9,7 +9,7 @@ export const usersMappingSA = (
 ): SAUserViewDTO[] => {
   return array.map((el) => {
     return {
-      id: el.id.toString(),
+      id: el.id,
       login: el.login,
       email: el.email,
       createdAt: el.addedAt.toISOString(),
@@ -50,7 +50,7 @@ export const usersMapping = (array: Array<UserCreateDTO>): UserViewDTO[] => {
 
 export const userMappingSA = (user: UserCreateDTO): SAUserViewDTO => {
   return {
-    id: user.id.toString(),
+    id: user.id,
     login: user.login,
     email: user.email,
     createdAt: user.addedAt.toISOString(),

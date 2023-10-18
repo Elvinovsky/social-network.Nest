@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { DeviceViewDTO, SessionCreateDTO } from '../../../dto/device.models';
+import { IDeviceRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class DevicesRawSqlRepository {
+export class DevicesRawSqlRepository implements IDeviceRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async findDeviceSessionByIAT(issuedAt: number): Promise<boolean> {

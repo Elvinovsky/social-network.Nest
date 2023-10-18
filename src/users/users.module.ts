@@ -1,6 +1,4 @@
 import { UsersService } from './application/users.service';
-import { UsersMongooseRepository } from './infrastructure/repositories/mongo/users-mongoose.repository';
-import { UsersMongooseQueryRepository } from './infrastructure/repositories/mongo/users-mongoose.query.repo';
 import {
   UserMongooseEntity,
   UserSchema,
@@ -13,7 +11,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { SaUsersController } from './api/sa-users.controller';
 import { DevicesModule } from '../devices/devices.module';
 import { LikesService } from '../likes/application/likes.service';
-import { LikesRepository } from '../likes/infrastructure/repositories/mongo/likes.repository';
 import {
   Like,
   LikeSchema,
@@ -23,22 +20,28 @@ import {
   CommentSchema,
 } from '../comments/entities/mongoose/comment-no-sql.schemas';
 import { CommentsService } from '../comments/application/comments.service';
-import { CommentsRepository } from '../comments/infrastructure/repositories/mongo/comments.repository';
 import { CommentMapper } from '../comments/infrastructure/helpers/comment-mapper';
-import { UsersRawSQLQueryRepository } from './infrastructure/repositories/sql/users-raw-sql-query.repository';
-import { UsersRawSQLRepository } from './infrastructure/repositories/sql/users-raw-sql.repository';
 import { getConfiguration } from '../infrastructure/configuration/getConfiguration';
-import { CommentsRawSqlRepository } from '../comments/infrastructure/repositories/sql/comments-raw-sql.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersTypeormRepository } from './infrastructure/repositories/typeorm/users-typeorm.repository';
 import {
   BanInfoTypeOrmEntity,
   EmailConfirmTypeOrmEntity,
   UserTypeOrmEntity,
 } from './entities/typeorm/user-sql.schemas';
-import { UsersTypeormQueryRepo } from './infrastructure/repositories/typeorm/users-typeorm-query.repo';
+import {
+  IUserQueryRepository,
+  repoTypeToClassMapUser,
+} from '../infrastructure/repositoriesModule/repositories.module';
 
 const useCases = [UserRegistrationToAdminUseCase];
+
+const repositories =
+  getConfiguration().repo_type === 'Mongo'
+    ? repoTypeToClassMapUser.mongo
+    : getConfiguration().repo_type === 'sql'
+    ? repoTypeToClassMapUser.sql
+    : repoTypeToClassMapUser.typeorm;
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -57,39 +60,14 @@ const useCases = [UserRegistrationToAdminUseCase];
   controllers: [UsersController, SaUsersController],
   providers: [
     ...useCases,
-    {
-      provide: UsersMongooseRepository,
-      useClass:
-        getConfiguration().repo_type === 'Mongo'
-          ? UsersMongooseRepository
-          : getConfiguration().repo_type === 'sql'
-          ? UsersRawSQLRepository
-          : UsersTypeormRepository,
-    },
-    {
-      provide: UsersMongooseQueryRepository,
-      useClass:
-        getConfiguration().repo_type === 'Mongo'
-          ? UsersMongooseQueryRepository
-          : getConfiguration().repo_type === 'sql'
-          ? UsersRawSQLQueryRepository
-          : UsersTypeormQueryRepo,
-    },
+    ...repositories,
     LikesService,
-    LikesRepository,
 
     CommentsService,
-    {
-      provide: CommentsRepository,
-      useClass:
-        getConfiguration().repo_type === 'Mongo'
-          ? CommentsRepository
-          : CommentsRawSqlRepository,
-    },
     CommentMapper,
 
     UsersService,
   ],
-  exports: [UsersService, UsersMongooseQueryRepository],
+  exports: [UsersService, IUserQueryRepository],
 })
 export class UsersModule {}

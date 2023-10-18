@@ -24,17 +24,17 @@ import {
   SearchEmailTerm,
   SearchLoginTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { UsersMongooseQueryRepository } from '../infrastructure/repositories/mongo/users-mongoose.query.repo';
 import {
   BanUserInputModel,
   UserInputModel,
 } from '../dto/input/user-input.models';
+import { IUserQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('sa/users')
 export class SaUsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly usersQueryRepo: UsersMongooseQueryRepository,
+    private readonly usersQueryRepo: IUserQueryRepository,
     private commandBus: CommandBus,
   ) {}
 
@@ -81,12 +81,12 @@ export class SaUsersController {
     @Query() queryBanStatus: QueryBanStatus,
   ) {
     console.log(queryLogin.searchLoginTerm, queryEmail.searchEmailTerm);
-    return this.usersQueryRepo.getSortedUsersForSA(
+    return this.usersQueryRepo.getSortedUsers(
       query.pageNumber,
       query.pageSize,
       query.sortBy,
       query.sortDirection,
-      queryBanStatus.banStatus,
+      //queryBanStatus.banStatus,
       queryEmail?.searchEmailTerm,
       queryLogin?.searchLoginTerm,
     );

@@ -3,43 +3,44 @@ import { LikeCreateDTO } from '../../../dto/like.models';
 import { Status } from '../../../../infrastructure/common/constants';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { ILikesRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class LikesRawSqlRepository {
+export class LikesRawSqlRepository implements ILikesRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
-  async newestLikes(postId: string) {
-    const newestLikes = await this.dataSource.query(
-      `
-          SELECT 
-                    l."userId", u."login", l."addedAt"
-          FROM 
-                    "features"."likes" l
-          LEFT JOIN 
-                    "user"."accountData" u
-          ON 
-                    u."id" = l."userId"
-          WHERE 
-                    l."postIdOrCommentId" = $1 
-                    and "status" = $2
-          ORDER BY 
-                    l."addedAt" Desc
-          LIMIT 3
-      `,
-      [postId, Status.Like],
-    );
-    return newestLikes.length < 1 ? [] : newestLikes;
-  }
-  async currentStatus(commentId: string, userId?: string): Promise<string> {
-    const myStatus = await this.dataSource.query(
-      `
-      SELECT "status"
-      FROM "features"."likes"
-      WHERE "postIdOrCommentId" = $1 and "userId" = $2 
-      `,
-      [commentId, userId],
-    );
-    return (await myStatus.length) < 1 ? 'None' : myStatus[0].status;
-  }
+  // async getLastLikes(postId: string) {
+  //   const newestLikes = await this.dataSource.query(
+  //     `
+  //         SELECT
+  //                   l."userId", u."login", l."addedAt"
+  //         FROM
+  //                   "features"."likes" l
+  //         LEFT JOIN
+  //                   "user"."accountData" u
+  //         ON
+  //                   u."id" = l."userId"
+  //         WHERE
+  //                   l."postIdOrCommentId" = $1
+  //                   and "status" = $2
+  //         ORDER BY
+  //                   l."addedAt" Desc
+  //         LIMIT 3
+  //     `,
+  //     [postId, Status.Like],
+  //   );
+  //   return newestLikes.length < 1 ? [] : newestLikes;
+  // }
+  // async currentStatus(commentId: string, userId?: string): Promise<string> {
+  //   const myStatus = await this.dataSource.query(
+  //     `
+  //     SELECT "status"
+  //     FROM "features"."likes"
+  //     WHERE "postIdOrCommentId" = $1 and "userId" = $2
+  //     `,
+  //     [commentId, userId],
+  //   );
+  //   return (await myStatus.length) < 1 ? 'None' : myStatus[0].status;
+  // }
 
   async countLikes(id: string): Promise<number> {
     const likes = await this.dataSource.query(
@@ -93,8 +94,9 @@ export class LikesRawSqlRepository {
     userId: string,
     postOrCommentId: string,
   ): Promise<LikeCreateDTO | null> {
-    const likeInfo = await this.dataSource.query(
-      `
+    try {
+      const likeInfo = await this.dataSource.query(
+        `
       SELECT 
             l."status", l."userId", u."login" as "userLogin", l."postIdOrCommentId", l."addedAt"
       FROM 
@@ -108,30 +110,31 @@ export class LikesRawSqlRepository {
             and l."postIdOrCommentId" = $2 
             and l."isBanned" = false
     `,
-      [userId, postOrCommentId],
-    );
+        [userId, postOrCommentId],
+      );
 
-    if (likeInfo.length < 1) return null;
+      if (likeInfo.length < 1) return null;
+      console.log({
+        status: likeInfo[0].status,
+        userId: likeInfo[0].userId,
+        userLogin: likeInfo[0].userLogin,
+        postIdOrCommentId: likeInfo[0].postIdOrCommentId,
+        addedAt: likeInfo[0].addedAt,
+        isBanned: likeInfo[0].isBanned,
+      });
 
-    return {
-      status: likeInfo[0].status,
-      userId: likeInfo[0].userId,
-      userLogin: likeInfo[0].userLogin,
-      postIdOrCommentId: likeInfo[0].postIdOrCommentId,
-      addedAt: likeInfo[0].addedAt,
-      isBanned: likeInfo[0].isBanned,
-    };
-  }
-  async deleteLikeInfo(userId: string, postOrCommentId: string) {
-    const deleteResult = await this.dataSource.query(
-      `
-    DELETE FROM  "features"."likes"
-    WHERE   
-                "postIdOrCommentId" = $2
-                and "userId" = $1
-    `,
-      [userId, postOrCommentId],
-    );
+      return {
+        status: likeInfo[0].status,
+        userId: likeInfo[0].userId,
+        userLogin: likeInfo[0].userLogin,
+        postIdOrCommentId: likeInfo[0].postIdOrCommentId,
+        addedAt: likeInfo[0].addedAt,
+        isBanned: likeInfo[0].isBanned,
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
   }
 
   async updateLikeInfo(

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserTypeOrmEntity } from '../../../users/entities/typeorm/user-sql.schemas';
 
 @Entity()
@@ -21,12 +21,9 @@ export class BlogTypeOrmEntity {
   @Column({ nullable: false, type: 'boolean' })
   isMembership: boolean;
 
-  @OneToMany(() => UserTypeOrmEntity, (u) => u.id, {
-    cascade: true,
+  @ManyToOne(() => UserTypeOrmEntity, (user) => user.id, {
     nullable: true,
   })
-  blogOwnerInfo: UserTypeOrmEntity | null;
-
-  @Column()
-  userId: string;
+  @JoinColumn()
+  user: UserTypeOrmEntity | null;
 }

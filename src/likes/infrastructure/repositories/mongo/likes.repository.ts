@@ -6,9 +6,10 @@ import {
   LikeModel,
 } from '../../../entitties/mongoose/like-no-sql.schemas';
 import { Status } from '../../../../infrastructure/common/constants';
+import { ILikesRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class LikesRepository {
+export class LikesRepository implements ILikesRepository {
   constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
   async countLikes(id: string): Promise<number> {
     const likes = await this.likeModel.countDocuments({
@@ -82,12 +83,5 @@ export class LikesRepository {
       { userId: userId },
       { $set: { isBanned: false } },
     ));
-  }
-
-  async deleteLikeInfo(userId: string, postOrCommentId: string) {
-    return !!(await this.likeModel.deleteOne({
-      userId: userId,
-      postIdOrCommentId: postOrCommentId,
-    }));
   }
 }

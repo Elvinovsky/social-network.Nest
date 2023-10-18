@@ -8,10 +8,11 @@ import { blogMapping } from '../../helpers/blog.helpers';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { IBlogRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()
-export class BlogsRawSqlRepository {
+export class BlogsRawSqlRepository implements IBlogRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // Находит блог по заданному ID

@@ -7,9 +7,10 @@ import { CommentMapper } from '../../helpers/comment-mapper';
 import { CommentCreateDTO, CommentViewDTO } from '../../../dto/comment.models';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { ICommentRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class CommentsRawSqlRepository {
+export class CommentsRawSqlRepository implements ICommentRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
     private readonly commentMapper: CommentMapper,
@@ -123,9 +124,7 @@ export class CommentsRawSqlRepository {
     return result[1] === 1;
   }
 
-  async findCommentById(
-    commentId: string,
-  ): Promise<CommentCreateDTO | boolean> {
+  async findCommentById(commentId: string): Promise<CommentCreateDTO | null> {
     try {
       const result = await this.dataSource.query(
         `
@@ -139,7 +138,7 @@ export class CommentsRawSqlRepository {
       `,
         [commentId],
       );
-      if (result.length < 1 || result[0].isBanned) return false;
+      if (result.length < 1 || result[0].isBanned) return null;
 
       return {
         id: result[0].id,

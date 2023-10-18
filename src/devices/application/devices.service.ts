@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DevicesRepository } from '../infrastructure/repositories/mongo/devices.repository';
 import { SessionCreateDTO } from '../dto/device.models';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { deviceCreator } from '../infrastructure/helpers/device.helpers';
+import { IDeviceRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 @Injectable()
 export class DevicesService {
-  constructor(protected devicesRepository: DevicesRepository) {}
+  constructor(protected devicesRepository: IDeviceRepository) {}
 
   async getDevicesSessionsByUserId(userId: string) {
     return this.devicesRepository.getDevicesSessionsByUserId(userId);

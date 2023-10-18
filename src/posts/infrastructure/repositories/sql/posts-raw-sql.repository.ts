@@ -7,12 +7,13 @@ import {
   PostCreateDTO,
   PostViewDTO,
 } from '../../../dto/post.models';
+import { IPostRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class PostsRawSqlRepository {
+export class PostsRawSqlRepository implements IPostRepository {
   constructor(
+    protected postMapper: PostMapper,
     @InjectDataSource() protected dataSource: DataSource,
-    private readonly postMapper: PostMapper,
   ) {}
 
   async findPostById(postId: string): Promise<boolean> {
@@ -47,7 +48,8 @@ export class PostsRawSqlRepository {
           inputModel.addedAt,
         ],
       )
-      .catch((error) => Promise.reject(console.log(error)));
+      .then((inputModel) => this.postMapper.mapPost(inputModel))
+      .catch(() => Promise.reject(new Error()));
 
     return this.postMapper.mapPost(inputModel);
   }
@@ -76,7 +78,7 @@ export class PostsRawSqlRepository {
       .catch((error) => error);
   }
 
-  async deletePost(postId: string): Promise<boolean | null> {
+  async deletePost(postId: string): Promise<boolean> {
     return this.dataSource
       .query(
         `

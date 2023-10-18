@@ -1,12 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { LikesRepository } from '../infrastructure/repositories/mongo/likes.repository';
 import { LikeCreateDTO, LikeViewDTO } from '../dto/like.models';
 import { Status } from '../../infrastructure/common/constants';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { likeCreator } from '../infrastructure/helpers/like.helpers';
+import { ILikesRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 @Injectable()
 export class LikesService {
-  constructor(private likesRepository: LikesRepository) {}
+  constructor(private likesRepository: ILikesRepository) {}
+  async getLastLikes(id: string): Promise<LikeViewDTO[]> {
+    const likesArr: LikeCreateDTO[] = await this.likesRepository.getLikes(id);
+
+    return Promise.all(
+      likesArr
+        .sort(function (a, b) {
+          return a.addedAt < b.addedAt ? -1 : a.addedAt > b.addedAt ? 1 : 0;
+        })
+        .reverse()
+        .map(async (lastLikes) => {
+          return {
+            addedAt: lastLikes.addedAt.toISOString(),
+            userId: lastLikes.userId,
+            login: lastLikes.userLogin,
+          };
+        })
+        .slice(0, 3),
+    );
+  }
+
   async createOrUpdateLike(
     postOrCommentId: string,
     userInfo: UserInfo,
@@ -54,9 +74,6 @@ export class LikesService {
 
     return { likes, disLikes };
   }
-  getLikes(id: string) {
-    return this.likesRepository.getLikes(id);
-  }
 
   async getLikeStatusCurrentUser(
     commentOrPostId: string,
@@ -72,25 +89,6 @@ export class LikesService {
     return likeInfo ? likeInfo.status : Status.None;
   }
 
-  async getLastLikes(id: string): Promise<LikeViewDTO[]> {
-    const likesArr: LikeCreateDTO[] = await this.likesRepository.getLikes(id);
-
-    return Promise.all(
-      likesArr
-        .sort(function (a, b) {
-          return a.addedAt < b.addedAt ? -1 : a.addedAt > b.addedAt ? 1 : 0;
-        })
-        .reverse()
-        .map(async (lastLikes) => {
-          return {
-            addedAt: lastLikes.addedAt.toISOString(),
-            userId: lastLikes.userId,
-            login: lastLikes.userLogin,
-          };
-        })
-        .slice(0, 3),
-    );
-  }
   async banLikes(userId: string) {
     return this.likesRepository.banLikes(userId);
   }

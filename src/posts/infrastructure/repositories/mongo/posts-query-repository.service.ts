@@ -18,9 +18,10 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { PostMapper } from '../../helpers/post-mapper';
+import { IPostQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class PostsQueryRepository {
+export class PostsQueryRepository implements IPostQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: PostModel,
     private postMapper: PostMapper,

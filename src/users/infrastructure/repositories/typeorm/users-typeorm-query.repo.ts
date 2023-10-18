@@ -1,8 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
 import { MeViewModel, UserViewDTO } from '../../../dto/view/user-view.models';
-import { usersMappingSA } from '../../helpers/user.helpers';
+import { usersMapping, usersMappingSA } from '../../helpers/user.helpers';
 import {
+  getDirection,
   getPageNumber,
   getPageSize,
   getSkip,
@@ -17,9 +18,10 @@ import {
 } from '../../../entities/typeorm/user-sql.schemas';
 import { Repository } from 'typeorm';
 import { UserCreateDTO } from '../../../dto/create/users-create.models';
+import { IUserQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersTypeormQueryRepo {
+export class UsersTypeormQueryRepo implements IUserQueryRepository {
   constructor(
     @InjectRepository(UserTypeOrmEntity)
     protected usersRepo: Repository<UserTypeOrmEntity>,
@@ -31,6 +33,51 @@ export class UsersTypeormQueryRepo {
     protected emailRepo: Repository<EmailConfirmTypeOrmEntity>,
   ) {}
 
+  async getSortedUsers(
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
+    searchEmailTerm?: string,
+    searchLoginTerm?: string,
+  ): Promise<PaginatorType<UserViewDTO[]>> {
+    try {
+      const getEmailTerm = (searchEmailTerm?: string): string =>
+        searchEmailTerm ? `%${searchEmailTerm}%` : `%%`;
+
+      const getLoginTerm = (searchLoginTerm?: string): string =>
+        searchLoginTerm ? `%${searchLoginTerm}%` : `%%`;
+
+      const sortDirectionSQL = (sortDirection?: string) =>
+        sortDirection?.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+
+      const queryBuilder = this.usersRepo
+        .createQueryBuilder('u')
+        .where('(u.login ILIKE :login OR u.email ILIKE :email)', {
+          login: getLoginTerm(searchLoginTerm),
+          email: getEmailTerm(searchEmailTerm),
+        })
+        .orderBy('u.' + getSortBy(sortBy), sortDirectionSQL(sortDirection))
+        .offset(getSkip(pageNumber, pageSize))
+        .limit(pageSize);
+
+      const [foundUsers, calculateOfFiles] = await Promise.all([
+        queryBuilder.getMany(),
+        queryBuilder.getCount(),
+      ]);
+
+      return {
+        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        page: getPageNumber(pageNumber),
+        pageSize: getPageSize(pageSize),
+        totalCount: calculateOfFiles,
+        items: usersMapping(foundUsers as UserCreateDTO[]),
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
+  }
   async getSortedUsersForSA(
     pageNumber: number,
     pageSize: number,

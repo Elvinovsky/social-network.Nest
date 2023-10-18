@@ -18,40 +18,36 @@ import {
   QueryInputModel,
   SearchNameTerm,
 } from '../../infrastructure/pagination/pagination.models';
-import { BlogsQueryRepo } from '../infrastructure/repositories/mongo/blogs.query.repo';
 import { BlogInputModel, BlogViewDTO } from '../dto/blog.models';
 import { JwtBearerGuard } from '../../auth/infrastructure/guards/jwt-bearer-auth.guard';
 import { BlogsService } from '../application/blogs.service';
-import { DevicesService } from '../../devices/application/devices.service';
 import { PostsService } from '../../posts/application/posts.service';
 import { BlogPostInputModel, PostViewDTO } from '../../posts/dto/post.models';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { CurrentSessionInfoFromAccessJWT } from '../../auth/infrastructure/decorators/current-session-info-jwt';
-import { CommentsQueryRepo } from '../../comments/infrastructure/repositories/mongo/comments.query.repository';
+import { IBlogQueryRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
   constructor(
-    private blogsQueryRepo: BlogsQueryRepo,
+    private blogsQueryRepo: IBlogQueryRepository,
     private blogsService: BlogsService,
-    private devicesService: DevicesService,
-    private postsService: PostsService,
-    private commentsQueryRepo: CommentsQueryRepo,
+    private postsService: PostsService, //private commentsQueryRepo: ICommentQueryRepository,
   ) {}
 
   // Получение всех комментариев для блогов текущего пользователя
-  @Get('comments')
-  @UseGuards(JwtBearerGuard)
-  async getAllCommentsForBlogs(
-    @Query() query: QueryInputModel,
-    @CurrentSessionInfoFromAccessJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string },
-  ) {
-    return this.commentsQueryRepo.getAllCommentsForCurrentBlogger(
-      query,
-      sessionInfo.userInfo,
-    );
-  }
+  // @Get('comments')
+  // @UseGuards(JwtBearerGuard)
+  // async getAllCommentsForBlogs(
+  //   @Query() query: QueryInputModel,
+  //   @CurrentSessionInfoFromAccessJWT()
+  //   sessionInfo: { userInfo: UserInfo; deviceId: string },
+  // ) {
+  //   return this.commentsQueryRepo.getAllCommentsForCurrentBlogger(
+  //     query,
+  //     sessionInfo.userInfo,
+  //   );
+  // }
 
   // Создание нового блога текущего пользователя
   @Post()

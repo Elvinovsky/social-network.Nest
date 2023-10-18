@@ -2,13 +2,12 @@ import { PostCreateDTO, PostViewDTO } from '../../dto/post.models';
 import { Injectable } from '@nestjs/common';
 import { LikesService } from '../../../likes/application/likes.service';
 import { LikeViewDTO } from '../../../likes/dto/like.models';
-import { PostDocument } from '../../entities/mongoose/post-no-sql.schemas';
 
 @Injectable()
 export class PostMapper {
-  constructor(private readonly likesService: LikesService) {}
+  constructor(protected likesService: LikesService) {}
   async mapPosts(
-    array: Array<PostDocument>,
+    array: Array<PostCreateDTO>,
     userId?: string,
   ): Promise<PostViewDTO[]> {
     return Promise.all(
@@ -49,7 +48,7 @@ export class PostMapper {
       post.id,
       userId,
     );
-
+    console.log(status);
     const countsLikeAndDis = await this.likesService.countLikesDisLikes(
       post.id,
     );

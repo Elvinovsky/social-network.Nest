@@ -5,14 +5,15 @@ import {
   UserTypeOrmEntity,
 } from '../../../entities/typeorm/user-sql.schemas';
 import { Repository } from 'typeorm';
-import { UserViewDTO } from '../../../dto/view/user-view.models';
-import { userMapping } from '../../helpers/user.helpers';
+import { SAUserViewDTO, UserViewDTO } from '../../../dto/view/user-view.models';
+import { userMapping, userMappingSA } from '../../helpers/user.helpers';
 import { UserCreateDTO } from '../../../dto/create/users-create.models';
 import { BanUserInputModel } from '../../../dto/input/user-input.models';
 import { Injectable } from '@nestjs/common';
+import { IUserRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersTypeormRepository {
+export class UsersTypeormRepository implements IUserRepository {
   constructor(
     @InjectRepository(UserTypeOrmEntity)
     protected usersRepo: Repository<UserTypeOrmEntity>,
@@ -29,27 +30,17 @@ export class UsersTypeormRepository {
    * @returns Объект SAUserViewDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async findUser(userId: string) {
+  async findUser(userId: string): Promise<SAUserViewDTO | null> {
     try {
       const user = await this.usersRepo.findOne({
         where: { id: userId },
         relations: { banInfo: true, emailConfirmation: true },
       });
-      // .createQueryBuilder('u')
-      //
-      // .leftJoinAndSelect('u.emailConfirmation', 'e')
-      // .where('e.userId = :userId', { userId: userId })
-      // .leftJoinAndSelect('u.banInfo', 'b')
-      // .where('b.userId = :userId', { userId: userId })
-      // .getOne();
-
-      console.log(user);
-
       if (!user) {
         return null;
       }
 
-      return user;
+      return userMappingSA(user);
     } catch (e) {
       console.log('error UsersTypeormRepository', e);
       throw new Error();
@@ -125,7 +116,7 @@ export class UsersTypeormRepository {
    * @returns Объект UserCreateDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async findUserByEmail(email: string) {
+  async findUserByEmail(email: string): Promise<UserCreateDTO | null> {
     try {
       const user = await this.usersRepo.findOneBy({
         email: email,
@@ -157,7 +148,7 @@ export class UsersTypeormRepository {
    * @returns Объект UserCreateDTO, представляющий пользователя, или null, если пользователь не найден.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async findUserByLogin(login: string) {
+  async findUserByLogin(login: string): Promise<UserCreateDTO | null> {
     try {
       const user = await this.usersRepo.findOneBy({
         login: login,
@@ -284,7 +275,10 @@ export class UsersTypeormRepository {
    * @returns true, если обновление успешно, в противном случае false.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async updateConfirmationCodeByEmail(email: string, newCode: string) {
+  async updateConfirmationCodeByEmail(
+    email: string,
+    newCode: string,
+  ): Promise<boolean> {
     try {
       const user = await this.usersRepo.findOneBy({
         email: email,
@@ -310,7 +304,7 @@ export class UsersTypeormRepository {
    * @returns true, если обновление успешно, в противном случае false.
    * @throws Error, если возникает ошибка при взаимодействии с базой данных.
    */
-  async updatePasswordForUser(hash: string, code: string) {
+  async updatePasswordForUser(hash: string, code: string): Promise<boolean> {
     try {
       const emailInfo = await this.emailRepo.findOneBy({
         confirmationCode: code,
@@ -328,7 +322,10 @@ export class UsersTypeormRepository {
     }
   }
 
-  async banUser(userId: string, inputModel: BanUserInputModel) {
+  async banUser(
+    userId: string,
+    inputModel: BanUserInputModel,
+  ): Promise<boolean | null> {
     try {
       const user = await this.usersRepo.findOneBy({ id: userId });
 
@@ -349,7 +346,10 @@ export class UsersTypeormRepository {
     }
   }
 
-  async unBanUser(userId: string, inputModel: BanUserInputModel) {
+  async unBanUser(
+    userId: string,
+    inputModel: BanUserInputModel,
+  ): Promise<boolean | null> {
     try {
       const user = await this.usersRepo.findOneBy({ id: userId });
 
@@ -369,7 +369,7 @@ export class UsersTypeormRepository {
     }
   }
 
-  async updateEmail(userId: string, email: string) {
+  async updateEmail(userId: string, email: string): Promise<boolean> {
     try {
       const updateResult = await this.usersRepo.update(
         { id: userId },
@@ -384,7 +384,7 @@ export class UsersTypeormRepository {
       throw new Error();
     }
   }
-  async updateLogin(userId: string, login: string) {
+  async updateLogin(userId: string, login: string): Promise<boolean> {
     try {
       const updateResult = await this.usersRepo.update(
         { id: userId },

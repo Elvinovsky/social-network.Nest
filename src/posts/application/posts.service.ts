@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PostsRepository } from '../infrastructure/repositories/mongo/posts.repository';
 import {
   BlogPostInputModel,
   PostCreateDTO,
@@ -10,11 +9,12 @@ import { BlogsService } from '../../blogs/application/blogs.service';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { BlogCreateDTO } from '../../blogs/dto/blog.models';
 import { postCreator } from '../infrastructure/helpers/post-creator';
+import { IPostRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class PostsService {
   constructor(
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepository: IPostRepository,
     private readonly blogService: BlogsService,
   ) {}
   async findPostById(id: string) {

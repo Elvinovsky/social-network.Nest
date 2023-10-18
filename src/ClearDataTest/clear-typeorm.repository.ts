@@ -7,9 +7,10 @@ import {
   UserTypeOrmEntity,
 } from '../users/entities/typeorm/user-sql.schemas';
 import { DeviceTypeOrmEntity } from '../devices/entities/typeorm/device-sql.schemas';
+import { IClearRepository } from '../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class ClearTypeOrmRepository {
+export class ClearTypeOrmRepository implements IClearRepository {
   constructor(
     @InjectRepository(UserTypeOrmEntity)
     protected usersRepo: Repository<UserTypeOrmEntity>,
@@ -23,7 +24,7 @@ export class ClearTypeOrmRepository {
     @InjectRepository(EmailConfirmTypeOrmEntity)
     protected emailRepo: Repository<EmailConfirmTypeOrmEntity>,
   ) {}
-  async deleteDB() {
+  async deleteDB(): Promise<void> {
     await this.devicesRepo.createQueryBuilder('d').delete().execute();
     await this.usersRepo.createQueryBuilder('u').delete().execute();
     await this.banRepo.createQueryBuilder('b').delete().execute();

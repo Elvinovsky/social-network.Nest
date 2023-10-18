@@ -22,9 +22,10 @@ import {
   Device,
   DeviceModel,
 } from '../devices/entities/mongoose/device-no-sql.schemas';
+import { IClearRepository } from '../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class ClearMongoRepository {
+export class ClearMongoRepository implements IClearRepository {
   constructor(
     @InjectModel(UserMongooseEntity.name)
     private userModel: Model<UserMongooseEntity>,

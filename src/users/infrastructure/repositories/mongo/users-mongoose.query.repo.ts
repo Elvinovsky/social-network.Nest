@@ -18,20 +18,21 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import mongoose from 'mongoose';
+import { IUserQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class UsersMongooseQueryRepository {
+export class UsersMongooseQueryRepository implements IUserQueryRepository {
   constructor(
     @InjectModel(UserMongooseEntity.name)
     private userModel: Model<UserDocument>,
   ) {}
   async getSortedUsers(
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string,
     searchEmailTerm?: string,
     searchLoginTerm?: string,
-    pageNumber?: number,
-    pageSize?: number,
-    sortBy?: string,
-    sortDirection?: string,
   ): Promise<PaginatorType<UserViewDTO[]>> {
     const filter: mongoose.FilterQuery<UserDocument> = {};
     if (searchEmailTerm) {

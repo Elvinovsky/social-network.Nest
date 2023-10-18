@@ -9,10 +9,11 @@ import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BlogTypeOrmEntity } from '../../../entities/typeorm/blog-sql.schemas';
+import { IBlogRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 // Репозиторий блогов, который используется для выполнения операций CRUD
 @Injectable()
-export class BlogsTypeOrmRepository {
+export class BlogsTypeOrmRepository implements IBlogRepository {
   constructor(
     @InjectRepository(BlogTypeOrmEntity)
     private blogsRepo: Repository<BlogTypeOrmEntity>,
@@ -49,7 +50,7 @@ export class BlogsTypeOrmRepository {
       };
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
-      throw new InternalServerErrorException();
+      throw new Error();
     }
   }
 

@@ -14,7 +14,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { PostsQueryRepository } from '../infrastructure/repositories/mongo/posts-query-repository.service';
 import {
   QueryInputModel,
   SearchTitleTerm,
@@ -28,19 +27,22 @@ import { OptionalBearerGuard } from '../../auth/infrastructure/guards/optional-b
 import { CurrentUserIdOptional } from '../../auth/infrastructure/decorators/current-userId-optional.decorator';
 import { CommentInputModel } from '../../comments/dto/comment.models';
 import { CommentsService } from '../../comments/application/comments.service';
-import { CommentsQueryRepo } from '../../comments/infrastructure/repositories/mongo/comments.query.repository';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { CurrentSessionInfoFromAccessJWT } from '../../auth/infrastructure/decorators/current-session-info-jwt';
 import { ParamUUIdPipe } from '../../infrastructure/common/pipes/object-id.pipe';
+import {
+  ICommentQueryRepository,
+  IPostQueryRepository,
+} from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
-    private readonly postsQueryRepo: PostsQueryRepository,
+    private readonly postsQueryRepo: IPostQueryRepository,
     private readonly likesService: LikesService,
     private readonly commentsService: CommentsService,
-    private readonly commentsQueryRepo: CommentsQueryRepo,
+    private readonly commentsQueryRepo: ICommentQueryRepository,
   ) {}
 
   @Get()

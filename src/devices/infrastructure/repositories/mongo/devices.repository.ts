@@ -6,8 +6,9 @@ import {
 } from '../../../entities/mongoose/device-no-sql.schemas';
 import { DeviceViewDTO, SessionCreateDTO } from '../../../dto/device.models';
 import { devicesMapper } from '../../helpers/device.helpers';
+import { IDeviceRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 @Injectable()
-export class DevicesRepository {
+export class DevicesRepository implements IDeviceRepository {
   constructor(@InjectModel(Device.name) private deviceModel: DeviceModel) {}
   async findDeviceSessionByIAT(issuedAt: number): Promise<boolean> {
     const deviceSession = await this.deviceModel.findOne({

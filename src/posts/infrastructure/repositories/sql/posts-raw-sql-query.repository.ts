@@ -7,13 +7,14 @@ import {
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
+import { IPostQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
+import { PostMapper } from '../../helpers/post-mapper';
 
 @Injectable()
-export class PostsRawSqlQueryRepository {
+export class PostsRawSqlQueryRepository implements IPostQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    private likesRawSqlRepository: LikesRawSqlRepository,
+    private postMapper: PostMapper,
   ) {}
 
   async getSortedPosts(
@@ -77,35 +78,12 @@ export class PostsRawSqlQueryRepository {
       [getTitleTerm(searchTitleTerm)],
     );
 
-    const usersMap = await Promise.all(
-      foundPosts.map(async (el) => {
-        return {
-          id: el.id,
-          title: el.title,
-          shortDescription: el.shortDescription,
-          content: el.content,
-          blogId: el.blogId,
-          blogName: el.blogName,
-          createdAt: el.addedAt.toISOString(),
-          extendedLikesInfo: {
-            likesCount: +el.likesCount,
-            dislikesCount: +el.dislikesCount,
-            myStatus: await this.likesRawSqlRepository.currentStatus(
-              el.id,
-              userId,
-            ),
-            newestLikes: await this.likesRawSqlRepository.newestLikes(el.id),
-          },
-        };
-      }),
-    );
-
     return {
       pagesCount: pagesCountOfBlogs(+calculateOfFiles[0].totalCount, pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: +calculateOfFiles[0].totalCount,
-      items: usersMap,
+      items: await this.postMapper.mapPosts(foundPosts, userId),
     };
   }
 
@@ -151,24 +129,7 @@ export class PostsRawSqlQueryRepository {
         return null;
       }
 
-      return {
-        id: post[0].id,
-        title: post[0].title,
-        shortDescription: post[0].shortDescription,
-        content: post[0].content,
-        blogId: post[0].blogId,
-        blogName: post[0].blogName,
-        createdAt: post[0].createdAt.toISOString(),
-        extendedLikesInfo: {
-          likesCount: +post[0].likesCount,
-          dislikesCount: +post[0].dislikesCount,
-          myStatus: await this.likesRawSqlRepository.currentStatus(
-            postId,
-            userId,
-          ),
-          newestLikes: await this.likesRawSqlRepository.newestLikes(postId),
-        },
-      };
+      return this.postMapper.mapPost(post, userId);
     } catch (e) {
       console.log(e, 'error getPostById method');
       throw new HttpException('failed', HttpStatus.EXPECTATION_FAILED);

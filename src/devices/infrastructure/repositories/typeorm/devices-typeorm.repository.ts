@@ -4,9 +4,10 @@ import { Repository } from 'typeorm';
 import { DeviceViewDTO, SessionCreateDTO } from '../../../dto/device.models';
 import { DeviceTypeOrmEntity } from '../../../entities/typeorm/device-sql.schemas';
 import { devicesMapper } from '../../helpers/device.helpers';
+import { IDeviceRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
-export class DevicesTypeormRepository {
+export class DevicesTypeormRepository implements IDeviceRepository {
   constructor(
     @InjectRepository(DeviceTypeOrmEntity)
     protected devicesRepo: Repository<DeviceTypeOrmEntity>,
