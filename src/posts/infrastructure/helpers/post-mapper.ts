@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { LikesService } from '../../../likes/application/likes.service';
 import { LikeViewDTO } from '../../../likes/dto/like.models';
 
-@Injectable()
 export class PostMapper {
   constructor(protected likesService: LikesService) {}
   async mapPosts(
