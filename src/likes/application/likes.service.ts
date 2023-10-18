@@ -92,6 +92,7 @@ export class LikesService {
   async banLikes(userId: string) {
     return this.likesRepository.banLikes(userId);
   }
+
   async unBanLikes(userId: string) {
     return this.likesRepository.unBanLikes(userId);
   }
