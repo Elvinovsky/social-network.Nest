@@ -3,7 +3,7 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { PostViewDTO } from '../../../dto/post.models';
 import {
   getSkip,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -79,7 +79,7 @@ export class PostsRawSqlQueryRepository implements IPostQueryRepository {
     );
 
     return {
-      pagesCount: pagesCountOfBlogs(+calculateOfFiles[0].totalCount, pageSize),
+      pagesCount: pagesCounter(+calculateOfFiles[0].totalCount, pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: +calculateOfFiles[0].totalCount,

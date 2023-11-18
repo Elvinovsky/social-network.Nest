@@ -14,7 +14,7 @@ import {
   getPageSize,
   getSkip,
   getSortBy,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import { PostMapper } from '../../helpers/post-mapper';
@@ -51,7 +51,7 @@ export class PostsQueryRepository implements IPostQueryRepository {
       .limit(getPageSize(pageSize));
 
     return {
-      pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+      pagesCount: pagesCounter(calculateOfFiles, pageSize),
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
