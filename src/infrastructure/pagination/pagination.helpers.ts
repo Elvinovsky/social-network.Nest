@@ -22,7 +22,7 @@ export const getDirection = (sortDirection?: string) => {
 export const getSkip = (pageNumber = 1, pageSize = 10): number => {
   return (+pageNumber - 1) * +pageSize;
 };
-export const pagesCountOfBlogs = (
+export const pagesCounter = (
   calculateOfFiles: number,
   pageSize?: number,
 ): number => {

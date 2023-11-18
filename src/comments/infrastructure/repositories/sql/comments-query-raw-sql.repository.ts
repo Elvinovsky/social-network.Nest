@@ -2,7 +2,7 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { CommentViewDTO } from '../../../dto/comment.models';
 import {
   getSkip,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -85,7 +85,7 @@ export class CommentsQueryRawSqlRepository implements ICommentQueryRepository {
     );
 
     return {
-      pagesCount: pagesCountOfBlogs(+calculateOfFiles[0].pages, pageSize),
+      pagesCount: pagesCounter(+calculateOfFiles[0].pages, pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: +calculateOfFiles[0].pages,

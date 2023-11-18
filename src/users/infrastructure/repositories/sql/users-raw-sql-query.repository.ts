@@ -7,7 +7,7 @@ import {
   getPageSize,
   getSkip,
   getSortBy,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -81,7 +81,7 @@ export class UsersRawSQLQueryRepository implements IUserQueryRepository {
         [getLoginTerm(searchLoginTerm), getEmailTerm(searchEmailTerm)],
       );
       return {
-        pagesCount: pagesCountOfBlogs(
+        pagesCount: pagesCounter(
           +calculateOfFiles[0].totalCount,
           getPageSize(pageSize),
         ),
@@ -183,7 +183,7 @@ export class UsersRawSQLQueryRepository implements IUserQueryRepository {
       ],
     );
     return {
-      pagesCount: pagesCountOfBlogs(
+      pagesCount: pagesCounter(
         +calculateOfFiles[0].totalCount,
         getPageSize(pageSize),
       ),

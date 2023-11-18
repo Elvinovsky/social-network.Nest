@@ -2,49 +2,46 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { BlogViewDTO, SABlogViewDTO } from '../../../dto/blog.models';
 import { Injectable } from '@nestjs/common';
 import {
-  getDirection,
   getPageNumber,
   getPageSize,
   getSkip,
   getSortBy,
   pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
-import { blogsMapperSA, blogsMapping } from '../../helpers/blog.helpers';
 import { PostViewDTO } from '../../../../posts/dto/post.models';
 import { UserInfo } from '../../../../users/dto/view/user-view.models';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { LikesRawSqlRepository } from '../../../../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { IBlogQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
+import { BlogTypeOrmEntity } from '../../../entities/typeorm/blog-sql.schemas';
 
 @Injectable()
-export class BlogsQueryRawSqlRepository implements IBlogQueryRepository {
+export class BlogsQueryTypeormRepository implements IBlogQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    protected postMapper: PostMapper, // private readonly likesRawSqlRepository: LikesRawSqlRepository,
+    @InjectRepository(BlogTypeOrmEntity)
+    protected blogsRepo: Repository<BlogTypeOrmEntity>,
+    protected postMapper: PostMapper,
   ) {}
 
   async getBlogById(blogId: string): Promise<BlogViewDTO | null> {
     try {
-      const blog = await this.dataSource.query(
-        `
-      SELECT *
-      FROM "features"."blogs"
-      WHERE "id" = $1`,
-        [blogId],
-      );
-      if (blog.length < 1) {
-        return null;
-      }
+      const blog = await this.blogsRepo.findOne({
+        where: {
+          id: blogId,
+        },
+      });
+
+      if (!blog) return null;
 
       return {
-        id: blog[0].id,
-        name: blog[0].name,
-        description: blog[0].description,
-        websiteUrl: blog[0].websiteUrl,
-        createdAt: blog[0].addedAt.toISOString(),
-        isMembership: blog[0].isMembership,
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.addedAt.toISOString(),
+        isMembership: blog.isMembership,
       };
     } catch (e) {
       console.log(e, 'error findBlogById method');
@@ -59,47 +56,23 @@ export class BlogsQueryRawSqlRepository implements IBlogQueryRepository {
     sortDirection: string,
     searchNameTerm?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>> {
-    const getNameTerm = (searchNameTerm) =>
-      searchNameTerm ? `%${searchNameTerm}%` : `%%`;
-
-    const queryData = `
-            SELECT 
-                    b."id", 
-                    b."name", 
-                    b."description", 
-                    b."websiteUrl", 
-                    b."addedAt", 
-                    b."isMembership", 
-                    b."userId", 
-                    b."userLogin"
-            FROM 
-                    "features"."blogs" b
-            WHERE 
-                    b."name" ilike $1
-            ORDER BY 
-                    "${getSortBy(sortBy)}" ${
-      getDirection(sortDirection) === 1 ? 'asc' : 'desc'
-    }
-            OFFSET $2 
-            LIMIT $3`;
-
     try {
-      const calculateOfFiles = await this.dataSource.query(
-        `
-      SELECT COUNT(*) as "totalCount"
-      FROM(
-        SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-        FROM "features"."blogs" b
-        WHERE b."name" ilike $1)
-      `,
-        [getNameTerm(searchNameTerm)],
-      );
+      const getNameTerm = (searchNameTerm?: string): string =>
+        searchNameTerm ? `%${searchNameTerm}%` : `%%`;
 
-      const foundBlogs = await this.dataSource.query(queryData, [
-        getNameTerm(searchNameTerm),
-        getSkip(pageNumber, pageSize),
-        pageSize,
+      const sortDirectionSQL = (sortDirection?: string) =>
+        sortDirection?.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+
+      const queryBuilder = this.blogsRepo
+        .createQueryBuilder('b')
+        .where(`b.name ILIKE :name`, { name: getNameTerm(searchNameTerm) })
+        .orderBy('b.' + getSortBy(sortBy), sortDirectionSQL(sortDirection))
+        .offset(getSkip(pageNumber, pageSize))
+        .limit(pageSize);
+
+      const [foundBlogs, calculateOfFiles] = await Promise.all([
+        queryBuilder.getMany(),
+        queryBuilder.getCount(),
       ]);
 
       const blogsMap = foundBlogs.map((el) => {
@@ -114,10 +87,10 @@ export class BlogsQueryRawSqlRepository implements IBlogQueryRepository {
       });
 
       return {
-        pagesCount: pagesCounter(+calculateOfFiles[0].totalCount, pageSize),
+        pagesCount: pagesCounter(calculateOfFiles, pageSize),
         page: getPageNumber(pageNumber),
         pageSize: getPageSize(pageSize),
-        totalCount: +calculateOfFiles[0].totalCount,
+        totalCount: calculateOfFiles,
         items: blogsMap,
       };
     } catch (e) {

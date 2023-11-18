@@ -3,12 +3,11 @@ import { PaginatorType } from '../../../../infrastructure/pagination/pagination.
 import { MeViewModel, UserViewDTO } from '../../../dto/view/user-view.models';
 import { usersMapping, usersMappingSA } from '../../helpers/user.helpers';
 import {
-  getDirection,
   getPageNumber,
   getPageSize,
   getSkip,
   getSortBy,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -67,7 +66,7 @@ export class UsersTypeormQueryRepo implements IUserQueryRepository {
       ]);
 
       return {
-        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        pagesCount: pagesCounter(calculateOfFiles, pageSize),
         page: getPageNumber(pageNumber),
         pageSize: getPageSize(pageSize),
         totalCount: calculateOfFiles,
@@ -124,7 +123,7 @@ export class UsersTypeormQueryRepo implements IUserQueryRepository {
       console.log(foundUsers);
 
       return {
-        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        pagesCount: pagesCounter(calculateOfFiles, pageSize),
         page: getPageNumber(pageNumber),
         pageSize: getPageSize(pageSize),
         totalCount: calculateOfFiles,

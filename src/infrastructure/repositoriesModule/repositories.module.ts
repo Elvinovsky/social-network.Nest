@@ -53,7 +53,8 @@ import {
   CommentViewDTO,
 } from '../../comments/dto/comment.models';
 import { CommentsQueryRawSqlRepository } from '../../comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
-import { PostMapper } from '../../posts/infrastructure/helpers/post-mapper';
+import { BlogsTypeOrmRepository } from '../../blogs/infrastructure/repositories/typeorm/blogs-typeorm.repository';
+import { BlogsQueryTypeormRepository } from '../../blogs/infrastructure/repositories/typeorm/blogs-query-typeorm.repository';
 
 export abstract class IUserRepository {
   abstract findUser(userId: string): Promise<SAUserViewDTO | null>;
@@ -339,10 +340,10 @@ export const repoTypeToClassMap = {
   ],
   typeorm: [
     { provide: IClearRepository, useClass: ClearTypeOrmRepository },
-    { provide: IBlogRepository, useClass: BlogsRawSqlRepository },
+    { provide: IBlogRepository, useClass: BlogsTypeOrmRepository },
     {
       provide: IBlogQueryRepository,
-      useClass: BlogsQueryRawSqlRepository,
+      useClass: BlogsQueryTypeormRepository,
     },
     { provide: IPostRepository, useClass: PostsRawSqlRepository },
     {

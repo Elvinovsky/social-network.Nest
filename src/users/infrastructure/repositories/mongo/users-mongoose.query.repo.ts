@@ -14,7 +14,7 @@ import {
   getPageSize,
   getSkip,
   getSortBy,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import mongoose from 'mongoose';
@@ -58,7 +58,7 @@ export class UsersMongooseQueryRepository implements IUserQueryRepository {
       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
       .limit(getPageSize(pageSize));
     return {
-      pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+      pagesCount: pagesCounter(calculateOfFiles, pageSize),
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,
@@ -115,7 +115,7 @@ export class UsersMongooseQueryRepository implements IUserQueryRepository {
         .limit(getPageSize(pageSize));
 
       return {
-        pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+        pagesCount: pagesCounter(calculateOfFiles, pageSize),
         page: getPageNumber(pageNumber),
         pageSize: getPageSize(pageSize),
         totalCount: calculateOfFiles,

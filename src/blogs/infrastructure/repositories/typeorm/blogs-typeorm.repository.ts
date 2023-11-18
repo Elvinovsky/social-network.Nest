@@ -20,33 +20,33 @@ export class BlogsTypeOrmRepository implements IBlogRepository {
   ) {}
 
   // Находит блог по заданному ID
-  // Возвращает BlogDocument или null, если блог не найден
+  // Возвращает Blog или null, если блог не найден
   async findBlogById(blogId: string): Promise<BlogCreateDTO | null> {
     try {
-      const blog = await this.blogsRepo.query(
-        `
-      SELECT "id", "name", "description", "websiteUrl", "addedAt", "isMembership", "userId", "userLogin"
-      FROM features.blogs
-      WHERE "id" = $1;
-      `,
-        [blogId],
-      );
+      const blog = await this.blogsRepo.findOne({
+        where: { id: blogId },
+        relations: {
+          user: true,
+        },
+      });
 
-      if (blog.length < 1) {
+      if (!blog) {
         return null;
       }
 
       return {
-        id: blog[0].id,
-        name: blog[0].name,
-        description: blog[0].description,
-        websiteUrl: blog[0].websiteUrl,
-        addedAt: blog[0].addedAt,
-        isMembership: blog[0].isMembership,
-        blogOwnerInfo: {
-          userId: blog[0].userId,
-          userLogin: blog[0].userLogin,
-        },
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        addedAt: blog.addedAt,
+        isMembership: blog.isMembership,
+        blogOwnerInfo: blog.user
+          ? {
+              userId: blog.user?.id,
+              userLogin: blog.user.login,
+            }
+          : null,
       };
     } catch (e) {
       console.log(e, 'error findBlogById method by BlogsRepository');
@@ -58,23 +58,8 @@ export class BlogsTypeOrmRepository implements IBlogRepository {
   // Возвращает BlogViewDTO созданного блога
   async addNewBlog(inputModel: BlogCreateDTO): Promise<BlogViewDTO> {
     try {
-      const newBlog = await this.blogsRepo.query(
-        `
-   INSERT INTO "features"."blogs"(
-        "id", "name", "description", "websiteUrl", "addedAt", "isMembership", "userId", "userLogin")
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-   `,
-        [
-          inputModel.id,
-          inputModel.name,
-          inputModel.description,
-          inputModel.websiteUrl,
-          inputModel.addedAt,
-          inputModel.isMembership,
-          inputModel.blogOwnerInfo?.userId,
-          inputModel.blogOwnerInfo?.userLogin,
-        ],
-      );
+      const newBlog = this.blogsRepo.create(inputModel);
+      await this.blogsRepo.save(newBlog);
 
       return blogMapping(inputModel);
     } catch (e) {
@@ -90,20 +75,16 @@ export class BlogsTypeOrmRepository implements IBlogRepository {
     inputModel: BlogInputModel,
   ): Promise<number> {
     try {
-      const result = await this.blogsRepo.query(
-        `
-        UPDATE "features"."blogs"
-        SET "name" = $1, "description" = $2, "websiteUrl" = $3
-        WHERE "id" = $4
-        `,
-        [
-          inputModel.name,
-          inputModel.description,
-          inputModel.websiteUrl,
-          blogId,
-        ],
+      const result = await this.blogsRepo.update(
+        { id: blogId },
+        {
+          name: inputModel.name,
+          description: inputModel.description,
+          websiteUrl: inputModel.websiteUrl,
+        },
       );
-      return result[1];
+
+      return result.affected ? result.affected : 0;
     } catch (e) {
       console.log('error updateBlogById', e);
       throw new InternalServerErrorException();
@@ -113,15 +94,9 @@ export class BlogsTypeOrmRepository implements IBlogRepository {
   // Удаляет блог с заданным ID
   async deleteBlogById(blogId: string): Promise<boolean> {
     return await this.blogsRepo
-      .query(
-        `
-        DELETE FROM "features"."blogs"
-        WHERE "id" = $1
-        `,
-        [blogId],
-      )
-      .then((result) => Promise.resolve(result[1] === 1))
-      .catch((error) => Promise.reject(error));
+      .delete({ id: blogId })
+      .then((result) => (result.affected ? result.affected === 1 : false))
+      .catch((error) => error);
   }
 
   async updateBlogOwnerInfo(
@@ -130,15 +105,13 @@ export class BlogsTypeOrmRepository implements IBlogRepository {
   ): Promise<boolean> {
     try {
       return await this.blogsRepo
-        .query(
-          `
-        UPDATE "feature"."blogs"
-        SET "userId" = $1, "userLogin" = $2
-        WHERE "id" = $3
-        `,
-          [userInfo.userId, userInfo.userLogin, blogId],
+        .update(
+          { id: blogId },
+          {
+            user: { id: userInfo.userId },
+          },
         )
-        .then((result) => result[1] === 1);
+        .then((result) => (result.affected ? result.affected === 1 : false));
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();

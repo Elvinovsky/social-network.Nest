@@ -17,7 +17,7 @@ import {
   getPageSize,
   getSkip,
   getSortBy,
-  pagesCountOfBlogs,
+  pagesCounter,
 } from '../../../../infrastructure/pagination/pagination.helpers';
 import { DEFAULT_PAGE_SortBy } from '../../../../infrastructure/common/constants';
 import {
@@ -59,7 +59,7 @@ export class CommentsQueryRepo implements ICommentQueryRepository {
       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
       .limit(getPageSize(pageSize));
     return {
-      pagesCount: pagesCountOfBlogs(calculateOfFiles, pageSize),
+      pagesCount: pagesCounter(calculateOfFiles, pageSize),
       page: getPageNumber(pageNumber),
       pageSize: getPageSize(pageSize),
       totalCount: calculateOfFiles,

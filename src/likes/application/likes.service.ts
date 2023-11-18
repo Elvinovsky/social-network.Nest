@@ -6,7 +6,7 @@ import { likeCreator } from '../infrastructure/helpers/like.helpers';
 import { ILikesRepository } from '../../infrastructure/repositoriesModule/repositories.module';
 @Injectable()
 export class LikesService {
-  constructor(private likesRepository: ILikesRepository) {}
+  constructor(protected likesRepository: ILikesRepository) {}
   async getLastLikes(id: string): Promise<LikeViewDTO[]> {
     const likesArr: LikeCreateDTO[] = await this.likesRepository.getLikes(id);
 
