@@ -16,17 +16,18 @@ import { OptionalBearerGuard } from '../../auth/infrastructure/guards/optional-b
 import { JwtBearerGuard } from '../../auth/infrastructure/guards/jwt-bearer-auth.guard';
 import { CommentInputModel } from '../dto/comment.models';
 import { LikeStatus } from '../../likes/dto/like.models';
-import { LikesService } from '../../likes/application/likes.service';
 import { CurrentUserIdOptional } from '../../auth/infrastructure/decorators/current-userId-optional.decorator';
 import { UserInfo } from '../../users/dto/view/user-view.models';
 import { CurrentSessionInfoFromAccessJWT } from '../../auth/infrastructure/decorators/current-session-info-jwt';
 import { ParamUUIdPipe } from '../../infrastructure/common/pipes/object-id.pipe';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUpdateLikeCommand } from '../../likes/application/use-cases/create-update-like-use-case';
 
 @Controller('/comments')
 export class CommentsController {
   constructor(
     private commentService: CommentsService,
-    private likesService: LikesService,
+    private commandBus: CommandBus,
   ) {}
 
   @Get(':id')
@@ -105,6 +106,12 @@ export class CommentsController {
     @CurrentSessionInfoFromAccessJWT()
     sessionInfo: { userInfo: UserInfo; deviceId: string },
   ) {
+    const createUpdateLikeDTO = {
+      postOrCommentId: id,
+      userInfo: sessionInfo.userInfo,
+      statusType: inputModel.likeStatus,
+    };
+
     // Получаем комментарий по id
     const comment = await this.commentService.findCommentById(id);
     if (!comment) {
@@ -112,11 +119,10 @@ export class CommentsController {
     }
 
     // Создаем или обновляем лайк для комментария
-    const result = await this.likesService.createOrUpdateLike(
-      id,
-      sessionInfo.userInfo,
-      inputModel.likeStatus,
+    const result = await this.commandBus.execute(
+      new CreateUpdateLikeCommand(createUpdateLikeDTO),
     );
+
     return result;
   }
 }

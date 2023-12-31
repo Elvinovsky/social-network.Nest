@@ -125,78 +125,78 @@ export class BlogsQueryRawSqlRepository implements IBlogQueryRepository {
       throw new Error();
     }
   }
-  async getSortedBlogsForCurrentBlogger(
-    userInfo: UserInfo,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string,
-    searchNameTerm?: string,
-  ): Promise<PaginatorType<BlogViewDTO[]>> {
-    const getNameTerm = (searchNameTerm) =>
-      searchNameTerm ? `%${searchNameTerm}%` : `%%`;
-
-    const queryData = `
-    SELECT 
-            b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
-    FROM "features"."blogs" b
-    WHERE b."name" ilike $1 and b."userId" = $2
-    ORDER BY "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
-    OFFSET $3 LIMIT $4`;
-
-    try {
-      const calculateOfFiles = await this.dataSource.query(
-        `
-            SELECT COUNT(*) as "totalCount"
-            FROM(
-                 SELECT 
-                        b."id", 
-                        b."name", 
-                        b."description", 
-                        b."websiteUrl", 
-                        b."addedAt", 
-                        b."isMembership", 
-                        b."userId", 
-                        b."userLogin"
-            FROM 
-                    "features"."blogs" b
-            WHERE 
-                    b."name" ilike $1 
-                    and b."userId" = $2) 
-      `,
-        [getNameTerm(searchNameTerm), userInfo.userId],
-      );
-
-      const foundBlogs = await this.dataSource.query(queryData, [
-        getNameTerm(searchNameTerm),
-        userInfo.userId,
-        getSkip(pageNumber, pageSize),
-        pageSize,
-      ]);
-
-      const blogsMap = foundBlogs.map((el) => {
-        return {
-          id: el.id,
-          name: el.name,
-          description: el.description,
-          websiteUrl: el.websiteUrl,
-          createdAt: el.addedAt.toISOString(),
-          isMembership: el.isMembership,
-        };
-      });
-
-      return {
-        pagesCount: pagesCounter(calculateOfFiles[0].totalCount, pageSize),
-        page: getPageNumber(pageNumber),
-        pageSize: getPageSize(pageSize),
-        totalCount: Number(calculateOfFiles[0].totalCount),
-        items: blogsMap,
-      };
-    } catch (e) {
-      console.log(e, 'getSortedBlogs method error');
-      throw new Error();
-    }
-  }
+  // async getSortedBlogsForCurrentBlogger(
+  //   userInfo: UserInfo,
+  //   pageNumber: number,
+  //   pageSize: number,
+  //   sortBy: string,
+  //   sortDirection: string,
+  //   searchNameTerm?: string,
+  // ): Promise<PaginatorType<BlogViewDTO[]>> {
+  //   const getNameTerm = (searchNameTerm) =>
+  //     searchNameTerm ? `%${searchNameTerm}%` : `%%`;
+  //
+  //   const queryData = `
+  //   SELECT
+  //           b."id", b."name", b."description", b."websiteUrl", b."addedAt", b."isMembership", b."userId", b."userLogin"
+  //   FROM "features"."blogs" b
+  //   WHERE b."name" ilike $1 and b."userId" = $2
+  //   ORDER BY "${sortBy}" ${sortDirection === 'asc' ? 'Asc' : 'Desc'}
+  //   OFFSET $3 LIMIT $4`;
+  //
+  //   try {
+  //     const calculateOfFiles = await this.dataSource.query(
+  //       `
+  //           SELECT COUNT(*) as "totalCount"
+  //           FROM(
+  //                SELECT
+  //                       b."id",
+  //                       b."name",
+  //                       b."description",
+  //                       b."websiteUrl",
+  //                       b."addedAt",
+  //                       b."isMembership",
+  //                       b."userId",
+  //                       b."userLogin"
+  //           FROM
+  //                   "features"."blogs" b
+  //           WHERE
+  //                   b."name" ilike $1
+  //                   and b."userId" = $2)
+  //     `,
+  //       [getNameTerm(searchNameTerm), userInfo.userId],
+  //     );
+  //
+  //     const foundBlogs = await this.dataSource.query(queryData, [
+  //       getNameTerm(searchNameTerm),
+  //       userInfo.userId,
+  //       getSkip(pageNumber, pageSize),
+  //       pageSize,
+  //     ]);
+  //
+  //     const blogsMap = foundBlogs.map((el) => {
+  //       return {
+  //         id: el.id,
+  //         name: el.name,
+  //         description: el.description,
+  //         websiteUrl: el.websiteUrl,
+  //         createdAt: el.addedAt.toISOString(),
+  //         isMembership: el.isMembership,
+  //       };
+  //     });
+  //
+  //     return {
+  //       pagesCount: pagesCounter(calculateOfFiles[0].totalCount, pageSize),
+  //       page: getPageNumber(pageNumber),
+  //       pageSize: getPageSize(pageSize),
+  //       totalCount: Number(calculateOfFiles[0].totalCount),
+  //       items: blogsMap,
+  //     };
+  //   } catch (e) {
+  //     console.log(e, 'getSortedBlogs method error');
+  //     throw new Error();
+  //   }
+  // }
 
   async getSortedPostsBlog(
     blogId: string,

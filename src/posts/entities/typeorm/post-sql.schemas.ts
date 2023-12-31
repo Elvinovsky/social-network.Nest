@@ -1,26 +1,24 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BlogTypeOrmEntity } from '../../../blogs/entities/typeorm/blog-sql.schemas';
 
 @Entity()
-export class Post {
-  @PrimaryGeneratedColumn()
+export class PostTypeOrmEntity {
+  @PrimaryColumn({ type: 'uuid' })
   id: string;
 
-  @Column()
+  @Column({ nullable: false, type: 'character varying' })
   title: string;
 
-  @Column()
+  @Column({ nullable: false, type: 'character varying' })
   shortDescription: string;
 
-  @Column()
+  @Column({ nullable: false, type: 'character varying' })
   content: string;
 
-  @OneToOne(() => BlogTypeOrmEntity, (b) => b.id)
-  blogId: string;
-
-  @OneToOne(() => BlogTypeOrmEntity, (b) => b.name)
-  blogName: string;
-
-  @Column()
+  @Column({ nullable: false, type: 'timestamp without time zone' })
   addedAt: Date;
+
+  @ManyToOne(() => BlogTypeOrmEntity, (b) => b.id)
+  @JoinColumn()
+  blog: BlogTypeOrmEntity;
 }

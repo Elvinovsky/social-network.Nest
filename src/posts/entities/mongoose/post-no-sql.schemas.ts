@@ -3,10 +3,10 @@ import { HydratedDocument, Model } from 'mongoose';
 import { BlogPostInputModel, PostCreateDTO } from '../../dto/post.models';
 import { v4 as uuidv4 } from 'uuid';
 
-export type PostDocument = HydratedDocument<Post>;
+export type PostDocument = HydratedDocument<PostMongooseEntity>;
 export type PostModel = Model<PostDocument>;
 @Schema()
-export class Post {
+export class PostMongooseEntity {
   @Prop({ required: true })
   id: string;
 
@@ -32,7 +32,7 @@ export class Post {
     blogName: string,
     blogId: string,
   ): PostCreateDTO {
-    const post: Post = new Post();
+    const post: PostMongooseEntity = new PostMongooseEntity();
     post.id = uuidv4();
     post.blogId = blogId;
     post.title = inputModel.title;
@@ -45,4 +45,4 @@ export class Post {
   }
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+export const PostSchema = SchemaFactory.createForClass(PostMongooseEntity);

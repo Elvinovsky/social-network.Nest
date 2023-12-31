@@ -8,8 +8,8 @@ import {
 } from '../../../entities/mongoose/comment-no-sql.schemas';
 import { CommentMapper } from '../../helpers/comment-mapper';
 import {
-  Post,
   PostModel,
+  PostMongooseEntity,
 } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
 import {
   getDirection,
@@ -29,7 +29,7 @@ import { ICommentQueryRepository } from '../../../../infrastructure/repositories
 export class CommentsQueryRepo implements ICommentQueryRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: CommentModel,
-    @InjectModel(Post.name) private postModel: PostModel,
+    @InjectModel(PostMongooseEntity.name) private postModel: PostModel,
     @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
     private readonly commentMapper: CommentMapper,
   ) {}

@@ -5,14 +5,14 @@ import {
 } from '../blogs/entities/mongoose/blog-no-sql.schemas';
 import { Injectable } from '@nestjs/common';
 import {
-  Post,
   PostModel,
+  PostMongooseEntity,
 } from '../posts/entities/mongoose/post-no-sql.schemas';
 import { UserMongooseEntity } from '../users/entities/mongoose/user-no-sql.schema';
 import { Model } from 'mongoose';
 import {
-  Like,
   LikeModel,
+  LikeMongooseEntity,
 } from '../likes/entitties/mongoose/like-no-sql.schemas';
 import {
   Comment,
@@ -30,9 +30,9 @@ export class ClearMongoRepository implements IClearRepository {
     @InjectModel(UserMongooseEntity.name)
     private userModel: Model<UserMongooseEntity>,
     @InjectModel(BlogMongooseEntity.name) private blogModel: BlogModel,
-    @InjectModel(Post.name) private postModel: PostModel,
+    @InjectModel(PostMongooseEntity.name) private postModel: PostModel,
     @InjectModel(Comment.name) private commentModel: CommentModel,
-    @InjectModel(Like.name) private likeModel: LikeModel,
+    @InjectModel(LikeMongooseEntity.name) private likeModel: LikeModel,
     @InjectModel(Device.name) private deviceModel: DeviceModel,
   ) {}
   async deleteDB() {

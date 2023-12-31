@@ -1,25 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { UserTypeOrmEntity } from '../../../users/entities/typeorm/user-sql.schemas';
 
 @Entity()
-export class Like {
+export class LikeTypeormEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'character varying' })
   status: string;
 
-  @Column()
-  userId: string;
+  @OneToOne(() => UserTypeOrmEntity, (u) => u.id)
+  @JoinColumn()
+  user: UserTypeOrmEntity;
 
-  @Column()
-  userLogin: string;
-
-  @Column()
+  @Column({ type: 'uuid' })
   postIdOrCommentId: string;
 
-  @Column()
+  @Column({ type: 'timestamp with time zone' })
   addedAt: Date;
 
-  @Column()
+  @Column({ type: 'boolean' })
   isBanned: boolean;
 }

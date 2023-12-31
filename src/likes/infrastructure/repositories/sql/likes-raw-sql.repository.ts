@@ -30,7 +30,7 @@ export class LikesRawSqlRepository implements ILikesRepository {
   //   );
   //   return newestLikes.length < 1 ? [] : newestLikes;
   // }
-  // async currentStatus(commentId: string, userId?: string): Promise<string> {
+  // async currentStatus(commentId: string, userId?: string): Promise<string>
   //   const myStatus = await this.dataSource.query(
   //     `
   //     SELECT "status"
@@ -91,9 +91,13 @@ export class LikesRawSqlRepository implements ILikesRepository {
   }
 
   async getLikeInfo(
-    userId: string,
     postOrCommentId: string,
+    userId?: string,
   ): Promise<LikeCreateDTO | null> {
+    if (!userId) {
+      return null;
+    }
+
     try {
       const likeInfo = await this.dataSource.query(
         `

@@ -3,44 +3,52 @@ import { Injectable } from '@nestjs/common';
 import { LikesService } from '../../../likes/application/likes.service';
 import { LikeViewDTO } from '../../../likes/dto/like.models';
 
+@Injectable()
 export class PostMapper {
-  constructor(protected likesService: LikesService) {}
+  constructor(private readonly likesService: LikesService) {}
   async mapPosts(
     array: Array<PostCreateDTO>,
     userId?: string,
   ): Promise<PostViewDTO[]> {
-    return Promise.all(
-      array.map(async (el) => {
-        const status = await this.likesService.getLikeStatusCurrentUser(
-          el.id,
-          userId,
-        );
+    try {
+      const posts = await Promise.all(
+        array.map(async (el) => {
+          debugger;
+          const status = await this.likesService.getLikeStatusCurrentUser(
+            el.id,
+            userId,
+          );
 
-        const countsLikeAndDis = await this.likesService.countLikesDisLikes(
-          el.id,
-        );
+          const countsLikeAndDis = await this.likesService.countLikesDisLikes(
+            el.id,
+          );
 
-        const lastLikes: LikeViewDTO[] = await this.likesService.getLastLikes(
-          el.id,
-        );
+          const lastLikes: LikeViewDTO[] = await this.likesService.getLastLikes(
+            el.id,
+          );
 
-        return {
-          id: el.id,
-          title: el.title,
-          shortDescription: el.shortDescription,
-          content: el.content,
-          blogId: el.blogId,
-          blogName: el.blogName,
-          createdAt: el.addedAt.toISOString(),
-          extendedLikesInfo: {
-            likesCount: countsLikeAndDis.likes,
-            dislikesCount: countsLikeAndDis.disLikes,
-            myStatus: status,
-            newestLikes: lastLikes,
-          },
-        };
-      }),
-    );
+          return {
+            id: el.id,
+            title: el.title,
+            shortDescription: el.shortDescription,
+            content: el.content,
+            blogId: el.blogId,
+            blogName: el.blogName,
+            createdAt: el.addedAt.toISOString(),
+            extendedLikesInfo: {
+              likesCount: countsLikeAndDis.likes,
+              dislikesCount: countsLikeAndDis.disLikes,
+              myStatus: status,
+              newestLikes: lastLikes,
+            },
+          };
+        }),
+      );
+      return posts;
+    } catch (e) {
+      console.log(e);
+      throw new Error();
+    }
   }
   async mapPost(post: PostCreateDTO, userId?: string): Promise<PostViewDTO> {
     const status = await this.likesService.getLikeStatusCurrentUser(

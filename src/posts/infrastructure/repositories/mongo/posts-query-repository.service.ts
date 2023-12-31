@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Post,
   PostDocument,
   PostModel,
+  PostMongooseEntity,
 } from '../../../entities/mongoose/post-no-sql.schemas';
 import { PaginatorType } from '../../../../infrastructure/pagination/pagination.models';
 import { PostCreateDTO, PostViewDTO } from '../../../dto/post.models';
@@ -23,7 +23,7 @@ import { IPostQueryRepository } from '../../../../infrastructure/repositoriesMod
 @Injectable()
 export class PostsQueryRepository implements IPostQueryRepository {
   constructor(
-    @InjectModel(Post.name) private postModel: PostModel,
+    @InjectModel(PostMongooseEntity.name) private postModel: PostModel,
     private postMapper: PostMapper,
   ) {}
 

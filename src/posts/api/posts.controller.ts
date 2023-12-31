@@ -21,7 +21,6 @@ import {
 import { PostInputModel, PostViewDTO } from '../dto/post.models';
 import { LikeStatus } from '../../likes/dto/like.models';
 import { JwtBearerGuard } from '../../auth/infrastructure/guards/jwt-bearer-auth.guard';
-import { LikesService } from '../../likes/application/likes.service';
 import { BasicAuthGuard } from '../../auth/infrastructure/guards/basic-auth.guard';
 import { OptionalBearerGuard } from '../../auth/infrastructure/guards/optional-bearer.guard';
 import { CurrentUserIdOptional } from '../../auth/infrastructure/decorators/current-userId-optional.decorator';
@@ -34,13 +33,15 @@ import {
   ICommentQueryRepository,
   IPostQueryRepository,
 } from '../../infrastructure/repositoriesModule/repositories.module';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUpdateLikeCommand } from '../../likes/application/use-cases/create-update-like-use-case';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly postsQueryRepo: IPostQueryRepository,
-    private readonly likesService: LikesService,
+    private commandBus: CommandBus,
     private readonly commentsService: CommentsService,
     private readonly commentsQueryRepo: ICommentQueryRepository,
   ) {}
@@ -92,10 +93,15 @@ export class PostsController {
     if (!post) {
       throw new NotFoundException();
     }
-    const result = await this.likesService.createOrUpdateLike(
-      postId,
-      sessionInfo.userInfo,
-      inputModel.likeStatus,
+
+    const createUpdateLikeDTO = {
+      postOrCommentId: postId,
+      userInfo: sessionInfo.userInfo,
+      statusType: inputModel.likeStatus,
+    };
+
+    const result = await this.commandBus.execute(
+      new CreateUpdateLikeCommand(createUpdateLikeDTO),
     );
     return result;
   }

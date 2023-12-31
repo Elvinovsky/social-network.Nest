@@ -55,6 +55,7 @@ import {
 import { CommentsQueryRawSqlRepository } from '../../comments/infrastructure/repositories/sql/comments-query-raw-sql.repository';
 import { BlogsTypeOrmRepository } from '../../blogs/infrastructure/repositories/typeorm/blogs-typeorm.repository';
 import { BlogsQueryTypeormRepository } from '../../blogs/infrastructure/repositories/typeorm/blogs-query-typeorm.repository';
+import { PostsTypeormRepository } from '../../posts/infrastructure/repositories/typeorm/posts-typeorm.repository';
 
 export abstract class IUserRepository {
   abstract findUser(userId: string): Promise<SAUserViewDTO | null>;
@@ -185,15 +186,6 @@ export abstract class IBlogQueryRepository {
     searchNameTerm?: string,
   ): Promise<PaginatorType<BlogViewDTO[]>>;
 
-  abstract getSortedBlogsForCurrentBlogger(
-    userInfo: UserInfo,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string,
-    searchNameTerm?: string,
-  ): Promise<PaginatorType<BlogViewDTO[]>>;
-
   abstract getSortedPostsBlog(
     blogId: string,
     pageNumber: number,
@@ -220,8 +212,8 @@ export abstract class ILikesRepository {
   abstract getLikes(id: string): Promise<LikeCreateDTO[]>;
 
   abstract getLikeInfo(
-    userId: string,
     postOrCommentId: string,
+    userId?: string,
   ): Promise<LikeCreateDTO | null>;
 
   abstract updateLikeInfo(
@@ -298,6 +290,7 @@ export abstract class ICommentRepository {
 
 export const repoTypeToClassMap = {
   mongo: [
+    { provide: ILikesRepository, useClass: LikesRepository },
     { provide: IClearRepository, useClass: ClearMongoRepository },
     { provide: IBlogRepository, useClass: BlogsRepository },
     { provide: IBlogQueryRepository, useClass: BlogsQueryRepo },
@@ -305,7 +298,6 @@ export const repoTypeToClassMap = {
     { provide: IPostQueryRepository, useClass: PostsQueryRepository },
     { provide: ICommentRepository, useClass: CommentsRepository },
     { provide: ICommentQueryRepository, useClass: CommentsQueryRepo },
-    { provide: ILikesRepository, useClass: LikesRepository },
     { provide: IUserRepository, useClass: UsersMongooseRepository },
     {
       provide: IUserQueryRepository,
@@ -345,7 +337,7 @@ export const repoTypeToClassMap = {
       provide: IBlogQueryRepository,
       useClass: BlogsQueryTypeormRepository,
     },
-    { provide: IPostRepository, useClass: PostsRawSqlRepository },
+    { provide: IPostRepository, useClass: PostsTypeormRepository },
     {
       provide: IPostQueryRepository,
       useClass: PostsRawSqlQueryRepository,

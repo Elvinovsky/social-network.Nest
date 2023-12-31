@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Post,
   PostModel,
+  PostMongooseEntity,
 } from '../../../entities/mongoose/post-no-sql.schemas';
 import {
   BlogPostInputModel,
@@ -16,7 +16,7 @@ import { IPostRepository } from '../../../../infrastructure/repositoriesModule/r
 export class PostsRepository implements IPostRepository {
   constructor(
     protected postMapper: PostMapper,
-    @InjectModel(Post.name) private readonly postModel: PostModel,
+    @InjectModel(PostMongooseEntity.name) private readonly postModel: PostModel,
   ) {}
 
   async findPostById(id: string): Promise<boolean> {

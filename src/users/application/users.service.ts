@@ -3,7 +3,6 @@ import { SAUserViewDTO, UserViewDTO } from '../dto/view/user-view.models';
 import { RegistrationInputModel } from '../../auth/dto/auth-input.models';
 import { ResultsAuthForErrors } from '../../auth/infrastructure/config/auth-exceptions.constants';
 import { DevicesService } from '../../devices/application/devices.service';
-import { LikesService } from '../../likes/application/likes.service';
 import { CommentsService } from '../../comments/application/comments.service';
 import {
   BanUserInputModel,
@@ -11,14 +10,17 @@ import {
 } from '../dto/input/user-input.models';
 import { UserCreateDTO } from '../dto/create/users-create.models';
 import { userCreator } from '../infrastructure/helpers/user.helpers';
-import { IUserRepository } from '../../infrastructure/repositoriesModule/repositories.module';
+import {
+  ILikesRepository,
+  IUserRepository,
+} from '../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: IUserRepository,
     private devicesService: DevicesService,
-    private likesService: LikesService,
+    private likesRepository: ILikesRepository,
     private commentsService: CommentsService,
   ) {}
   async findUser(userId: string): Promise<SAUserViewDTO | null> {
@@ -102,7 +104,6 @@ export class UsersService {
   }
 
   async updateBanStatus(userId: string, inputModel: BanUserInputModel) {
-    debugger;
     const badBoy: SAUserViewDTO | null = await this.usersRepository.findUser(
       userId,
     );
@@ -113,13 +114,15 @@ export class UsersService {
     if (badBoy.banInfo?.isBanned === inputModel.isBanned) {
       return false;
     }
+
     if (inputModel.isBanned === true) {
       await this.commentsService.banComments(userId);
-      await this.likesService.banLikes(userId);
+      await this.likesRepository.banLikes(userId);
       await this.devicesService.LogoutAllDevicesAdminOrder(userId);
       return this.usersRepository.banUser(userId, inputModel);
     }
-    await this.likesService.unBanLikes(userId);
+
+    await this.likesRepository.unBanLikes(userId);
     await this.commentsService.unBanComments(userId);
     return this.usersRepository.unBanUser(userId, inputModel);
   }

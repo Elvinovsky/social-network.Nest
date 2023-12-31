@@ -30,7 +30,7 @@ export const getConfiguration = () => ({
       port: Number(process.env.DATABASE_PORT) || 5433,
       username: String(process.env.DATABASE_USERNAME) || 'postgres',
       password: String(process.env.DATABASE_PASSWORD) || 'sa',
-      database: String(process.env.DATABASE_DB) || 'social-network',
+      database: String(process.env.DATABASE_DB) || 'postgres',
       autoLoadEntities: true,
       synchronize: true,
     } as TypeOrmModuleOptions,

@@ -1,13 +1,11 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { UserInfo } from '../../../users/dto/view/user-view.models';
-import { LikeCreateDTO } from '../../dto/like.models';
 
-export type LikeDocument = HydratedDocument<Like>;
+export type LikeDocument = HydratedDocument<LikeMongooseEntity>;
 
 export type LikeModel = Model<LikeDocument>;
 @Schema()
-export class Like {
+export class LikeMongooseEntity {
   @Prop({ required: true })
   status: string;
   @Prop({ required: true })
@@ -22,4 +20,4 @@ export class Like {
   isBanned: boolean;
 }
 
-export const LikeSchema = SchemaFactory.createForClass(Like);
+export const LikeSchema = SchemaFactory.createForClass(LikeMongooseEntity);

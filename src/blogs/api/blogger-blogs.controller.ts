@@ -64,25 +64,25 @@ export class BloggerBlogsController {
     );
     return result;
   }
-
-  // Получение отсортированных блогов текущего пользователя
-  @Get()
-  @UseGuards(JwtBearerGuard)
-  async getBlogs(
-    @Query() query: QueryInputModel,
-    @Query() queryName: SearchNameTerm,
-    @CurrentSessionInfoFromAccessJWT()
-    sessionInfo: { userInfo: UserInfo; deviceId: string },
-  ) {
-    return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
-      sessionInfo.userInfo,
-      query.pageNumber,
-      query.pageSize,
-      query.sortBy,
-      query.sortDirection,
-      queryName.searchNameTerm,
-    );
-  }
+  //
+  // // Получение отсортированных блогов текущего пользователя
+  // @Get()
+  // @UseGuards(JwtBearerGuard)
+  // async getBlogs(
+  //   @Query() query: QueryInputModel,
+  //   @Query() queryName: SearchNameTerm,
+  //   @CurrentSessionInfoFromAccessJWT()
+  //   sessionInfo: { userInfo: UserInfo; deviceId: string },
+  // ) {
+  //   return this.blogsQueryRepo.getSortedBlogsForCurrentBlogger(
+  //     sessionInfo.userInfo,
+  //     query.pageNumber,
+  //     query.pageSize,
+  //     query.sortBy,
+  //     query.sortDirection,
+  //     queryName.searchNameTerm,
+  //   );
+  // }
 
   // Обновление блога текущего пользователя
   @Put(':blogId')

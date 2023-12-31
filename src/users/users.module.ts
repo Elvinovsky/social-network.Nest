@@ -10,9 +10,8 @@ import { UserRegistrationToAdminUseCase } from './application/use-cases/user-reg
 import { CqrsModule } from '@nestjs/cqrs';
 import { SaUsersController } from './api/sa-users.controller';
 import { DevicesModule } from '../devices/devices.module';
-import { LikesService } from '../likes/application/likes.service';
 import {
-  Like,
+  LikeMongooseEntity,
   LikeSchema,
 } from '../likes/entitties/mongoose/like-no-sql.schemas';
 import {
@@ -21,26 +20,20 @@ import {
 } from '../comments/entities/mongoose/comment-no-sql.schemas';
 import { CommentsService } from '../comments/application/comments.service';
 import { CommentMapper } from '../comments/infrastructure/helpers/comment-mapper';
-import { getConfiguration } from '../infrastructure/configuration/getConfiguration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   BanInfoTypeOrmEntity,
   EmailConfirmTypeOrmEntity,
   UserTypeOrmEntity,
 } from './entities/typeorm/user-sql.schemas';
-import {
-  IUserQueryRepository,
-  repoTypeToClassMapUser,
-} from '../infrastructure/repositoriesModule/repositories.module';
+import { repoTypeToClassMapUser } from '../infrastructure/repositoriesModule/repositories.module';
+import { LikeTypeormEntity } from '../likes/entitties/typeorm/like-sql.schemas';
+import { LikesService } from '../likes/application/likes.service';
+import { LikesRawSqlRepository } from '../likes/infrastructure/repositories/sql/likes-raw-sql.repository';
 
 const useCases = [UserRegistrationToAdminUseCase];
 
-const repositories =
-  getConfiguration().repo_type === 'Mongo'
-    ? repoTypeToClassMapUser.mongo
-    : getConfiguration().repo_type === 'sql'
-    ? repoTypeToClassMapUser.sql
-    : repoTypeToClassMapUser.typeorm;
+const repositories = repoTypeToClassMapUser.typeorm;
 
 @Module({
   imports: [
@@ -48,10 +41,11 @@ const repositories =
       UserTypeOrmEntity,
       EmailConfirmTypeOrmEntity,
       BanInfoTypeOrmEntity,
+      LikeTypeormEntity,
     ]),
     MongooseModule.forFeature([
       { name: UserMongooseEntity.name, schema: UserSchema },
-      { name: Like.name, schema: LikeSchema },
+      { name: LikeMongooseEntity.name, schema: LikeSchema },
       { name: Comment.name, schema: CommentSchema },
     ]),
     forwardRef(() => DevicesModule),
@@ -61,13 +55,12 @@ const repositories =
   providers: [
     ...useCases,
     ...repositories,
-    LikesService,
-
+    LikesRawSqlRepository,
     CommentsService,
-    CommentMapper,
-
     UsersService,
+    CommentMapper,
+    LikesService,
   ],
-  exports: [UsersService, IUserQueryRepository],
+  exports: [UsersService, ...repositories],
 })
 export class UsersModule {}

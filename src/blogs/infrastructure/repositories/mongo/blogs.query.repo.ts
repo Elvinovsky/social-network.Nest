@@ -24,18 +24,17 @@ import {
 } from '../../helpers/blog.helpers';
 import { PostCreateDTO, PostViewDTO } from '../../../../posts/dto/post.models';
 import {
-  Post,
   PostModel,
+  PostMongooseEntity,
 } from '../../../../posts/entities/mongoose/post-no-sql.schemas';
 import { PostMapper } from '../../../../posts/infrastructure/helpers/post-mapper';
-import { UserInfo } from '../../../../users/dto/view/user-view.models';
 import { IBlogQueryRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class BlogsQueryRepo implements IBlogQueryRepository {
   constructor(
     @InjectModel(BlogMongooseEntity.name) private readonly blogModel: BlogModel,
-    @InjectModel(Post.name) private readonly postModel: PostModel,
+    @InjectModel(PostMongooseEntity.name) private readonly postModel: PostModel,
     protected postMapper: PostMapper,
   ) {}
 
@@ -94,49 +93,49 @@ export class BlogsQueryRepo implements IBlogQueryRepository {
       throw new Error();
     }
   }
-  async getSortedBlogsForCurrentBlogger(
-    userInfo: UserInfo,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string,
-    searchNameTerm?: string,
-  ): Promise<PaginatorType<BlogViewDTO[]>> {
-    const filter: mongoose.FilterQuery<BlogDocument> = {
-      'blogOwnerInfo.userId': userInfo.userId,
-    };
-    try {
-      if (searchNameTerm) {
-        filter.name = {
-          $regex: searchNameTerm,
-          $options: 'i',
-        };
-      }
-
-      const calculateOfFiles = await this.blogModel.countDocuments(filter);
-      const foundBlogs: BlogDocument[] = await this.blogModel
-        .find(filter)
-        .sort({
-          [getSortBy(sortBy)]: getDirection(sortDirection),
-          [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
-        })
-        .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
-        .limit(getPageSize(pageSize))
-        .lean()
-        .exec();
-
-      return {
-        pagesCount: pagesCounter(calculateOfFiles, pageSize),
-        page: getPageNumber(pageNumber),
-        pageSize: getPageSize(pageSize),
-        totalCount: calculateOfFiles,
-        items: blogsMapping(foundBlogs),
-      };
-    } catch (e) {
-      console.log(e, 'getSortedBlogs method error');
-      throw new Error();
-    }
-  }
+  // async getSortedBlogsForCurrentBlogger(
+  //   userInfo: UserInfo,
+  //   pageNumber: number,
+  //   pageSize: number,
+  //   sortBy: string,
+  //   sortDirection: string,
+  //   searchNameTerm?: string,
+  // ): Promise<PaginatorType<BlogViewDTO[]>> {
+  //   const filter: mongoose.FilterQuery<BlogDocument> = {
+  //     'blogOwnerInfo.userId': userInfo.userId,
+  //   };
+  //   try {
+  //     if (searchNameTerm) {
+  //       filter.name = {
+  //         $regex: searchNameTerm,
+  //         $options: 'i',
+  //       };
+  //     }
+  //
+  //     const calculateOfFiles = await this.blogModel.countDocuments(filter);
+  //     const foundBlogs: BlogDocument[] = await this.blogModel
+  //       .find(filter)
+  //       .sort({
+  //         [getSortBy(sortBy)]: getDirection(sortDirection),
+  //         [DEFAULT_PAGE_SortBy]: getDirection(sortDirection),
+  //       })
+  //       .skip(getSkip(getPageNumber(pageNumber), getPageSize(pageSize)))
+  //       .limit(getPageSize(pageSize))
+  //       .lean()
+  //       .exec();
+  //
+  //     return {
+  //       pagesCount: pagesCounter(calculateOfFiles, pageSize),
+  //       page: getPageNumber(pageNumber),
+  //       pageSize: getPageSize(pageSize),
+  //       totalCount: calculateOfFiles,
+  //       items: blogsMapping(foundBlogs),
+  //     };
+  //   } catch (e) {
+  //     console.log(e, 'getSortedBlogs method error');
+  //     throw new Error();
+  //   }
+  // }
   async getSortedPostsBlog(
     blogId: string,
     pageNumber: number,

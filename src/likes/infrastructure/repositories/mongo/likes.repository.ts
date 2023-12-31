@@ -2,22 +2,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { LikeCreateDTO } from '../../../dto/like.models';
 import {
-  Like,
   LikeModel,
+  LikeMongooseEntity,
 } from '../../../entitties/mongoose/like-no-sql.schemas';
 import { Status } from '../../../../infrastructure/common/constants';
 import { ILikesRepository } from '../../../../infrastructure/repositoriesModule/repositories.module';
 
 @Injectable()
 export class LikesRepository implements ILikesRepository {
-  constructor(@InjectModel(Like.name) private likeModel: LikeModel) {}
+  constructor(
+    @InjectModel(LikeMongooseEntity.name) private readonly likeModel: LikeModel,
+  ) {}
   async countLikes(id: string): Promise<number> {
     const likes = await this.likeModel.countDocuments({
       postIdOrCommentId: id,
       status: Status.Like,
       isBanned: { $ne: true },
     });
-    return likes;
+    return likes ? likes : 0;
   }
   async countDisLikes(id: string): Promise<number> {
     const disLikes = await this.likeModel.countDocuments({
@@ -25,7 +27,7 @@ export class LikesRepository implements ILikesRepository {
       status: Status.Dislike,
       isBanned: { $ne: true },
     });
-    return disLikes;
+    return disLikes ? disLikes : 0;
   }
   async getLikes(id: string): Promise<LikeCreateDTO[]> {
     return this.likeModel.find({
@@ -35,9 +37,13 @@ export class LikesRepository implements ILikesRepository {
     });
   }
   async getLikeInfo(
-    userId: string,
     postOrCommentId: string,
+    userId?: string,
   ): Promise<LikeCreateDTO | null> {
+    if (!userId) {
+      return null;
+    }
+
     const likeInfo: LikeCreateDTO | null = await this.likeModel
       .findOne({
         userId: userId,

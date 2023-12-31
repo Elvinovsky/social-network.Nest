@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PostMapper } from '../../helpers/post-mapper';
@@ -11,33 +11,38 @@ import { IPostRepository } from '../../../../infrastructure/repositoriesModule/r
 
 @Injectable()
 export class PostsRawSqlRepository implements IPostRepository {
+  private readonly logger = new Logger(PostsRawSqlRepository.name);
+
   constructor(
     protected postMapper: PostMapper,
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
   async findPostById(postId: string): Promise<boolean> {
-    return this.dataSource
-      .query(
+    try {
+      const result = await this.dataSource.query(
         `
-    SELECT "title", "blogId"
-    FROM "features"."posts" 
-    WHERE "id" = $1
-    `,
+          SELECT "title", "blogId"
+          FROM "features"."posts" 
+          WHERE "id" = $1
+        `,
         [postId],
-      )
-      .then((result) => result.length === 1)
-      .catch((error) => Promise.reject(error));
+      );
+      return result.length === 1;
+    } catch (error) {
+      this.logger.error(`Error in findPostById: ${error.message}`);
+      throw error;
+    }
   }
 
   async createPost(inputModel: PostCreateDTO): Promise<PostViewDTO> {
-    await this.dataSource
-      .query(
+    try {
+      await this.dataSource.query(
         `
-    INSERT INTO "features"."posts"(
-    "id", "title", "shortDescription", "content", "blogId", "blogName", "addedAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
-    `,
+          INSERT INTO "features"."posts"(
+            "id", "title", "shortDescription", "content", "blogId", "blogName", "addedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7);
+        `,
         [
           inputModel.id,
           inputModel.title,
@@ -47,11 +52,12 @@ export class PostsRawSqlRepository implements IPostRepository {
           inputModel.blogName,
           inputModel.addedAt,
         ],
-      )
-      .then((inputModel) => this.postMapper.mapPost(inputModel))
-      .catch(() => Promise.reject(new Error()));
-
-    return this.postMapper.mapPost(inputModel);
+      );
+      return this.postMapper.mapPost(inputModel);
+    } catch (error) {
+      this.logger.error(`Error in createPost: ${error.message}`);
+      throw error;
+    }
   }
 
   async updatePostById(
@@ -59,13 +65,13 @@ export class PostsRawSqlRepository implements IPostRepository {
     blogId: string,
     inputModel: BlogPostInputModel,
   ): Promise<boolean> {
-    return this.dataSource
-      .query(
+    try {
+      const result = await this.dataSource.query(
         `
-      UPDATE "features"."posts"
-      SET  "title" = $3, "shortDescription" = $4, "content"=$5
-      WHERE "id" = $1 and "blogId" = $2;
-      `,
+          UPDATE "features"."posts"
+          SET  "title" = $3, "shortDescription" = $4, "content"=$5
+          WHERE "id" = $1 and "blogId" = $2;
+        `,
         [
           postId,
           blogId,
@@ -73,21 +79,27 @@ export class PostsRawSqlRepository implements IPostRepository {
           inputModel.shortDescription,
           inputModel.content,
         ],
-      )
-      .then((result) => result[1] === 1)
-      .catch((error) => error);
+      );
+      return result[1] === 1;
+    } catch (error) {
+      this.logger.error(`Error in updatePostById: ${error.message}`);
+      throw error;
+    }
   }
 
   async deletePost(postId: string): Promise<boolean> {
-    return this.dataSource
-      .query(
+    try {
+      const result = await this.dataSource.query(
         `
-      DELETE FROM features.posts
-      WHERE "id" = $1;
-      `,
+          DELETE FROM features.posts
+          WHERE "id" = $1;
+        `,
         [postId],
-      )
-      .then((result) => result[1] === 1)
-      .catch((error) => error);
+      );
+      return result[1] === 1;
+    } catch (error) {
+      this.logger.error(`Error in deletePost: ${error.message}`);
+      throw error;
+    }
   }
 }
